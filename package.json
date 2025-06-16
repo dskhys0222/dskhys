@@ -1,5 +1,6 @@
 {
   "name": "dskhys",
+  "private": true,
   "workspaces": [
     "apps/server/api",
     "apps/client/memo",
