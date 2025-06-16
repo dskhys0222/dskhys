@@ -1,0 +1,8 @@
+{
+  "name": "dskhys",
+  "workspaces": [
+    "apps/server/api",
+    "apps/client/memo",
+    "libs/util"
+  ]
+}
