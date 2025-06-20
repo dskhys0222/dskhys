@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { ResultAsync } from 'neverthrow';
 import type { ApiError } from '../middleware/errorHandler.js';
 
 // カスタムエラークラス
@@ -29,11 +30,26 @@ export class UnauthorizedError extends Error implements ApiError {
   }
 }
 
-// 非同期エラーハンドリング用のラッパー
+// 非同期エラーハンドリング用のラッパー - neverthrowのResultAsyncを使用
 export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+  fn: (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => Promise<unknown> | ResultAsync<unknown, Error>
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+    const result = fn(req, res, next);
+
+    if (result instanceof ResultAsync) {
+      result
+        .match(
+          () => {}, // 成功時は何もしない（既にレスポンスが送信されている）
+          (error) => next(error) // エラーの場合はnextに渡す
+        )
+        .catch(next); // 予期せぬエラーの場合
+    } else {
+      Promise.resolve(result).catch(next);
+    }
   };
 };

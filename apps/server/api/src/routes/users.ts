@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { err, ok, Result } from 'neverthrow';
 import {
   asyncHandler,
   NotFoundError,
@@ -12,22 +13,33 @@ userRoutes.get(
   '/:id',
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    // バリデーション例
-    if (!id || Number.isNaN(Number(id))) {
-      throw new ValidationError('Invalid user ID');
-    }
 
-    // データベース検索の模擬
-    const userId = Number(id);
-    if (userId > 100) {
-      throw new NotFoundError('User');
-    }
+    // 検証関数を作成
+    const validateId = (idParam: string): Result<number, Error> => {
+      if (!idParam || Number.isNaN(Number(idParam))) {
+        return err(new ValidationError('Invalid user ID'));
+      }
+      const numId = Number(idParam);
 
-    // 正常レスポンス
-    res.json({
-      id: userId,
-      name: `User ${userId}`,
-      email: `user${userId}@example.com`,
+      if (numId > 100) {
+        return err(new NotFoundError('User'));
+      }
+
+      return ok(numId);
+    };
+
+    // IDを検証して処理を続行
+    return validateId(id).map((userId) => {
+      // 正常レスポンスの生成
+      const user = {
+        id: userId,
+        name: `User ${userId}`,
+        email: `user${userId}@example.com`,
+      };
+
+      // レスポンスを送信
+      res.json(user);
+      return user;
     });
   })
 );
@@ -38,22 +50,42 @@ userRoutes.post(
   asyncHandler(async (req, res) => {
     const { name, email } = req.body;
 
-    if (!name || !email) {
-      throw new ValidationError('Name and email are required');
-    }
+    // 名前のバリデーション
+    const nameResult = name
+      ? ok(name)
+      : err(new ValidationError('Name is required'));
 
-    if (!email.includes('@')) {
-      throw new ValidationError('Invalid email format');
-    }
+    // メールのバリデーションを実行する関数
+    const validateEmail = (email: string): Result<string, Error> => {
+      if (!email) {
+        return err(new ValidationError('Email is required'));
+      }
 
-    // 作成処理の模擬
-    const newUser = {
-      id: Math.floor(Math.random() * 1000),
-      name,
-      email,
-      created_at: new Date().toISOString(),
+      if (!email.includes('@')) {
+        return err(new ValidationError('Invalid email format'));
+      }
+
+      return ok(email);
     };
 
-    res.status(201).json(newUser);
+    // メールのバリデーション実行
+    const emailResult = validateEmail(email);
+
+    // 両方のバリデーション結果を合成
+    const combinedResult = Result.combine([nameResult, emailResult]);
+
+    return combinedResult.map(([validName, validEmail]) => {
+      // すべてのバリデーションを通過したら、ユーザー作成
+      const newUser = {
+        id: Math.floor(Math.random() * 1000),
+        name: validName,
+        email: validEmail,
+        created_at: new Date().toISOString(),
+      };
+
+      // 成功レスポンスを送信
+      res.status(201).json(newUser);
+      return newUser;
+    });
   })
 );
