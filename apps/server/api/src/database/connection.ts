@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ResultAsync } from 'neverthrow';
 import sqlite3 from 'sqlite3';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,8 +22,7 @@ export const db = new sqlite.Database(dbPath, (err) => {
 
 // データベースの初期化
 const initializeDatabase = (): void => {
-  // ユーザーテーブルの作成例
-  db.run(`
+  runQuery(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -30,22 +30,83 @@ const initializeDatabase = (): void => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
-
-  // その他のテーブルもここで作成
-  console.log('データベースの初期化が完了しました');
+  `).match(
+    () => console.log('データベースの初期化が完了しました'),
+    (error: Error) => console.error('データベース初期化エラー:', error.message)
+  );
 };
 
+// クエリを実行するヘルパー
+export function runQuery<T = void>(
+  sql: string,
+  params: unknown[] = []
+): ResultAsync<T, Error> {
+  return ResultAsync.fromPromise(
+    new Promise<T>((resolve, reject) => {
+      db.run(sql, params, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          // SQLiteの場合はthisにlastID等が含まれる
+          resolve(this as unknown as T);
+        }
+      });
+    }),
+    (error) => (error instanceof Error ? error : new Error(String(error)))
+  );
+}
+
+// データを取得するヘルパー
+export function getOne<T>(
+  sql: string,
+  params: unknown[] = []
+): ResultAsync<T | null, Error> {
+  return ResultAsync.fromPromise(
+    new Promise<T | null>((resolve, reject) => {
+      db.get(sql, params, (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row as T | null);
+        }
+      });
+    }),
+    (error) => (error instanceof Error ? error : new Error(String(error)))
+  );
+}
+
+// 複数データを取得するヘルパー
+export function getMany<T>(
+  sql: string,
+  params: unknown[] = []
+): ResultAsync<T[], Error> {
+  return ResultAsync.fromPromise(
+    new Promise<T[]>((resolve, reject) => {
+      db.all(sql, params, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows as T[]);
+        }
+      });
+    }),
+    (error) => (error instanceof Error ? error : new Error(String(error)))
+  );
+}
+
 // データベース接続を閉じる関数
-export const closeDatabase = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    db.close((err) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.log('データベース接続を閉じました');
-        resolve();
-      }
-    });
-  });
+export const closeDatabase = (): ResultAsync<void, Error> => {
+  return ResultAsync.fromPromise(
+    new Promise<void>((resolve, reject) => {
+      db.close((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log('データベース接続を閉じました');
+          resolve();
+        }
+      });
+    }),
+    (error) => (error instanceof Error ? error : new Error(String(error)))
+  );
 };
