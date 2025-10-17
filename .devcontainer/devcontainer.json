@@ -63,5 +63,9 @@
 
   "mounts": [
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/node/.ssh,readonly,type=bind,consistency=cached"
-  ]
+  ],
+
+  "containerEnv": {
+    "TZ": "Asia/Tokyo"
+  }
 }
