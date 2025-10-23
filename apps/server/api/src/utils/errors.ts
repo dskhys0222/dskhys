@@ -30,6 +30,15 @@ export class UnauthorizedError extends Error implements ApiError {
   }
 }
 
+export class ConflictError extends Error implements ApiError {
+  statusCode = 409;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'ConflictError';
+  }
+}
+
 // 非同期エラーハンドリング用のラッパー - neverthrowのResultAsyncを使用
 export const asyncHandler = (
   fn: (

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authRoutes } from './auth.js';
 import { userRoutes } from './users.js';
 
 export const router = Router();
@@ -11,6 +12,9 @@ router.get('/', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// 認証ルート
+router.use('/auth', authRoutes);
 
 // ユーザールート
 router.use('/users', userRoutes);
