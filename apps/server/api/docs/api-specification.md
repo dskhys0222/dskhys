@@ -4,10 +4,187 @@
 
 - **ベースURL**: `http://localhost:3000`
 - **API版数**: v0.0.1
-- **認証**: なし（将来実装予定）
+- **認証**: JWT (JSON Web Token)
 - **データ形式**: JSON
 
 ## 🔗 エンドポイント一覧
+
+### 認証関連
+
+#### ユーザー登録
+
+```txt
+POST /api/auth/register
+```
+
+**リクエストボディ:**
+
+```json
+{
+  "name": "テストユーザー",
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "テストユーザー",
+    "email": "user@example.com"
+  }
+}
+```
+
+**エラー例:**
+
+```json
+// 409 Conflict (メールアドレス重複)
+{
+  "error": {
+    "message": "Email already exists"
+  }
+}
+
+// 400 Bad Request (バリデーションエラー)
+{
+  "error": {
+    "message": "Password must be at least 8 characters"
+  }
+}
+```
+
+#### ログイン
+
+```txt
+POST /api/auth/login
+```
+
+**リクエストボディ:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "テストユーザー",
+    "email": "user@example.com"
+  }
+}
+```
+
+**エラー例:**
+
+```json
+// 401 Unauthorized (認証失敗)
+{
+  "error": {
+    "message": "Invalid credentials"
+  }
+}
+```
+
+#### ログアウト
+
+```txt
+POST /api/auth/logout
+```
+
+**認証**: 必要 (Bearer Token)
+
+**ヘッダー:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**リクエストボディ:**
+
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### トークンリフレッシュ
+
+```txt
+POST /api/auth/refresh
+```
+
+**リクエストボディ:**
+
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**エラー例:**
+
+```json
+// 401 Unauthorized (無効なトークン)
+{
+  "error": {
+    "message": "Invalid refresh token"
+  }
+}
+```
+
+#### 現在のユーザー情報取得
+
+```txt
+GET /api/auth/me
+```
+
+**認証**: 必要 (Bearer Token)
+
+**ヘッダー:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "id": 1,
+  "name": "テストユーザー",
+  "email": "user@example.com",
+  "created_at": "2025-10-23T12:00:00.000Z"
+}
+```
 
 ### システム関連
 
@@ -215,11 +392,22 @@ const createUser = async (userData) => {
 
 ## 🔮 今後の実装予定
 
-### 認証機能
+### 認証機能の拡張
 
-- JWT認証
-- ログイン/ログアウト
-- パスワードリセット
+- パスワードリセット機能
+- メール認証
+- ソーシャルログイン (Google, GitHub)
+- 二段階認証 (2FA)
+
+### レート制限
+
+認証エンドポイントへのレート制限を実装し、ブルートフォース攻撃を防ぐ：
+
+```txt
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 99
+X-RateLimit-Reset: 1640995200
+```
 
 ### ページネーション
 
@@ -239,12 +427,4 @@ const createUser = async (userData) => {
 
 ```txt
 GET /api/users?page=1&limit=10&sort=created_at&order=desc&name=john
-```
-
-### レート制限
-
-```txt
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 99
-X-RateLimit-Reset: 1640995200
 ```
