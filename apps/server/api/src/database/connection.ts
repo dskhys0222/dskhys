@@ -22,17 +22,36 @@ export const db = new sqlite.Database(dbPath, (err) => {
 
 // データベースの初期化
 const initializeDatabase = (): void => {
+  // ユーザーテーブル
   runQuery(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `).match(
-    () => console.log('データベースの初期化が完了しました'),
-    (error: Error) => console.error('データベース初期化エラー:', error.message)
+    () => {
+      console.log('usersテーブルの初期化が完了しました');
+      // リフレッシュトークンテーブル
+      runQuery(`
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          token TEXT UNIQUE NOT NULL,
+          expires_at DATETIME NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        )
+      `).match(
+        () => console.log('データベースの初期化が完了しました'),
+        (error: Error) =>
+          console.error('refresh_tokensテーブル初期化エラー:', error.message)
+      );
+    },
+    (error: Error) => console.error('usersテーブル初期化エラー:', error.message)
   );
 };
 
