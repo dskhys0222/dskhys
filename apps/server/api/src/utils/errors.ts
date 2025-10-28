@@ -39,13 +39,22 @@ export class ConflictError extends Error implements ApiError {
   }
 }
 
+export class InternalServerError extends Error implements ApiError {
+  statusCode = 500;
+
+  constructor(message = 'Internal Server Error') {
+    super(message);
+    this.name = 'InternalServerError';
+  }
+}
+
 // 非同期エラーハンドリング用のラッパー - neverthrowのResultAsyncを使用
-export const asyncHandler = (
+export const asyncHandler = <T>(
   fn: (
     req: Request,
     res: Response,
     next: NextFunction
-  ) => Promise<unknown> | ResultAsync<unknown, Error>
+  ) => Promise<T> | ResultAsync<T, ApiError>
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = fn(req, res, next);
