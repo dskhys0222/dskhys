@@ -1,11 +1,13 @@
 import { Router } from 'express';
+import { err, ok } from 'neverthrow';
 import { getOne, runQuery } from '../database/connection.js';
 import { authenticate } from '../middleware/authenticate.js';
+import { insertRefreshToken } from '../repository/refreshTokensRepository.js';
+import { findUserByEmail, insertUser } from '../repository/usersRepository.js';
 import type {
   LoginInput,
   LogoutInput,
   RefreshTokenInput,
-  RegisterInput,
   User,
 } from '../schemas/index.js';
 import {
@@ -26,6 +28,7 @@ import {
   verifyRefreshToken,
 } from '../utils/jwt.js';
 import { hashPassword, verifyPassword } from '../utils/password.js';
+import { parseSchema } from '../utils/validation.js';
 
 export const authRoutes = Router();
 
@@ -47,68 +50,35 @@ interface RefreshTokenRow {
 authRoutes.post(
   '/register',
   asyncHandler(async (req, res) => {
-    const parseResult = RegisterSchema.safeParse(req.body);
-
-    if (!parseResult.success) {
-      throw new ValidationError(parseResult.error.errors[0].message);
-    }
-
-    const { name, email, password }: RegisterInput = parseResult.data;
-
-    // メールアドレスの重複チェック
-    const existingUserResult = await getOne<DbUser>(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-
-    return existingUserResult.asyncAndThen(async (existingUser) => {
-      if (existingUser) {
-        throw new ConflictError('Email already exists');
-      }
-
-      // パスワードをハッシュ化
-      const passwordHashResult = await hashPassword(password);
-
-      return passwordHashResult.asyncAndThen(async (passwordHash) => {
-        // ユーザーを作成
-        const insertResult = await runQuery<{ lastID: number }>(
-          'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
-          [name, email, passwordHash]
-        );
-
-        return insertResult.asyncAndThen(async (result) => {
-          const userId = result.lastID;
-
-          // トークンを生成
-          const accessToken = generateAccessToken({ userId, email });
-          const refreshToken = generateRefreshToken({ userId, email });
-
-          // リフレッシュトークンをデータベースに保存
-          const expiresAt = new Date();
-          expiresAt.setDate(expiresAt.getDate() + 30); // 30日後
-
-          await runQuery(
-            'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
-            [userId, refreshToken, expiresAt.toISOString()]
-          );
-
-          // パスワードハッシュを含めないユーザー情報
-          const user = {
-            id: userId,
-            name,
-            email,
-          };
-
+    return await parseSchema(RegisterSchema, req.body).asyncAndThen((input) =>
+      findUserByEmail(input.email)
+        .andThen((user) =>
+          user == null ? ok() : err(new ConflictError('Email already exists'))
+        )
+        .andThen(() =>
+          hashPassword(input.password).andThen((passwordHash) =>
+            insertUser(input.name, input.email, passwordHash)
+          )
+        )
+        .map(({ lastID: userId }) => ({
+          userId,
+          accessToken: generateAccessToken({ userId, email: input.email }),
+          refreshToken: generateRefreshToken({ userId, email: input.email }),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30日後
+        }))
+        .andThen(({ userId, accessToken, refreshToken, expiresAt }) =>
+          insertRefreshToken(userId, refreshToken, expiresAt).map(() => ({
+            accessToken,
+            refreshToken,
+          }))
+        )
+        .map(({ accessToken, refreshToken }) =>
           res.status(201).json({
             accessToken,
             refreshToken,
-            user,
-          });
-
-          return { user, accessToken, refreshToken };
-        });
-      });
-    });
+          })
+        )
+    );
   })
 );
 
