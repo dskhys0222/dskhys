@@ -9,6 +9,10 @@ export const findUserByEmail = (email: string) => {
   return getOne<DbUser>('SELECT * FROM users WHERE email = ?', [email]);
 };
 
+export const findUserById = (userId: number) => {
+  return getOne<DbUser>('SELECT * FROM users WHERE id = ?', [userId]);
+};
+
 export const insertUser = (
   name: string,
   email: string,
