@@ -11,7 +11,7 @@ export const userRoutes = Router();
 // GET /api/users/:id - ユーザー取得の例
 userRoutes.get(
   '/:id',
-  asyncHandler(async (req, res) => {
+  asyncHandler((req, res) => {
     const { id } = req.params;
 
     // 検証関数を作成
@@ -47,7 +47,7 @@ userRoutes.get(
 // POST /api/users - ユーザー作成の例
 userRoutes.post(
   '/',
-  asyncHandler(async (req, res) => {
+  asyncHandler((req, res) => {
     const { name, email } = req.body;
 
     // 名前のバリデーション

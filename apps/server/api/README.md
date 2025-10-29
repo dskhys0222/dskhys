@@ -8,6 +8,7 @@ dskhysプロジェクトのAPIサーバーです。
 - **Language**: TypeScript
 - **Framework**: Express
 - **Database**: SQLite3
+- **Authentication**: JWT (JSON Web Token) + bcrypt
 - **Validation**: Zod
 - **Testing**: Vitest + Supertest
 - **Linting**: Biome
@@ -49,9 +50,19 @@ npm run dev
 
 - `GET /health` - サーバーの稼働状況を確認
 
+### 認証
+
+- `POST /api/auth/register` - ユーザー登録
+- `POST /api/auth/login` - ログイン
+- `POST /api/auth/logout` - ログアウト（要認証）
+- `POST /api/auth/refresh` - トークンリフレッシュ
+- `GET /api/auth/me` - 現在のユーザー情報取得（要認証）
+
 ### API
 
 - `GET /api/` - API情報を取得
+
+詳細は [API仕様書](docs/api-specification.md) を参照してください。
 
 ## ディレクトリ構成
 
@@ -61,12 +72,20 @@ src/
 ├── database/
 │   └── connection.ts     # データベース接続設定
 ├── middleware/
-│   └── errorHandler.ts   # エラーハンドリングミドルウェア
+│   ├── errorHandler.ts   # エラーハンドリングミドルウェア
+│   └── authenticate.ts   # 認証ミドルウェア
 ├── routes/
 │   ├── index.ts          # メインルーター
-│   └── index.test.ts     # ルートのテスト
-└── schemas/
-    └── index.ts          # Zodスキーマ定義
+│   ├── index.test.ts     # ルートのテスト
+│   ├── auth.ts           # 認証ルート
+│   ├── auth.test.ts      # 認証ルートのテスト
+│   └── users.ts          # ユーザールート
+├── schemas/
+│   └── index.ts          # Zodスキーマ定義
+└── utils/
+    ├── errors.ts         # カスタムエラークラス
+    ├── jwt.ts            # JWTトークン処理
+    └── password.ts       # パスワードハッシュ化
 ```
 
 ## データベース
@@ -78,3 +97,5 @@ SQLite3を使用しています。データベースファイルは `data/databa
 - [開発ガイド](docs/development-guide.md) - 開発フローと基本的な使い方
 - [API仕様書](docs/api-specification.md) - エンドポイントの詳細仕様
 - [エラーハンドリング](docs/error-handling.md) - エラーハンドリングシステムの詳細
+- [セキュリティサマリー](docs/security-summary.md) - セキュリティ対策と推奨事項
+- [認証フロー](../../docs/認証フロー.md) - 認証システムの詳細フロー

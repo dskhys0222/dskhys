@@ -1,49 +1,53 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ResultAsync } from 'neverthrow';
-import sqlite3 from 'sqlite3';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dbPath = path.join(__dirname, '../../data/database.sqlite');
-
-// SQLite3をverboseモードで初期化
-const sqlite = sqlite3.verbose();
-
-export const db = new sqlite.Database(dbPath, (err) => {
-  if (err) {
-    console.error('データベース接続エラー:', err.message);
-  } else {
-    console.log('SQLiteデータベースに接続しました');
-    initializeDatabase();
-  }
-});
+import { InternalServerError } from '../utils/errors';
+import { getDatabase } from './db-instance';
 
 // データベースの初期化
 const initializeDatabase = (): void => {
+  // ユーザーテーブル
   runQuery(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `).match(
-    () => console.log('データベースの初期化が完了しました'),
-    (error: Error) => console.error('データベース初期化エラー:', error.message)
+    () => {
+      console.log('usersテーブルの初期化が完了しました');
+      // リフレッシュトークンテーブル
+      runQuery(`
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          token TEXT UNIQUE NOT NULL,
+          expires_at DATETIME NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        )
+      `).match(
+        () => console.log('データベースの初期化が完了しました'),
+        (error: Error) =>
+          console.error('refresh_tokensテーブル初期化エラー:', error.message)
+      );
+    },
+    (error: Error) => console.error('usersテーブル初期化エラー:', error.message)
   );
 };
+
+// 初期化を実行
+initializeDatabase();
 
 // クエリを実行するヘルパー
 export function runQuery<T = void>(
   sql: string,
   params: unknown[] = []
-): ResultAsync<T, Error> {
+): ResultAsync<T, InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T>((resolve, reject) => {
-      db.run(sql, params, function (err) {
+      getDatabase().run(sql, params, function (err) {
         if (err) {
           reject(err);
         } else {
@@ -52,7 +56,10 @@ export function runQuery<T = void>(
         }
       });
     }),
-    (error) => (error instanceof Error ? error : new Error(String(error)))
+    (error) =>
+      new InternalServerError(
+        error instanceof Error ? error.message : String(error)
+      )
   );
 }
 
@@ -60,10 +67,10 @@ export function runQuery<T = void>(
 export function getOne<T>(
   sql: string,
   params: unknown[] = []
-): ResultAsync<T | null, Error> {
+): ResultAsync<T | null, InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T | null>((resolve, reject) => {
-      db.get(sql, params, (err, row) => {
+      getDatabase().get(sql, params, (err, row) => {
         if (err) {
           reject(err);
         } else {
@@ -71,7 +78,10 @@ export function getOne<T>(
         }
       });
     }),
-    (error) => (error instanceof Error ? error : new Error(String(error)))
+    (error) =>
+      new InternalServerError(
+        error instanceof Error ? error.message : String(error)
+      )
   );
 }
 
@@ -79,10 +89,10 @@ export function getOne<T>(
 export function getMany<T>(
   sql: string,
   params: unknown[] = []
-): ResultAsync<T[], Error> {
+): ResultAsync<T[], InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T[]>((resolve, reject) => {
-      db.all(sql, params, (err, rows) => {
+      getDatabase().all(sql, params, (err, rows) => {
         if (err) {
           reject(err);
         } else {
@@ -90,15 +100,18 @@ export function getMany<T>(
         }
       });
     }),
-    (error) => (error instanceof Error ? error : new Error(String(error)))
+    (error) =>
+      new InternalServerError(
+        error instanceof Error ? error.message : String(error)
+      )
   );
 }
 
 // データベース接続を閉じる関数
-export const closeDatabase = (): ResultAsync<void, Error> => {
+export const closeDatabase = (): ResultAsync<void, InternalServerError> => {
   return ResultAsync.fromPromise(
     new Promise<void>((resolve, reject) => {
-      db.close((err) => {
+      getDatabase().close((err) => {
         if (err) {
           reject(err);
         } else {
@@ -107,6 +120,9 @@ export const closeDatabase = (): ResultAsync<void, Error> => {
         }
       });
     }),
-    (error) => (error instanceof Error ? error : new Error(String(error)))
+    (error) =>
+      new InternalServerError(
+        error instanceof Error ? error.message : String(error)
+      )
   );
 };

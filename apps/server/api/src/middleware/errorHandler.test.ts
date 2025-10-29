@@ -20,6 +20,12 @@ app.get('/test-generic-error', (_req, _res, next) => {
   next(new Error('Generic error'));
 });
 
+app.get('/test-no-message-error', (_req, _res, next) => {
+  const error = new Error();
+  error.message = '';
+  next(error);
+});
+
 // エラーハンドラーを追加
 app.use(errorHandler);
 
@@ -69,5 +75,17 @@ describe('Error Handler', () => {
 
     // 環境変数を元に戻す
     process.env.NODE_ENV = originalEnv;
+  });
+
+  it('should use default message when error message is empty', async () => {
+    const response = await request(app)
+      .get('/test-no-message-error')
+      .expect(500);
+
+    expect(response.body).toMatchObject({
+      error: {
+        message: 'Internal Server Error',
+      },
+    });
   });
 });
