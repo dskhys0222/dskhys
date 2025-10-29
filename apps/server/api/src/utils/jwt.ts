@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { err, ok, type Result } from 'neverthrow';
+import { UnauthorizedError } from './errors';
 
 const JWT_ACCESS_SECRET =
   process.env.JWT_ACCESS_SECRET || 'default-access-secret';
@@ -41,14 +42,12 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
  */
 export const verifyAccessToken = (
   token: string
-): Result<DecodedToken, Error> => {
+): Result<DecodedToken, UnauthorizedError> => {
   try {
     const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as DecodedToken;
     return ok(decoded);
-  } catch (error) {
-    return err(
-      error instanceof Error ? error : new Error('Token verification failed')
-    );
+  } catch (_) {
+    return err(new UnauthorizedError('Token verification failed'));
   }
 };
 
@@ -57,13 +56,11 @@ export const verifyAccessToken = (
  */
 export const verifyRefreshToken = (
   token: string
-): Result<DecodedToken, Error> => {
+): Result<DecodedToken, UnauthorizedError> => {
   try {
     const decoded = jwt.verify(token, JWT_REFRESH_SECRET) as DecodedToken;
     return ok(decoded);
-  } catch (error) {
-    return err(
-      error instanceof Error ? error : new Error('Token verification failed')
-    );
+  } catch (_) {
+    return err(new UnauthorizedError('Token verification failed'));
   }
 };

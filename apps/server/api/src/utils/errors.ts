@@ -65,9 +65,9 @@ export const asyncHandler = <T>(
           () => {}, // 成功時は何もしない（既にレスポンスが送信されている）
           (error) => next(error) // エラーの場合はnextに渡す
         )
-        .catch(next); // 予期せぬエラーの場合
+        .catch(() => next(new InternalServerError())); // 予期せぬエラーの場合
     } else {
-      Promise.resolve(result).catch(next);
+      Promise.resolve(result).catch(() => next(new InternalServerError()));
     }
   };
 };
