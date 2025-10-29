@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import type { Result } from 'neverthrow';
 import { ResultAsync } from 'neverthrow';
 import type { ApiError } from '../middleware/errorHandler.js';
 
@@ -48,26 +49,33 @@ export class InternalServerError extends Error implements ApiError {
   }
 }
 
-// 非同期エラーハンドリング用のラッパー - neverthrowのResultAsyncを使用
+// 非同期エラーハンドリング用のラッパー - neverthrowのResultとResultAsyncを使用
 export const asyncHandler = <T>(
   fn: (
     req: Request,
     res: Response,
     next: NextFunction
-  ) => Promise<T> | ResultAsync<T, ApiError>
+  ) => Promise<T> | Result<T, ApiError> | ResultAsync<T, ApiError>
 ) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const result = fn(req, res, next);
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await fn(req, res, next);
 
-    if (result instanceof ResultAsync) {
-      result
-        .match(
+      if (result instanceof ResultAsync) {
+        await result.match(
           () => {}, // 成功時は何もしない（既にレスポンスが送信されている）
           (error) => next(error) // エラーの場合はnextに渡す
-        )
-        .catch(() => next(new InternalServerError())); // 予期せぬエラーの場合
-    } else {
-      Promise.resolve(result).catch(() => next(new InternalServerError()));
+        );
+      } else if (result && typeof result === 'object' && 'isOk' in result) {
+        // Result型の処理
+        const resultObj = result as Result<T, ApiError>;
+        resultObj.match(
+          () => {}, // 成功時は何もしない（既にレスポンスが送信されている）
+          (error) => next(error) // エラーの場合はnextに渡す
+        );
+      }
+    } catch (_error) {
+      next(new InternalServerError());
     }
   };
 };

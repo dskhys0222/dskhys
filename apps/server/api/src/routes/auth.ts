@@ -38,8 +38,8 @@ export const authRoutes = Router();
  */
 authRoutes.post(
   '/register',
-  asyncHandler(async (req, res) => {
-    return await parseSchema(RegisterSchema, req.body).asyncAndThen((input) =>
+  asyncHandler((req, res) => {
+    return parseSchema(RegisterSchema, req.body).asyncAndThen((input) =>
       findUserByEmail(input.email)
         .andThen((user) =>
           user == null ? ok() : err(new ConflictError('Email already exists'))
@@ -76,8 +76,8 @@ authRoutes.post(
  */
 authRoutes.post(
   '/login',
-  asyncHandler(async (req, res) => {
-    return await parseSchema(LoginSchema, req.body).asyncAndThen((input) =>
+  asyncHandler((req, res) => {
+    return parseSchema(LoginSchema, req.body).asyncAndThen((input) =>
       findUserByEmail(input.email)
         .andThen((user) =>
           user == null
@@ -131,8 +131,8 @@ authRoutes.post(
 authRoutes.post(
   '/logout',
   authenticate,
-  asyncHandler(async (req, res) => {
-    return await parseSchema(LogoutSchema, req.body).asyncAndThen((input) =>
+  asyncHandler((req, res) => {
+    return parseSchema(LogoutSchema, req.body).asyncAndThen((input) =>
       deleteRefreshToken(input.refreshToken).map(() =>
         res.status(200).json({
           message: 'Logged out successfully',
@@ -147,7 +147,7 @@ authRoutes.post(
  */
 authRoutes.post(
   '/refresh',
-  asyncHandler(async (req, res) => {
+  asyncHandler((req, res) => {
     return parseSchema(RefreshTokenSchema, req.body)
       .andThen((input) =>
         verifyRefreshToken(input.refreshToken).map((decoded) => ({
@@ -217,14 +217,14 @@ authRoutes.post(
 authRoutes.get(
   '/me',
   authenticate,
-  asyncHandler(async (req, res) => {
+  asyncHandler((req, res) => {
     if (!req.user) {
       return err(new UnauthorizedError('User not authenticated'));
     }
 
     const userId = req.user.userId;
 
-    return await findUserById(userId)
+    return findUserById(userId)
       .andThen((user) =>
         user == null ? err(new UnauthorizedError('User not found')) : ok(user)
       )

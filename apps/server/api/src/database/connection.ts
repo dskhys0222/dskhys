@@ -1,25 +1,6 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ResultAsync } from 'neverthrow';
-import sqlite3 from 'sqlite3';
 import { InternalServerError } from '../utils/errors';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dbPath = path.join(__dirname, '../../data/database.sqlite');
-
-// SQLite3をverboseモードで初期化
-const sqlite = sqlite3.verbose();
-
-export const db = new sqlite.Database(dbPath, (err) => {
-  if (err) {
-    console.error('データベース接続エラー:', err.message);
-  } else {
-    console.log('SQLiteデータベースに接続しました');
-    initializeDatabase();
-  }
-});
+import { getDatabase } from './db-instance';
 
 // データベースの初期化
 const initializeDatabase = (): void => {
@@ -56,6 +37,9 @@ const initializeDatabase = (): void => {
   );
 };
 
+// 初期化を実行
+initializeDatabase();
+
 // クエリを実行するヘルパー
 export function runQuery<T = void>(
   sql: string,
@@ -63,7 +47,7 @@ export function runQuery<T = void>(
 ): ResultAsync<T, InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T>((resolve, reject) => {
-      db.run(sql, params, function (err) {
+      getDatabase().run(sql, params, function (err) {
         if (err) {
           reject(err);
         } else {
@@ -86,7 +70,7 @@ export function getOne<T>(
 ): ResultAsync<T | null, InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T | null>((resolve, reject) => {
-      db.get(sql, params, (err, row) => {
+      getDatabase().get(sql, params, (err, row) => {
         if (err) {
           reject(err);
         } else {
@@ -108,7 +92,7 @@ export function getMany<T>(
 ): ResultAsync<T[], InternalServerError> {
   return ResultAsync.fromPromise(
     new Promise<T[]>((resolve, reject) => {
-      db.all(sql, params, (err, rows) => {
+      getDatabase().all(sql, params, (err, rows) => {
         if (err) {
           reject(err);
         } else {
@@ -127,7 +111,7 @@ export function getMany<T>(
 export const closeDatabase = (): ResultAsync<void, InternalServerError> => {
   return ResultAsync.fromPromise(
     new Promise<void>((resolve, reject) => {
-      db.close((err) => {
+      getDatabase().close((err) => {
         if (err) {
           reject(err);
         } else {
