@@ -115,10 +115,10 @@ jobs:
           scp -i ~/.ssh/deploy_key -P ${SSH_PORT:-22} deployment.tar.gz ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/
 
           # Deploy on server with error checking
-          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} << 'ENDSSH'
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} << ENDSSH
             set -e  # Exit on any error
             
-            cd $DEPLOY_PATH
+            cd ${DEPLOY_PATH}
             tar -xzf deployment.tar.gz
             rm deployment.tar.gz
             
