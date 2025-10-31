@@ -104,6 +104,9 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p ${SSH_PORT:-22} $SSH_HOST >> ~/.ssh/known_hosts
+          
+          # Set trap to cleanup SSH key on exit
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
 
           # Transfer deployment package
           scp -i ~/.ssh/deploy_key -P ${SSH_PORT:-22} deployment.tar.gz ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/
@@ -113,10 +116,16 @@ jobs:
             cd $DEPLOY_PATH
             tar -xzf deployment.tar.gz
             rm deployment.tar.gz
-            docker-compose down
+            
+            # Graceful shutdown with timeout
+            docker-compose down --timeout 30
+            
+            # Wait for clean shutdown
+            sleep 5
+            
+            # Start new version
             docker-compose up -d --build
+            
+            # Show status
             docker-compose ps
           ENDSSH
-
-          # Cleanup
-          rm -f ~/.ssh/deploy_key
