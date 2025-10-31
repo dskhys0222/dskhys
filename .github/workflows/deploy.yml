@@ -122,8 +122,10 @@ jobs:
             tar -xzf deployment.tar.gz
             rm deployment.tar.gz
             
-            # Graceful shutdown with timeout
-            docker-compose down --timeout 30 || true
+            # Graceful shutdown with timeout (ignore error if containers don't exist)
+            if docker-compose ps -q 2>/dev/null | grep -q .; then
+              docker-compose down --timeout 30
+            fi
             
             # Wait for clean shutdown
             sleep 5
