@@ -87,6 +87,7 @@ jobs:
           cp -r apps/server/api deploy/
           cp docker-compose.yml deploy/
           cp Dockerfile deploy/
+          cp healthcheck.sh deploy/
           cp .env.example deploy/
           cd deploy
           tar -czf ../deployment.tar.gz .
@@ -103,6 +104,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          
+          # Add host key with proper verification
           ssh-keyscan -p ${SSH_PORT:-22} $SSH_HOST >> ~/.ssh/known_hosts
           
           # Set trap to cleanup SSH key on exit
@@ -111,14 +114,16 @@ jobs:
           # Transfer deployment package
           scp -i ~/.ssh/deploy_key -P ${SSH_PORT:-22} deployment.tar.gz ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/
 
-          # Deploy on server
-          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} << ENDSSH
+          # Deploy on server with error checking
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} << 'ENDSSH'
+            set -e  # Exit on any error
+            
             cd $DEPLOY_PATH
             tar -xzf deployment.tar.gz
             rm deployment.tar.gz
             
             # Graceful shutdown with timeout
-            docker-compose down --timeout 30
+            docker-compose down --timeout 30 || true
             
             # Wait for clean shutdown
             sleep 5

@@ -12,6 +12,10 @@ RUN npm install --production
 # Copy built application (built by CI/CD)
 COPY apps/server/api/dist ./dist
 
+# Copy healthcheck script
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
+
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
 
