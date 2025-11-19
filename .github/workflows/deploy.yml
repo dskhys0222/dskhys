@@ -57,7 +57,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: dskhys/dskhys-api
+          images: dskhys0222/dskhys-api
           tags: |
             type=sha,prefix=,format=short
 
