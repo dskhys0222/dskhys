@@ -1,9 +1,9 @@
-name: Deploy to Server
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - 'main'
   workflow_dispatch:
 
 permissions:
@@ -34,73 +34,48 @@ jobs:
 
       - name: Run tests
         run: |
-          cd apps/server/api
-          npm run test
+          npm -w @dskhys/api run test
 
   build:
-    name: Build
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: test
-    permissions:
-      contents: read
+    outputs:
+      tag: ${{ steps.meta.outputs.version }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          node-version: '20'
-          cache: 'npm'
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build API server
-        run: |
-          cd apps/server/api
-          npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          name: api-build
-          path: |
-            apps/server/api/dist/
-            apps/server/api/package.json
-            apps/server/api/package-lock.json
-          retention-days: 1
+          images: dskhys/dskhys-api
+          tags: |
+            type=sha,prefix=,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: api-build
-          path: apps/server/api/
-
-      - name: Create deployment package
-        run: |
-          mkdir -p deploy
-          cp -r apps/server/api deploy/
-          cp docker-compose.yml deploy/
-          cp Dockerfile deploy/
-          cp healthcheck.sh deploy/
-          cp .env.example deploy/
-          cd deploy
-          tar -czf ../deployment.tar.gz .
-
       - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -108,6 +83,7 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          IMAGE_TAG: ${{ needs.build.outputs.tag }}
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
@@ -120,28 +96,13 @@ jobs:
           # Set trap to cleanup SSH key on exit
           trap 'rm -f ~/.ssh/deploy_key' EXIT
 
-          # Transfer deployment package
-          scp -i ~/.ssh/deploy_key -P ${SSH_PORT:-22} deployment.tar.gz ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/
-
           # Deploy on server with error checking
-          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} << ENDSSH
-            set -e  # Exit on any error
-            
+          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} "
+            set -e
             cd ${DEPLOY_PATH}
-            tar -xzf deployment.tar.gz
-            rm deployment.tar.gz
-            
-            # Graceful shutdown with timeout (ignore error if containers don't exist)
-            if docker-compose ps -q 2>/dev/null | grep -q .; then
-              docker-compose down --timeout 30
-            fi
-            
-            # Wait for clean shutdown
-            sleep 5
-            
-            # Start new version
-            docker-compose up -d --build
-            
-            # Show status
+            git pull
+            export IMAGE_TAG=${IMAGE_TAG}
+            docker-compose pull
+            docker-compose up -d
             docker-compose ps
-          ENDSSH
+          "
