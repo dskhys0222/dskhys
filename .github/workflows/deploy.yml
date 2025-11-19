@@ -76,6 +76,19 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     
     steps:
+      - name: Checkout compose file
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.yml
+
+      - name: Create .env file
+        run: |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+          echo "JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION:-15m }}" >> .env
+          echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION:-7d }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT:-3000 }}" >> .env
+
       - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -89,20 +102,21 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          
-          # Add host key with proper verification
-          ssh-keyscan -p ${SSH_PORT:-22} $SSH_HOST >> ~/.ssh/known_hosts
-          
-          # Set trap to cleanup SSH key on exit
+          ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
           trap 'rm -f ~/.ssh/deploy_key' EXIT
 
-          # Deploy on server with error checking
-          ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} "
+          # Create deploy directory on server
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}"
+
+          # Copy files to server
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" docker-compose.yml .env "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+
+          # Deploy on server
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             set -e
             cd ${DEPLOY_PATH}
-            git pull
             export IMAGE_TAG=${IMAGE_TAG}
             docker-compose pull
-            docker-compose up -d
+            docker-compose up -d --force-recreate
             docker-compose ps
           "
