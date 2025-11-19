@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    image: dskhys/dskhys-api:${IMAGE_TAG:-latest}
+    container_name: dskhys-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION:-15m}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-7d}
+      - DATABASE_PATH=/app/data/database.sqlite
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - dskhys-network
+
+networks:
+  dskhys-network:
+    driver: bridge
