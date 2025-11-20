@@ -2,7 +2,11 @@ import { ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as connection from '../database/connection.js';
 import { InternalServerError } from '../utils/errors.js';
-import { findUserByEmail, findUserById, insertUser } from './usersRepository.js';
+import {
+  findUserByEmail,
+  findUserById,
+  insertUser,
+} from './usersRepository.js';
 
 // connection モジュールをモック
 vi.mock('../database/connection');
