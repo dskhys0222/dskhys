@@ -86,9 +86,9 @@ jobs:
       - name: Create .env file
         run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
-          echo "JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION:-15m }}" >> .env
-          echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION:-7d }}" >> .env
-          echo "API_PORT=${{ secrets.API_PORT:-3000 }}" >> .env
+          echo "JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION }}" >> .env
+          echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
 
       - name: Deploy to server
         env:
