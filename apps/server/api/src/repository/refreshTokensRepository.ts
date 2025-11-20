@@ -1,4 +1,4 @@
-import { getOne, runQuery } from '../database/connection';
+import { getOne, runQuery } from '../database/connection.js';
 
 interface RefreshTokenRow {
   id: number;

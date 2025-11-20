@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { closeDatabase, getMany, getOne, runQuery } from './connection';
+import { closeDatabase, getMany, getOne, runQuery } from './connection.js';
 
 describe('Database Connection', () => {
   beforeEach(() => {

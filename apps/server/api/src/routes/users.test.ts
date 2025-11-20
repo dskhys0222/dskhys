@@ -1,8 +1,8 @@
 import express from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { errorHandler } from '../middleware/errorHandler';
-import { userRoutes } from './users';
+import { errorHandler } from '../middleware/errorHandler.js';
+import { userRoutes } from './users.js';
 
 describe('userRoutes', () => {
   let app: express.Application;

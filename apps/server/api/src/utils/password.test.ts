@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { hashPassword, verifyPassword } from './password';
+import { hashPassword, verifyPassword } from './password.js';
 
 describe('Password Utils', () => {
   beforeEach(() => {

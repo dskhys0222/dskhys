@@ -5,7 +5,7 @@ import {
   type TokenPayload,
   verifyAccessToken,
   verifyRefreshToken,
-} from './jwt';
+} from './jwt.js';
 
 describe('JWT Utils', () => {
   const mockPayload: TokenPayload = {

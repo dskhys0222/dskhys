@@ -1,6 +1,6 @@
 import { ResultAsync } from 'neverthrow';
-import { InternalServerError } from '../utils/errors';
-import { getDatabase } from './db-instance';
+import { InternalServerError } from '../utils/errors.js';
+import { getDatabase } from './db-instance.js';
 
 // データベースの初期化
 const initializeDatabase = (): void => {

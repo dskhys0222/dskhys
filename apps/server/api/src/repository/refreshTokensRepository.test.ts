@@ -1,13 +1,13 @@
 import { ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as connection from '../database/connection';
-import { InternalServerError } from '../utils/errors';
+import * as connection from '../database/connection.js';
+import { InternalServerError } from '../utils/errors.js';
 import {
   deleteRefreshToken,
   deleteRefreshTokenById,
   findRefreshToken,
   insertRefreshToken,
-} from './refreshTokensRepository';
+} from './refreshTokensRepository.js';
 
 // connection モジュールをモック
 vi.mock('../database/connection');

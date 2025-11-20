@@ -1,5 +1,5 @@
-import { getOne, runQuery } from '../database/connection';
-import type { User } from '../schemas';
+import { getOne, runQuery } from '../database/connection.js';
+import type { User } from '../schemas/index.js';
 
 interface DbUser extends User {
   password_hash: string;

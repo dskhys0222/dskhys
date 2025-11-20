@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { parseSchema, parseSchemaAll } from './validation';
+import { parseSchema, parseSchemaAll } from './validation.js';
 
 describe('Validation Utils', () => {
   describe('parseSchema', () => {

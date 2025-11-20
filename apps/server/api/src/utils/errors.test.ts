@@ -8,7 +8,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-} from './errors';
+} from './errors.js';
 
 describe('Custom Error Classes', () => {
   describe('ValidationError', () => {

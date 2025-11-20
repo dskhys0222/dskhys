@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getDatabase } from './db-instance';
+import { getDatabase } from './db-instance.js';
 
 describe('Database Instance', () => {
   beforeEach(() => {

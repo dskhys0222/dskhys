@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { ResultAsync } from 'neverthrow';
-import { InternalServerError } from './errors';
+import { InternalServerError } from './errors.js';
 
 const SALT_ROUNDS = 10;
 

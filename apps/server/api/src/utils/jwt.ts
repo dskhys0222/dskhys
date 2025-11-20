@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { err, ok, type Result } from 'neverthrow';
-import { UnauthorizedError } from './errors';
+import { UnauthorizedError } from './errors.js';
 
 const JWT_ACCESS_SECRET =
   process.env.JWT_ACCESS_SECRET || 'default-access-secret';

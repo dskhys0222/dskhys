@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { generateAccessToken } from '../utils/jwt';
-import { authenticate } from './authenticate';
+import { generateAccessToken } from '../utils/jwt.js';
+import { authenticate } from './authenticate.js';
 
 describe('authenticate middleware', () => {
   let mockRequest: Partial<Request>;
