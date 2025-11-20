@@ -76,11 +76,12 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     
     steps:
-      - name: Checkout compose file
+      - name: Checkout files
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            docker-compose.yml
+            compose.yml
+            apps/server/nginx/nginx.conf
 
       - name: Create .env file
         run: |
@@ -109,14 +110,14 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}"
 
           # Copy files to server
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" docker-compose.yml .env "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r compose.yml .env apps "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
 
           # Deploy on server
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             set -e
             cd ${DEPLOY_PATH}
             export IMAGE_TAG=${IMAGE_TAG}
-            docker-compose pull
-            docker-compose up -d --force-recreate
-            docker-compose ps
+            docker compose pull
+            docker compose up -d --force-recreate
+            docker compose ps
           "

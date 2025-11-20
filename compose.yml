@@ -2,11 +2,9 @@ version: '3.8'
 
 services:
   api:
-    image: dskhys/dskhys-api:${IMAGE_TAG:-latest}
+    image: dskhys0222/dskhys-api:${IMAGE_TAG:-latest}
     container_name: dskhys-api
     restart: unless-stopped
-    ports:
-      - "${API_PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -22,6 +20,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - dskhys-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: dskhys-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./apps/server/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
     networks:
       - dskhys-network
 
