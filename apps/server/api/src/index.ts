@@ -10,16 +10,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// ヘルスチェック（エラーハンドラーの前に配置）
+app.get('/health', (_req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 // ルーティング
 app.use('/api', router);
 
 // エラーハンドリング
 app.use(errorHandler);
-
-// ヘルスチェック
-app.get('/health', (_req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
