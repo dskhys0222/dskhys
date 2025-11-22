@@ -28,7 +28,25 @@ const initializeDatabase = (): void => {
           FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
         )
       `).match(
-        () => console.log('データベースの初期化が完了しました'),
+        () => {
+          console.log('refresh_tokensテーブルの初期化が完了しました');
+          // リストアイテムテーブル
+          runQuery(`
+            CREATE TABLE IF NOT EXISTS list_items (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              owner_id INTEGER NOT NULL,
+              key TEXT NOT NULL UNIQUE,
+              data TEXT NOT NULL,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
+            )
+          `).match(
+            () => console.log('データベースの初期化が完了しました'),
+            (error: Error) =>
+              console.error('list_itemsテーブル初期化エラー:', error.message)
+          );
+        },
         (error: Error) =>
           console.error('refresh_tokensテーブル初期化エラー:', error.message)
       );
