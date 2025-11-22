@@ -14,7 +14,12 @@ import {
   FindOneListItemSchema,
   UpdateListItemSchema,
 } from '../schemas/index.js';
-import { asyncHandler, ConflictError, NotFoundError } from '../utils/errors.js';
+import {
+  asyncHandler,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../utils/errors.js';
 import { parseSchema } from '../utils/validation.js';
 
 export const itemRoutes = Router();
@@ -29,7 +34,7 @@ itemRoutes.post(
   asyncHandler((req, res) => {
     const userId = req.user?.userId;
     if (!userId) {
-      return err(new Error('User ID not found'));
+      return err(new UnauthorizedError('User not authenticated'));
     }
 
     return parseSchema(CreateListItemSchema, req.body).asyncAndThen((input) =>
@@ -62,7 +67,7 @@ itemRoutes.get(
   asyncHandler((req, res) => {
     const userId = req.user?.userId;
     if (!userId) {
-      return err(new Error('User ID not found'));
+      return err(new UnauthorizedError('User not authenticated'));
     }
 
     const key = req.query.key as string;
@@ -87,7 +92,7 @@ itemRoutes.get(
   asyncHandler((req, res) => {
     const userId = req.user?.userId;
     if (!userId) {
-      return err(new Error('User ID not found'));
+      return err(new UnauthorizedError('User not authenticated'));
     }
 
     return findAllListItemsByOwnerId(userId).map((items) => res.json(items));
@@ -104,7 +109,7 @@ itemRoutes.put(
   asyncHandler((req, res) => {
     const userId = req.user?.userId;
     if (!userId) {
-      return err(new Error('User ID not found'));
+      return err(new UnauthorizedError('User not authenticated'));
     }
 
     return parseSchema(UpdateListItemSchema, req.body).asyncAndThen((input) =>
@@ -132,7 +137,7 @@ itemRoutes.delete(
   asyncHandler((req, res) => {
     const userId = req.user?.userId;
     if (!userId) {
-      return err(new Error('User ID not found'));
+      return err(new UnauthorizedError('User not authenticated'));
     }
 
     const key = req.query.key as string;

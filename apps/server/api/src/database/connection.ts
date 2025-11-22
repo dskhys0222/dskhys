@@ -42,7 +42,7 @@ const initializeDatabase = (): void => {
               FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
             )
           `).match(
-            () => console.log('データベースの初期化が完了しました'),
+            () => console.log('list_itemsテーブルの初期化が完了しました'),
             (error: Error) =>
               console.error('list_itemsテーブル初期化エラー:', error.message)
           );
