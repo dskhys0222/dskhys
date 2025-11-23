@@ -4,8 +4,7 @@ import { getDatabase } from './db-instance.js';
 
 // データベースの初期化
 const initializeDatabase = (): void => {
-  // ユーザーテーブル
-  runQuery(`
+  const createUsersTable = `
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -14,27 +13,38 @@ const initializeDatabase = (): void => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `).match(
-    () => {
-      console.log('usersテーブルの初期化が完了しました');
-      // リフレッシュトークンテーブル
-      runQuery(`
-        CREATE TABLE IF NOT EXISTS refresh_tokens (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          user_id INTEGER NOT NULL,
-          token TEXT UNIQUE NOT NULL,
-          expires_at DATETIME NOT NULL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-        )
-      `).match(
-        () => console.log('データベースの初期化が完了しました'),
-        (error: Error) =>
-          console.error('refresh_tokensテーブル初期化エラー:', error.message)
-      );
-    },
-    (error: Error) => console.error('usersテーブル初期化エラー:', error.message)
-  );
+  `;
+
+  const createRefreshTokensTable = `
+    CREATE TABLE IF NOT EXISTS refresh_tokens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      token TEXT UNIQUE NOT NULL,
+      expires_at DATETIME NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    )
+  `;
+
+  const createListItemsTable = `
+    CREATE TABLE IF NOT EXISTS list_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      owner_id INTEGER NOT NULL,
+      key TEXT NOT NULL UNIQUE,
+      data TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
+    )
+  `;
+
+  runQuery(createUsersTable)
+    .andThen(() => runQuery(createRefreshTokensTable))
+    .andThen(() => runQuery(createListItemsTable))
+    .match(
+      () => console.log('データベースの初期化が完了しました'),
+      (error) => console.error('データベース初期化エラー:', error.message)
+    );
 };
 
 // 初期化を実行

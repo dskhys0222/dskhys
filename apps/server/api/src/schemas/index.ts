@@ -61,3 +61,40 @@ export type ApiResponse<T = unknown> = {
   error?: string;
   message?: string;
 };
+
+// リストアイテム関連のスキーマ
+export const ListItemSchema = z.object({
+  id: z.number().int().positive().optional(),
+  owner_id: z.number().int().positive(),
+  key: z.string().min(1, 'Key is required'),
+  data: z.string().min(1, 'Data is required'),
+  created_at: z.string().datetime().optional(),
+  updated_at: z.string().datetime().optional(),
+});
+
+export const CreateListItemSchema = ListItemSchema.omit({
+  id: true,
+  owner_id: true,
+  key: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export const UpdateListItemSchema = z.object({
+  key: z.string().min(1, 'Key is required'),
+  data: z.string().min(1, 'Data is required'),
+});
+
+export const FindOneListItemSchema = z.object({
+  key: z.string().min(1, 'Key is required'),
+});
+
+export const DeleteListItemSchema = z.object({
+  key: z.string().min(1, 'Key is required'),
+});
+
+export type ListItem = z.infer<typeof ListItemSchema>;
+export type CreateListItem = z.infer<typeof CreateListItemSchema>;
+export type UpdateListItem = z.infer<typeof UpdateListItemSchema>;
+export type FindOneListItem = z.infer<typeof FindOneListItemSchema>;
+export type DeleteListItem = z.infer<typeof DeleteListItemSchema>;

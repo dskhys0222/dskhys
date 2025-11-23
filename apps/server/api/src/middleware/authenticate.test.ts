@@ -109,7 +109,7 @@ describe('authenticate middleware', () => {
     it('改ざんされたトークンでエラーを返す', () => {
       const payload = { userId: 1, email: 'test@example.com' };
       const token = generateAccessToken(payload);
-      const tamperedToken = token.slice(0, -5) + 'xxxxx';
+      const tamperedToken = `${token.slice(0, -5)}xxxxx`;
 
       mockRequest.headers = {
         authorization: `Bearer ${tamperedToken}`,
