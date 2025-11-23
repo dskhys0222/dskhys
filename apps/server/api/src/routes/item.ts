@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { err, ok } from 'neverthrow';
+import { v4 as uuidv4 } from 'uuid';
 import { authenticate } from '../middleware/authenticate.js';
 import {
   deleteListItem,
@@ -16,7 +17,6 @@ import {
 } from '../schemas/index.js';
 import {
   asyncHandler,
-  ConflictError,
   NotFoundError,
   UnauthorizedError,
 } from '../utils/errors.js';
@@ -37,23 +37,15 @@ itemRoutes.post(
       return err(new UnauthorizedError('User not authenticated'));
     }
 
-    return parseSchema(CreateListItemSchema, req.body).asyncAndThen((input) =>
-      findListItemByKey(input.key, userId)
-        .andThen((existingItem) =>
-          existingItem == null
-            ? ok()
-            : err(new ConflictError('Key already exists'))
-        )
-        .andThen(() => insertListItem(userId, input.key, input.data))
-        .map(({ lastID }) =>
-          res.status(201).json({
-            id: lastID,
-            owner_id: userId,
-            key: input.key,
-            data: input.data,
-          })
-        )
-    );
+    return parseSchema(CreateListItemSchema, req.body).asyncAndThen((input) => {
+      const key = uuidv4();
+      return insertListItem(userId, key, input.data).map(() =>
+        res.status(201).json({
+          key,
+          data: input.data,
+        })
+      );
+    });
   })
 );
 
@@ -77,7 +69,7 @@ itemRoutes.get(
         .andThen((item) =>
           item ? ok(item) : err(new NotFoundError('List item'))
         )
-        .map((item) => res.json(item))
+        .map((item) => res.json({ key: item.key, data: item.data }))
     );
   })
 );
@@ -95,7 +87,9 @@ itemRoutes.get(
       return err(new UnauthorizedError('User not authenticated'));
     }
 
-    return findAllListItemsByOwnerId(userId).map((items) => res.json(items));
+    return findAllListItemsByOwnerId(userId).map((items) =>
+      res.json(items.map((item) => ({ key: item.key, data: item.data })))
+    );
   })
 );
 

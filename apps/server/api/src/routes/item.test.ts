@@ -140,7 +140,6 @@ describe('Item Routes', () => {
   describe('POST /api/item/create', () => {
     it('should create a new list item successfully', async () => {
       const newItem = {
-        key: 'test-key',
         data: 'test data',
       };
 
@@ -151,39 +150,15 @@ describe('Item Routes', () => {
         .expect(201);
 
       expect(response.body).toMatchObject({
-        owner_id: testUserId,
-        key: newItem.key,
         data: newItem.data,
       });
-      expect(response.body.id).toBeDefined();
-    });
-
-    it('should fail to create item with duplicate key', async () => {
-      const newItem = {
-        key: 'duplicate-key',
-        data: 'test data',
-      };
-
-      // 最初のアイテムを作成
-      await request(app)
-        .post('/api/item/create')
-        .set('Authorization', `Bearer ${testAccessToken}`)
-        .send(newItem)
-        .expect(201);
-
-      // 同じキーで2回目の作成を試みる
-      const response = await request(app)
-        .post('/api/item/create')
-        .set('Authorization', `Bearer ${testAccessToken}`)
-        .send(newItem)
-        .expect(409);
-
-      expect(response.body.error.message).toContain('Key already exists');
+      expect(response.body.key).toBeDefined();
+      expect(response.body.owner_id).toBeUndefined();
+      expect(response.body.id).toBeUndefined();
     });
 
     it('should fail without authentication', async () => {
       const newItem = {
-        key: 'test-key',
         data: 'test data',
       };
 
@@ -195,24 +170,8 @@ describe('Item Routes', () => {
       expect(response.body.error.message).toContain('No token provided');
     });
 
-    it('should fail with missing key', async () => {
-      const newItem = {
-        data: 'test data',
-      };
-
-      const response = await request(app)
-        .post('/api/item/create')
-        .set('Authorization', `Bearer ${testAccessToken}`)
-        .send(newItem)
-        .expect(400);
-
-      expect(response.body.error.message).toBeDefined();
-    });
-
     it('should fail with missing data', async () => {
-      const newItem = {
-        key: 'test-key',
-      };
+      const newItem = {};
 
       const response = await request(app)
         .post('/api/item/create')
@@ -227,28 +186,30 @@ describe('Item Routes', () => {
   describe('GET /api/item/findOne', () => {
     it('should get a list item by key successfully', async () => {
       const newItem = {
-        key: 'test-key',
         data: 'test data',
       };
 
       // アイテムを作成
-      await request(app)
+      const createResponse = await request(app)
         .post('/api/item/create')
         .set('Authorization', `Bearer ${testAccessToken}`)
         .send(newItem);
 
+      const key = createResponse.body.key;
+
       // アイテムを取得
       const response = await request(app)
         .get('/api/item/findOne')
-        .query({ key: newItem.key })
+        .query({ key })
         .set('Authorization', `Bearer ${testAccessToken}`)
         .expect(200);
 
       expect(response.body).toMatchObject({
-        owner_id: testUserId,
-        key: newItem.key,
+        key,
         data: newItem.data,
       });
+      expect(response.body.owner_id).toBeUndefined();
+      expect(response.body.id).toBeUndefined();
     });
 
     it('should fail to get non-existent item', async () => {
@@ -282,11 +243,7 @@ describe('Item Routes', () => {
 
   describe('GET /api/item/findAll', () => {
     it('should get all list items for the user', async () => {
-      const items = [
-        { key: 'key1', data: 'data1' },
-        { key: 'key2', data: 'data2' },
-        { key: 'key3', data: 'data3' },
-      ];
+      const items = [{ data: 'data1' }, { data: 'data2' }, { data: 'data3' }];
 
       // 複数のアイテムを作成
       for (const item of items) {
@@ -305,7 +262,8 @@ describe('Item Routes', () => {
       expect(response.body).toHaveLength(3);
       expect(response.body[0]).toHaveProperty('key');
       expect(response.body[0]).toHaveProperty('data');
-      expect(response.body[0]).toHaveProperty('owner_id', testUserId);
+      expect(response.body[0].owner_id).toBeUndefined();
+      expect(response.body[0].id).toBeUndefined();
     });
 
     it('should return empty array when no items exist', async () => {
@@ -327,19 +285,20 @@ describe('Item Routes', () => {
   describe('PUT /api/item/update', () => {
     it('should update a list item successfully', async () => {
       const newItem = {
-        key: 'test-key',
         data: 'original data',
       };
 
       // アイテムを作成
-      await request(app)
+      const createResponse = await request(app)
         .post('/api/item/create')
         .set('Authorization', `Bearer ${testAccessToken}`)
         .send(newItem);
 
+      const key = createResponse.body.key;
+
       // アイテムを更新
       const updatedItem = {
-        key: 'test-key',
+        key,
         data: 'updated data',
       };
 
@@ -354,7 +313,7 @@ describe('Item Routes', () => {
       // 更新されたことを確認
       const getResponse = await request(app)
         .get('/api/item/findOne')
-        .query({ key: newItem.key })
+        .query({ key })
         .set('Authorization', `Bearer ${testAccessToken}`)
         .expect(200);
 
@@ -422,20 +381,21 @@ describe('Item Routes', () => {
   describe('DELETE /api/item/delete', () => {
     it('should delete a list item successfully', async () => {
       const newItem = {
-        key: 'test-key',
         data: 'test data',
       };
 
       // アイテムを作成
-      await request(app)
+      const createResponse = await request(app)
         .post('/api/item/create')
         .set('Authorization', `Bearer ${testAccessToken}`)
         .send(newItem);
 
+      const key = createResponse.body.key;
+
       // アイテムを削除
       const response = await request(app)
         .delete('/api/item/delete')
-        .query({ key: newItem.key })
+        .query({ key })
         .set('Authorization', `Bearer ${testAccessToken}`)
         .expect(200);
 
@@ -444,7 +404,7 @@ describe('Item Routes', () => {
       // 削除されたことを確認
       await request(app)
         .get('/api/item/findOne')
-        .query({ key: newItem.key })
+        .query({ key })
         .set('Authorization', `Bearer ${testAccessToken}`)
         .expect(404);
     });

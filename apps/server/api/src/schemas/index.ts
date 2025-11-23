@@ -75,6 +75,7 @@ export const ListItemSchema = z.object({
 export const CreateListItemSchema = ListItemSchema.omit({
   id: true,
   owner_id: true,
+  key: true,
   created_at: true,
   updated_at: true,
 });
