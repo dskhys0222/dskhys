@@ -4,6 +4,7 @@
   "workspaces": [
     "apps/server/api",
     "apps/client/memo",
+    "apps/client/list",
     "libs/util"
   ],
   "scripts": {
