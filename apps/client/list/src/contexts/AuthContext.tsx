@@ -22,6 +22,7 @@ import {
   saveEncryptionSalt,
   saveUser,
 } from '../services/storage';
+import { isOnline } from '../services/sync';
 import type { LoginForm, RegisterForm, User } from '../types';
 import {
   decodeSalt,
@@ -99,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userResult.value);
 
           // オンラインなら最新のユーザー情報を取得
-          if (navigator.onLine) {
+          if (isOnline()) {
             const meResult = await getMe();
             if (meResult.isOk()) {
               setUser(meResult.value);
@@ -186,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (tokensResult.isOk() && tokensResult.value) {
       // オンラインならサーバーにログアウトを通知
-      if (navigator.onLine) {
+      if (isOnline()) {
         await apiLogout(tokensResult.value.refreshToken);
       }
     }
