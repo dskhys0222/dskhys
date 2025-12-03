@@ -61,12 +61,17 @@ export async function encrypt(
       encoder.encode(data)
     );
 
-    // IV + 暗号化データをBase64エンコード
     const combined = new Uint8Array(iv.length + encryptedData.byteLength);
     combined.set(iv);
     combined.set(new Uint8Array(encryptedData), iv.length);
 
-    return ok(btoa(String.fromCharCode(...combined)));
+    // バイナリ文字列に変換してからBase64エンコードする
+    let binaryString = '';
+    combined.forEach((byte) => {
+      binaryString += String.fromCharCode(byte);
+    });
+
+    return ok(btoa(binaryString));
   } catch (error) {
     return err(
       error instanceof Error ? error : new Error('Failed to encrypt data')
@@ -80,9 +85,11 @@ export async function decrypt(
   key: CryptoKey
 ): Promise<Result<string, Error>> {
   try {
-    const combined = Uint8Array.from(atob(encryptedString), (c) =>
-      c.charCodeAt(0)
-    );
+    const binaryString = atob(encryptedString);
+    const combined = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      combined[i] = binaryString.charCodeAt(i);
+    }
 
     // 最初の12バイトがIV
     const iv = combined.slice(0, 12);

@@ -1,12 +1,20 @@
 import { useState } from 'react';
-import { Header, ListItems, Login, Register } from './components';
+import {
+  Header,
+  ListItems,
+  Login,
+  PasswordModal,
+  Register,
+} from './components';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ListProvider } from './contexts/ListContext';
 import './App.css';
 
 function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, encryptionKey } = useAuth();
   const [isLoginView, setIsLoginView] = useState(true);
+
+  const isLocked = isAuthenticated && !encryptionKey;
 
   if (isLoading) {
     return (
@@ -14,6 +22,10 @@ function AppContent() {
         <div className="loading">読み込み中...</div>
       </div>
     );
+  }
+
+  if (isLocked) {
+    return <PasswordModal />;
   }
 
   if (!isAuthenticated) {

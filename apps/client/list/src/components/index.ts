@@ -1,6 +1,7 @@
 export { AddItem } from './AddItem';
 export { Header } from './Header';
 export { ListItemComponent } from './ListItem';
-export { ListItems } from './ListItems';
-export { Login } from './Login';
-export { Register } from './Register';
+export * from './ListItems';
+export * from './Login';
+export * from './PasswordModal';
+export * from './Register';

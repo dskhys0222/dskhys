@@ -1,3 +1,4 @@
+import { err, ok, type Result } from 'neverthrow';
 import {
   createContext,
   type ReactNode,
@@ -109,23 +110,31 @@ export function ListProvider({ children }: { children: ReactNode }) {
 
   // サーバーからアイテムを取得
   const fetchItemsFromServer = useCallback(async (): Promise<
-    DecryptedListItem[]
+    Result<DecryptedListItem[], Error>
   > => {
     if (!isOnline()) {
-      return [];
+      return ok([]);
     }
 
     const result = await apiGetItems();
     if (result.isErr()) {
       console.error('Failed to fetch items from server:', result.error);
-      return [];
+      return err(result.error);
     }
 
     const decrypted = await Promise.all(
       result.value.map((item) => decryptItem(item.key, item.data))
     );
 
-    return decrypted.filter((item): item is DecryptedListItem => item !== null);
+    const successfulItems = decrypted.filter(
+      (item): item is DecryptedListItem => item !== null
+    );
+
+    if (successfulItems.length !== result.value.length) {
+      return err(new Error('Failed to decrypt one or more items.'));
+    }
+
+    return ok(successfulItems);
   }, [decryptItem]);
 
   // ローカルからアイテムを取得
@@ -146,18 +155,20 @@ export function ListProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      if (isOnline() && isAuthenticated) {
-        // オンラインならサーバーから取得
-        const serverItems = await fetchItemsFromServer();
-        setItems(serverItems);
+      const localItems = await fetchItemsFromLocal();
+      setItems(localItems);
 
-        // ローカルにキャッシュ
-        await clearAllItems();
-        await Promise.all(serverItems.map((item) => saveItem(item)));
-      } else {
-        // オフラインならローカルから取得
-        const localItems = await fetchItemsFromLocal();
-        setItems(localItems);
+      if (isOnline() && isAuthenticated) {
+        const serverResult = await fetchItemsFromServer();
+        if (serverResult.isOk()) {
+          const serverItems = serverResult.value;
+          setItems(serverItems);
+
+          await clearAllItems();
+          await Promise.all(serverItems.map((item) => saveItem(item)));
+        } else {
+          setError('サーバーとの同期に失敗しました。');
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load items');
@@ -166,14 +177,14 @@ export function ListProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchItemsFromServer, fetchItemsFromLocal, isAuthenticated]);
 
-  // 認証状態が変わったらアイテムを取得
+  // 認証状態と暗号化キーが準備できたらアイテムを取得
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && encryptionKey) {
       refreshItems();
     } else {
       setItems([]);
     }
-  }, [isAuthenticated, refreshItems]);
+  }, [isAuthenticated, encryptionKey, refreshItems]);
 
   // オンライン復帰時に同期
   useEffect(() => {
@@ -189,20 +200,18 @@ export function ListProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback(
     async (title: string) => {
       const now = new Date().toISOString();
-      const key = uuidv4();
+      const clientKey = uuidv4();
       const newItem: DecryptedListItem = {
-        key,
+        key: clientKey,
         title,
         completed: false,
         createdAt: now,
         updatedAt: now,
       };
 
-      // ローカルに保存
-      await saveItem(newItem);
+      // 楽観的UI更新
       setItems((prev) => [...prev, newItem]);
 
-      // 暗号化
       const encryptedData = await encryptItem({
         title: newItem.title,
         completed: newItem.completed,
@@ -212,38 +221,54 @@ export function ListProvider({ children }: { children: ReactNode }) {
 
       if (!encryptedData) {
         setError('Failed to encrypt item');
+        // ロールバック
+        setItems((prev) => prev.filter((item) => item.key !== clientKey));
         return;
       }
 
+      const createSyncItem = (key: string): PendingSyncItem => ({
+        id: uuidv4(),
+        action: 'create',
+        key,
+        data: encryptedData,
+        timestamp: Date.now(),
+      });
+
       if (isOnline()) {
-        // オンラインならサーバーに送信
         const result = await apiCreateItem(encryptedData);
-        if (result.isErr()) {
-          // 失敗したら同期キューに追加
-          const syncItem: PendingSyncItem = {
-            id: uuidv4(),
-            action: 'create',
-            key,
-            data: encryptedData,
-            timestamp: Date.now(),
-          };
-          await addToSyncQueue(syncItem);
+        if (result.isOk()) {
+          const serverItem = result.value;
+          const decryptedServerItem = await decryptItem(
+            serverItem.key,
+            serverItem.data
+          );
+
+          if (decryptedServerItem) {
+            setItems((prev) =>
+              prev.map((item) =>
+                item.key === clientKey ? decryptedServerItem : item
+              )
+            );
+            await deleteItem(clientKey);
+            await saveItem(decryptedServerItem);
+          } else {
+            setError('Failed to process server response for created item.');
+            await saveItem(newItem);
+            await addToSyncQueue(createSyncItem(clientKey));
+            setPendingSyncCount((prev) => prev + 1);
+          }
+        } else {
+          await saveItem(newItem);
+          await addToSyncQueue(createSyncItem(clientKey));
           setPendingSyncCount((prev) => prev + 1);
         }
       } else {
-        // オフラインなら同期キューに追加
-        const syncItem: PendingSyncItem = {
-          id: uuidv4(),
-          action: 'create',
-          key,
-          data: encryptedData,
-          timestamp: Date.now(),
-        };
-        await addToSyncQueue(syncItem);
+        await saveItem(newItem);
+        await addToSyncQueue(createSyncItem(clientKey));
         setPendingSyncCount((prev) => prev + 1);
       }
     },
-    [encryptItem]
+    [encryptItem, decryptItem]
   );
 
   // アイテムを更新

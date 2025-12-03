@@ -41,6 +41,7 @@ interface AuthContextType {
     data: RegisterForm
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  rearmWithPassword: (password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,12 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (saltResult.value) {
         salt = decodeSalt(saltResult.value);
       } else {
-        salt = generateSalt();
-        const saveResult = await saveEncryptionSalt(encodeSalt(salt));
-        if (saveResult.isErr()) {
-          console.error('Failed to save encryption salt');
-          return null;
-        }
+        // このケースは登録時にしか発生しないはず
+        console.error('Encryption salt not found during key initialization.');
+        return null;
       }
 
       const keyResult = await deriveKey(password, salt);
@@ -80,6 +78,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return keyResult.value;
     },
     []
+  );
+
+  const rearmWithPassword = useCallback(
+    async (password: string): Promise<boolean> => {
+      const key = await initializeEncryptionKey(password);
+      if (key) {
+        setEncryptionKey(key);
+        return true;
+      }
+      return false;
+    },
+    [initializeEncryptionKey]
   );
 
   // 初期化（ローカルストレージからユーザー情報を復元）
@@ -207,8 +217,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      rearmWithPassword,
     }),
-    [user, isLoading, encryptionKey, login, register, logout]
+    [user, isLoading, encryptionKey, login, register, logout, rearmWithPassword]
   );
 
   return (
