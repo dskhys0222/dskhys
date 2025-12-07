@@ -80,6 +80,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const logout = useCallback(async () => {
+    const tokensResult = await getAuthTokens();
+
+    if (tokensResult.isOk() && tokensResult.value) {
+      // オンラインならサーバーにログアウトを通知
+      if (isOnline()) {
+        await apiLogout(tokensResult.value.refreshToken);
+      }
+    }
+
+    // ローカルデータをクリア
+    await clearAllData();
+    setUser(null);
+    setEncryptionKey(null);
+  }, []);
+
   const rearmWithPassword = useCallback(
     async (password: string): Promise<boolean> => {
       const key = await initializeEncryptionKey(password);
@@ -115,6 +131,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (meResult.isOk()) {
               setUser(meResult.value);
               await saveUser(meResult.value);
+            } else {
+              console.error(
+                'セッションの復元に失敗しました。ログアウトします:',
+                meResult.error
+              );
+              await logout();
             }
           }
         }
@@ -126,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     initialize();
-  }, []);
+  }, [logout]);
 
   const login = useCallback(
     async (data: LoginForm): Promise<{ success: boolean; error?: string }> => {
@@ -191,22 +213,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [initializeEncryptionKey]
   );
-
-  const logout = useCallback(async () => {
-    const tokensResult = await getAuthTokens();
-
-    if (tokensResult.isOk() && tokensResult.value) {
-      // オンラインならサーバーにログアウトを通知
-      if (isOnline()) {
-        await apiLogout(tokensResult.value.refreshToken);
-      }
-    }
-
-    // ローカルデータをクリア
-    await clearAllData();
-    setUser(null);
-    setEncryptionKey(null);
-  }, []);
 
   const contextValue = useMemo(
     () => ({

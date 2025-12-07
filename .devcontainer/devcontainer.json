@@ -17,13 +17,15 @@
         "eamodio.gitlens",
         "usernamehw.errorlens",
         "mhutchie.git-graph",
-        "github.vscode-github-actions",
         "yzhang.markdown-all-in-one",
         "bierner.markdown-mermaid",
         "vitest.explorer",
         "mechatroner.rainbow-csv",
         "esbenp.prettier-vscode",
-        "DavidAnson.vscode-markdownlint"
+        "DavidAnson.vscode-markdownlint",
+        "MS-CEINTL.vscode-language-pack-ja",
+        "humao.rest-client",
+        "ms-azuretools.vscode-containers"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
