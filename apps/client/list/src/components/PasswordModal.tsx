@@ -41,7 +41,6 @@ export function PasswordModal() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoFocus
             />
           </div>
           {error && <p className="error-message">{error}</p>}

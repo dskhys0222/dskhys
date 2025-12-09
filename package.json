@@ -1,15 +1,16 @@
 {
   "name": "dskhys",
   "private": true,
-  "workspaces": [
-    "apps/server/api",
-    "apps/client/memo",
-    "apps/client/list",
-    "libs/util"
-  ],
+  "engines": {
+    "pnpm": "10.24.0",
+    "npm": "npmではなくpnpmを使用してください"
+  },
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a",
   "scripts": {
     "lint": "biome check .",
-    "format": "biome check --write ."
+    "format": "biome check --write .",
+    "api": "pnpm --filter @dskhys/api",
+    "list": "pnpm --filter @dskhys/list"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0"

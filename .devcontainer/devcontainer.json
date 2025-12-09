@@ -59,7 +59,7 @@
     }
   },
 
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "sudo corepack enable && pnpm install",
 
   "remoteUser": "node",
 
