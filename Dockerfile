@@ -4,7 +4,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Copy root package files and install all dependencies
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml ./
 COPY .npmrc .npmrc
 COPY packages/server/api/package.json ./packages/server/api/
 RUN npm ci
