@@ -48,7 +48,8 @@
           "**/build/**": true
         },
         "files.watcherInclude": ["**/*"],
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.scrollback": 10000
       }
     }
   },
