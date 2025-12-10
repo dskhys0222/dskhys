@@ -10,8 +10,7 @@
   "scripts": {
     "lint": "biome check .",
     "format": "biome check --write .",
-    "api": "pnpm --filter @dskhys/api",
-    "list": "pnpm --filter @dskhys/list"
+    "api": "pnpm --filter @dskhys/api"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0"

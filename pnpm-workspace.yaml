@@ -1,6 +1,3 @@
 packages:
   - "apps/server/api"
-  - "apps/client/memo"
-  - "apps/client/list"
-  - "libs/util"
 minimumReleaseAge: 2880
