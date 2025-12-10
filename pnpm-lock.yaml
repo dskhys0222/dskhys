@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.0.0
+        specifier: ^2.3.8
         version: 2.3.8
 
   packages/server/api:
