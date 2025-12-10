@@ -6,43 +6,41 @@
 
 ## プロジェクト構成
 
-```
+```txt
 dskhys/
-├── apps/
+├── packages/
 │   ├── server/api/      # APIサーバー（Express + TypeScript）
-│   └── client/memo/     # クライアントアプリ（予定）
-├── libs/
-│   └── util/            # 共通ユーティリティ
-├── .github/workflows/   # GitHub Actions CI/CD
-├── docs/                # ドキュメント
-└── docker-compose.yml   # デプロイ設定
+│   └── client/list/     # クライアントアプリ（予定）
+│   └── libs/util/       # 共通ユーティリティ（予定）
+├── .github/workflows/    # GitHub Actions CI/CD
+├── docs/                 # ドキュメント
+└── docker-compose.yml    # デプロイ設定
 ```
 
 ## 開発
 
 ### 前提条件
 
-- Node.js 20以上
+- Node.js 20 以上
 - npm
 
 ### セットアップ
 
 ```bash
 # 依存関係のインストール
-npm install
+pnpm install
 
 # リント
-npm run lint
+pnpm run lint
 
 # テスト（APIサーバー）
-cd apps/server/api
-npm run test
+pnpm api run test
 
 # ビルド（APIサーバー）
-npm run build
+pnpm api run build
 
 # 開発サーバー起動
-npm run dev
+pnpm api run dev
 ```
 
 ## デプロイ
@@ -54,7 +52,7 @@ npm run dev
 `main` ブランチへのプッシュで自動的に以下が実行されます：
 
 1. **テスト** - リントとユニットテストの実行
-2. **ビルド** - TypeScriptのコンパイル
+2. **ビルド** - TypeScript のコンパイル
 3. **デプロイ** - Linux サーバーへ SSH で配布し、Docker Compose で起動
 
 ### デプロイ設定

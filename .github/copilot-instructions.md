@@ -13,7 +13,7 @@
 .github/                            # GitHub関連の設定ファイル
   ├─ workflows/                   # GitHub Actionsのワークフローファイル
   └─ copilot-instructions.md      # Copilot用の指示書
-apps/                               # アプリケーションのソースコード
+packages/                           # アプリケーションのソースコード
   ├─ server/                      # バックエンドのソースコード
   └─ client/                      # フロントエンドのソースコード
 docs/                               # プロジェクト共通のドキュメントファイル

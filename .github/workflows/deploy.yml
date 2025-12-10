@@ -83,7 +83,7 @@ jobs:
         with:
           sparse-checkout: |
             compose.yml
-            apps/server/nginx/nginx.conf
+            packages/server/nginx/nginx.conf
 
       - name: Create .env file
         run: |
@@ -112,7 +112,7 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}"
 
           # Copy files to server
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r compose.yml .env apps "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r compose.yml .env packages "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
 
           # Deploy on server
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "

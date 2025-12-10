@@ -6,7 +6,7 @@ WORKDIR /app
 # Copy root package files and install all dependencies
 COPY package.json package-lock.json ./
 COPY .npmrc .npmrc
-COPY apps/server/api/package.json ./apps/server/api/
+COPY packages/server/api/package.json ./packages/server/api/
 RUN npm ci
 
 # Copy the rest of the source code
@@ -22,13 +22,13 @@ FROM node:22-alpine
 WORKDIR /app
 
 # Copy only production package.json
-COPY apps/server/api/package.json ./
+COPY packages/server/api/package.json ./
 
 # Install only production dependencies
 RUN npm install --production
 
 # Copy built application from builder stage
-COPY --from=builder /app/apps/server/api/dist ./dist
+COPY --from=builder /app/packages/server/api/dist ./dist
 
 # Copy healthcheck script
 COPY healthcheck.sh /healthcheck.sh

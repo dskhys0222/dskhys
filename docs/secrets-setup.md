@@ -72,7 +72,7 @@ cat ~/.ssh/github_deploy.pub
 **Example values:**
 
 - `/opt/dskhys`
-- `/home/deploy/apps/dskhys`
+- `/home/deploy/packages/dskhys`
 - `/var/www/dskhys`
 
 **Note:** This directory should exist on the server and be writable by the SSH user.
