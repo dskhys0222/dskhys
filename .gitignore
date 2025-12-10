@@ -17,3 +17,15 @@ build/
 
 # Deployment
 deployment.tar.gz
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp

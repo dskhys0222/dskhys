@@ -45,7 +45,7 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/packages/server/api/dist ./packages/server/api/dist
 
 # Copy healthcheck script
-COPY healthcheck.sh /healthcheck.sh
+COPY deployment/healthcheck.sh /healthcheck.sh
 RUN chmod +x /healthcheck.sh
 
 # Create data directory for SQLite database

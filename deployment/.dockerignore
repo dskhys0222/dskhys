@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+.github
+
+# Dev Container
+.devcontainer
+
+# Documentation
+docs
+README.md
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.example
+
+# Database
+data/
+*.sqlite
+*.sqlite-journal
+
+# Build output (except what we need)
+dist/
+build/
+
+# Test files
+*.test.ts
+*.test.js
+**/__tests__
+vitest.config.ts
+
+# Development files
+.npmrc
+biome.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
