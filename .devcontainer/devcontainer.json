@@ -33,7 +33,6 @@
         "ms-azuretools.vscode-containers"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome",
         "editor.codeActionsOnSave": {
@@ -42,12 +41,14 @@
         },
         "files.watcherExclude": {
           "**/node_modules/**": true,
+          "**/.pnpm-store/**": true,
           "**/.git/objects/**": true,
           "**/.git/subtree-cache/**": true,
           "**/dist/**": true,
           "**/build/**": true
         },
-        "files.watcherInclude": ["**/*"]
+        "files.watcherInclude": ["**/*"],
+        "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
