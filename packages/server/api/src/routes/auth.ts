@@ -1,3 +1,4 @@
+import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { err, ok } from 'neverthrow';
 import { authenticate } from '../middleware/authenticate.js';
@@ -31,7 +32,7 @@ import {
 import { hashPassword, verifyPassword } from '../utils/password.js';
 import { parseSchema } from '../utils/validation.js';
 
-export const authRoutes = Router();
+export const authRoutes: ExpressRouter = Router();
 
 /**
  * POST /api/auth/register - ユーザー登録

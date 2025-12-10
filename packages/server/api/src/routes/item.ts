@@ -1,3 +1,4 @@
+import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { err, ok } from 'neverthrow';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,7 +23,7 @@ import {
 } from '../utils/errors.js';
 import { parseSchema } from '../utils/validation.js';
 
-export const itemRoutes = Router();
+export const itemRoutes: ExpressRouter = Router();
 
 /**
  * POST /api/item/create - リストアイテムを作成

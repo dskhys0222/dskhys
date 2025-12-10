@@ -1,9 +1,10 @@
+import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { authRoutes } from './auth.js';
 import { itemRoutes } from './item.js';
 import { userRoutes } from './users.js';
 
-export const router = Router();
+export const router: ExpressRouter = Router();
 
 // 基本的なルート
 router.get('/', (_req, res) => {

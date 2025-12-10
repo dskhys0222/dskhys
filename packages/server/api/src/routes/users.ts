@@ -1,3 +1,4 @@
+import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { err, ok, Result } from 'neverthrow';
 import {
@@ -6,7 +7,7 @@ import {
   ValidationError,
 } from '../utils/errors.js';
 
-export const userRoutes = Router();
+export const userRoutes: ExpressRouter = Router();
 
 // GET /api/users/:id - ユーザー取得の例
 userRoutes.get(
