@@ -4,7 +4,7 @@
 
 ## 概要
 
-GitHub Actions ワークフローは以下の3つのジョブで構成されています：
+GitHub Actions ワークフローは以下の 3 つのジョブで構成されています：
 
 1. **Test** - コードのリントとテストを実行
 2. **Build** - TypeScript のビルドを実行
@@ -14,15 +14,15 @@ GitHub Actions ワークフローは以下の3つのジョブで構成されて�
 
 以下のシークレットを GitHub リポジトリの Settings > Secrets and variables > Actions に設定してください：
 
-### SSH接続情報
+### SSH 接続情報
 
-- `SSH_PRIVATE_KEY`: デプロイサーバーへの SSH 秘密鍵（OpenSSH形式）
+- `SSH_PRIVATE_KEY`: デプロイサーバーへの SSH 秘密鍵（OpenSSH 形式）
 - `SSH_HOST`: デプロイサーバーのホスト名または IP アドレス
 - `SSH_USER`: SSH 接続に使用するユーザー名
 - `SSH_PORT`: SSH ポート（デフォルト: 22）
 - `DEPLOY_PATH`: サーバー上のデプロイ先ディレクトリの絶対パス
 
-### SSH秘密鍵の生成方法
+### SSH 秘密鍵の生成方法
 
 ```bash
 ssh-keygen -t ed25519 -C "github-actions-deploy"
@@ -65,6 +65,7 @@ nano .env
 ```
 
 必要な環境変数：
+
 - `JWT_SECRET`: JWT トークンの署名に使用する秘密鍵（ランダムな長い文字列）
 - `API_PORT`: API サーバーのポート（デフォルト: 3000）
 - `JWT_ACCESS_EXPIRATION`: アクセストークンの有効期限（デフォルト: 15m）

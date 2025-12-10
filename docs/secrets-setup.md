@@ -11,14 +11,17 @@ This document lists all the secrets that need to be configured in GitHub reposit
 ## Required Secrets
 
 ### SSH_PRIVATE_KEY
+
 **Description:** SSH private key for connecting to the deployment server
 
 **How to generate:**
+
 ```bash
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_deploy
 ```
 
 Then copy the content of the private key:
+
 ```bash
 cat ~/.ssh/github_deploy
 ```
@@ -26,39 +29,48 @@ cat ~/.ssh/github_deploy
 Paste the entire content (including `-----BEGIN OPENSSH PRIVATE KEY-----` and `-----END OPENSSH PRIVATE KEY-----`) as the secret value.
 
 **Important:** Also add the public key to the server:
+
 ```bash
 cat ~/.ssh/github_deploy.pub
 # Copy this and add it to ~/.ssh/authorized_keys on your deployment server
 ```
 
 ### SSH_HOST
+
 **Description:** The hostname or IP address of your deployment server
 
 **Example values:**
+
 - `example.com`
 - `192.168.1.100`
 - `deploy.myapp.com`
 
 ### SSH_USER
+
 **Description:** The username to use for SSH connection
 
 **Example values:**
+
 - `ubuntu`
 - `deploy`
 - `myuser`
 
 ### SSH_PORT
+
 **Description:** The SSH port number (optional, defaults to 22)
 
 **Example values:**
+
 - `22` (default)
 - `2222`
 - `22000`
 
 ### DEPLOY_PATH
+
 **Description:** The absolute path on the server where the application will be deployed
 
 **Example values:**
+
 - `/opt/dskhys`
 - `/home/deploy/apps/dskhys`
 - `/var/www/dskhys`

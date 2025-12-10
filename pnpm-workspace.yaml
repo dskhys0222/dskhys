@@ -1,0 +1,3 @@
+packages:
+  - "apps/server/api"
+minimumReleaseAge: 2880
