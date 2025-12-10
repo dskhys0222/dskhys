@@ -113,7 +113,7 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}"
 
           # Copy files to server
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r deployment/compose.yaml .env packages "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r deployment/compose.yaml .env deployment/nginx "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
 
           # Deploy on server
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
