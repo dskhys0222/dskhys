@@ -11,7 +11,7 @@ RUN corepack enable && corepack install
 
 # Copy workspace configuration and package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/server/api/package.json ./packages/server/api/
+COPY packages/server/api/package.json ./api/
 
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
@@ -36,13 +36,13 @@ RUN corepack enable && corepack install
 
 # Copy workspace configuration and package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/server/api/package.json ./packages/server/api/
+COPY packages/server/api/package.json ./api/
 
 # Install only production dependencies
 RUN pnpm install --prod --frozen-lockfile
 
 # Copy built application from builder stage
-COPY --from=builder /app/packages/server/api/dist ./packages/server/api/dist
+COPY --from=builder /app/api/dist ./api/dist
 
 # Copy healthcheck script
 COPY deployment/healthcheck.sh /healthcheck.sh
@@ -59,4 +59,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "packages/server/api/dist/index.js"]
+CMD ["node", "api/dist/index.js"]

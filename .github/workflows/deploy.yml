@@ -84,7 +84,7 @@ jobs:
         with:
           sparse-checkout: |
             deployment/compose.yml
-            packages/server/nginx/nginx.conf
+            deployment/nginx/nginx.conf
 
       - name: Create .env file
         run: |
