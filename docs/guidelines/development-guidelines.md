@@ -1,14 +1,25 @@
-# プロジェクト構成
+# 開発規約
 
-## ✅ 全体構成まとめ
+- ドキュメントは markdown 形式で作成すること
+- 図は mermaid 形式で作成し、markdown 内に埋め込むこと
+- yaml ファイルの拡張子は`.yaml`にすること
 
-2025/10/16 時点の予定
+## 最低限必要な環境
 
-### 🔧 開発環境
+- Docker
+- Visual Studio Code
+- Dev Containers 拡張機能
 
-- OS: Windows x Docker Desktop x Dev Container
-- エディター: Visual Studio Code
-- ドキュメント: Markdown x Mermaid
+## 開発フロー
+
+すべての開発は以下のステップで進めること。
+また、各ステップの間にレビューを挟むこと。
+
+1. ドキュメントを作成する
+2. テストコードを作成する
+3. プロダクトコードを作成する
+
+## 使用するライブラリ
 
 ### 🌐 サーバーサイド
 
@@ -16,6 +27,7 @@
 - ランタイム: Node.js
 - フレームワーク: Express
 - データベース: SQLite3
+- ORM: Drizzle
 - API 設計: REST API
 - バリデーション: Zod
 - リンター: Biome
@@ -29,9 +41,8 @@
 
 ### 🖥️ クライアントサイド
 
-- 開発対象: Web
-- PWA: 対応
-- ローカル動作: サポート
+- 開発対象: PWA
+- ローカル動作: サポート必須
 - プログラミング言語: TypeScript
 - フロントエンド: React
 - バンドラー: Vite

@@ -1,71 +1,43 @@
 # dskhys
 
-個人用アプリ開発プロジェクト
+このプロジェクトは、システムのバックエンド、フロントエンド、インフラのドキュメントやソースコードなど、関連するものを一括で管理するためのものです。
+このシステムは、私が個人的に使用するものであり、商用利用や第三者への提供は予定していません。
 
-モノレポにする予定
+## ディレクトリ構成
 
-## プロジェクト構成
+pnpm workspace を利用したモノレポとする。
 
 ```txt
 dskhys/
+├── .devcontainer/         # 開発環境の設定
+├── .github/workflows/     # CI/CDの設定
+├── docs/                  # ドキュメント
 ├── packages/
-│   ├── server/api/      # APIサーバー（Express + TypeScript）
-│   └── client/list/     # クライアントアプリ（予定）
-│   └── libs/util/       # 共通ユーティリティ（予定）
-├── .github/workflows/    # GitHub Actions CI/CD
-├── docs/                 # ドキュメント
-└── docker-compose.yml    # デプロイ設定
+│   ├── server/           # サーバー用アプリケーション
+│   └── client/           # クライアント用アプリケーション
+│   └── libs/             # 共通ライブラリ
+└── deployment/            # デプロイ用
 ```
 
-## 開発
-
-### 前提条件
-
-- Node.js 20 以上
-- npm
-
-### セットアップ
+## 基本コマンド
 
 ```bash
-# 依存関係のインストール
-pnpm install
+# linter
+pnpm lint
 
-# リント
-pnpm run lint
+# formatter
+pnpm format
 
 # テスト（APIサーバー）
-pnpm api run test
+pnpm api test
 
 # ビルド（APIサーバー）
-pnpm api run build
+pnpm api build
 
-# 開発サーバー起動
-pnpm api run dev
+# 開発サーバー起動（APIサーバー）
+pnpm api dev
 ```
 
-## デプロイ
+## 開発規約
 
-このプロジェクトは GitHub Actions を使用した自動デプロイに対応しています。
-
-### 自動デプロイ
-
-`main` ブランチへのプッシュで自動的に以下が実行されます：
-
-1. **テスト** - リントとユニットテストの実行
-2. **ビルド** - TypeScript のコンパイル
-3. **デプロイ** - Linux サーバーへ SSH で配布し、Docker Compose で起動
-
-### デプロイ設定
-
-詳細な設定手順は以下のドキュメントを参照してください：
-
-- [デプロイメント設定](docs/deployment.md) - サーバー準備とデプロイの手順
-- [GitHub Secrets 設定](docs/secrets-setup.md) - 必要なシークレットの設定方法
-
-### 手動デプロイ
-
-GitHub の Actions タブから "Deploy to Server" ワークフローを選択し、"Run workflow" をクリックして手動実行できます。
-
-## ライセンス
-
-ISC
+[開発規約](./docs/guidelines/development-guidelines.md)を参照すること。
