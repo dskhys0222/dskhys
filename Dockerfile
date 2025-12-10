@@ -11,7 +11,6 @@ RUN corepack enable && corepack install
 
 # Copy workspace configuration and package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY .npmrc .npmrc
 COPY packages/server/api/package.json ./packages/server/api/
 
 # Install all dependencies
@@ -37,7 +36,6 @@ RUN corepack enable && corepack install
 
 # Copy workspace configuration and package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY .npmrc .npmrc
 COPY packages/server/api/package.json ./packages/server/api/
 
 # Install only production dependencies
