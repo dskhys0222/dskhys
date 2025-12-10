@@ -1,62 +1,62 @@
-# 1. Builder stage
+# 1. ビルドステージ
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package.json to get pnpm version
+# pnpmバージョン取得のためpackage.jsonをコピー
 COPY package.json ./
 
-# Install pnpm from packageManager field
+# packageManagerフィールドからpnpmをインストール
 RUN corepack enable && corepack install
 
-# Copy workspace configuration and package files
+# ワークスペース設定とパッケージファイルをコピー
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/server/api/package.json ./packages/server/api/
 
-# Install all dependencies
+# すべての依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the source code
+# 残りのソースコードをコピー
 COPY . .
 
-# Build the application
+# アプリケーションをビルド
 RUN pnpm --filter @dskhys/api run build
 
 
-# 2. Production stage
+# 2. プロダクションステージ
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package.json to get pnpm version
+# pnpmバージョン取得のためpackage.jsonをコピー
 COPY package.json ./
 
-# Install pnpm from packageManager field
+# packageManagerフィールドからpnpmをインストール
 RUN corepack enable && corepack install
 
-# Copy workspace configuration and package files
+# ワークスペース設定とパッケージファイルをコピー
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/server/api/package.json ./packages/server/api/
 
-# Install only production dependencies
+# プロダクション依存関係のみインストール
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy built application from builder stage
+# ビルダーステージからビルド済みアプリケーションをコピー
 COPY --from=builder /app/packages/server/api/dist ./packages/server/api/dist
 
-# Copy healthcheck script
+# ヘルスチェックスクリプトをコピー
 COPY deployment/healthcheck.sh /healthcheck.sh
 RUN chmod +x /healthcheck.sh
 
-# Create data directory for SQLite database
+# SQLiteデータベース用のデータディレクトリを作成
 RUN mkdir -p /app/data
 
-# Set environment variables
+# 環境変数を設定
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Expose port
+# ポートを公開
 EXPOSE 3000
 
-# Start the application
+# アプリケーションを起動
 CMD ["node", "packages/server/api/dist/index.js"]
