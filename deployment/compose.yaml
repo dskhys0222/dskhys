@@ -34,8 +34,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
-    depends_on:
-      - api
     networks:
       - dskhys-network
 

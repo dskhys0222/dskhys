@@ -89,11 +89,14 @@ jobs:
             '
           "
 
-          # Start nginx with dummy cert
+          # Start nginx with dummy cert (pull images first, start only nginx)
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
-            docker compose up -d nginx
+            docker compose pull nginx certbot
+            docker compose up -d --no-deps nginx
             sleep 5
+            docker compose ps
+            docker compose logs nginx
           "
 
           # Obtain real certificate
