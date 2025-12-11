@@ -84,14 +84,6 @@ jobs:
         with:
           sparse-checkout: |
             deployment/compose.yaml
-            deployment/nginx/nginx.conf
-
-      - name: Create .env file
-        run: |
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
-          echo "JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION }}" >> .env
-          echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}" >> .env
-          echo "API_PORT=${{ secrets.API_PORT }}" >> .env
 
       - name: Deploy to server
         env:
@@ -101,6 +93,9 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           IMAGE_TAG: ${{ needs.build.outputs.tag }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+          JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
@@ -112,14 +107,35 @@ jobs:
           # Create deploy directory on server
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}"
 
-          # Copy files to server
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" -r deployment/compose.yaml .env deployment/nginx "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          # Copy compose.yaml to server
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" deployment/compose.yaml "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+
+          # Update .env file (update existing keys or add new ones)
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            cd ${DEPLOY_PATH}
+            touch .env
+            
+            # Function to update or add env var
+            update_env() {
+              local key=\$1
+              local value=\$2
+              if grep -q \"^\${key}=\" .env; then
+                sed -i \"s|^\${key}=.*|\${key}=\${value}|\" .env
+              else
+                echo \"\${key}=\${value}\" >> .env
+              fi
+            }
+            
+            update_env JWT_SECRET '${JWT_SECRET}'
+            update_env JWT_ACCESS_EXPIRATION '${JWT_ACCESS_EXPIRATION}'
+            update_env JWT_REFRESH_EXPIRATION '${JWT_REFRESH_EXPIRATION}'
+            update_env IMAGE_TAG '${IMAGE_TAG}'
+          "
 
           # Deploy on server
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             set -e
             cd ${DEPLOY_PATH}
-            export IMAGE_TAG=${IMAGE_TAG}
             docker compose pull
             docker compose up -d --force-recreate
             docker compose ps

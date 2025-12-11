@@ -77,6 +77,28 @@ cat ~/.ssh/github_deploy.pub
 
 **注意:** このディレクトリはサーバー上に存在し、SSH ユーザーが書き込み可能である必要があります。
 
+### DOMAIN_NAME
+
+**説明:** SSL 証明書を取得するドメイン名
+
+**設定例:**
+
+- `example.com`
+- `api.example.com`
+
+**注意:** このドメインの DNS A レコードがデプロイサーバーの IP アドレスを指している必要があります。
+
+### LETSENCRYPT_EMAIL
+
+**説明:** Let's Encrypt からの通知を受け取るメールアドレス（証明書の有効期限警告など）
+
+**設定例:**
+
+- `admin@example.com`
+- `devops@example.com`
+
+**注意:** SSL セットアップワークフロー (`setup-ssl.yaml`) でのみ使用されます。
+
 ## 検証
 
 すべてのシークレットを設定した後、以下の方法で検証できます:
