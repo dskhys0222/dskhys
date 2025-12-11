@@ -101,6 +101,9 @@ jobs:
             echo '=== Testing nginx configuration ==='
             docker compose run --rm --no-deps --entrypoint '' nginx nginx -t -c /etc/nginx/nginx.conf || echo 'Config test failed, continuing...'
             
+            echo '=== Checking nginx.conf ACME challenge location ==='
+            grep -A 2 'location /.well-known/acme-challenge/' ${DEPLOY_PATH}/nginx/nginx.conf || echo 'ACME location not found'
+            
             docker compose up -d --no-deps nginx
             sleep 5
             
@@ -113,13 +116,29 @@ jobs:
             echo '=== Port 80 Check ==='
             ss -tlnp | grep :80 || netstat -tlnp | grep :80 || echo 'Port 80 not listening'
             
+            echo '=== Check certbot-www volume mount ==='
+            docker compose exec nginx ls -la /var/www/certbot || echo 'Volume not accessible'
+            
+            echo '=== Create test file in certbot-www ==='
+            docker compose run --rm certbot sh -c 'echo \"test\" > /var/www/certbot/test-file && ls -la /var/www/certbot/'
+            
             echo '=== Test Local Access ==='
-            curl -v http://localhost/.well-known/acme-challenge/test 2>&1 || echo 'Local curl failed'
+            curl -v http://localhost/.well-known/acme-challenge/test-file 2>&1 || echo 'Local curl failed'
           "
 
           # Obtain real certificate
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
+            
+            echo '=== Removing existing certificates completely ==='
+            docker compose run --rm --entrypoint '' certbot sh -c '
+              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
+              ls -la /etc/letsencrypt/live/ || echo \"Live directory cleared\"
+            '
+            
+            echo '=== Obtaining real certificate ==='
             docker compose run --rm certbot certonly \
               --webroot \
               --webroot-path=/var/www/certbot \
