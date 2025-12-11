@@ -59,10 +59,16 @@ jobs:
 
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' ${DEPLOY_PATH}/nginx/nginx.conf
+            echo '=== Before replacement ==='
+            grep 'ssl_certificate' ${DEPLOY_PATH}/nginx/nginx.conf | head -2
+            
+            sed -i 's/\${DOMAIN_NAME}/${DOMAIN_NAME}/g' ${DEPLOY_PATH}/nginx/nginx.conf
+            
+            echo '=== After replacement ==='
+            grep 'ssl_certificate' ${DEPLOY_PATH}/nginx/nginx.conf | head -2
             
             echo '=== Verifying nginx.conf content ==='
-            grep -n 'upstream\|resolver\|proxy_pass' ${DEPLOY_PATH}/nginx/nginx.conf || echo 'Config check complete'
+            grep -n 'resolver\|proxy_pass' ${DEPLOY_PATH}/nginx/nginx.conf || echo 'Config check complete'
           "
 
           # Update .env file (update existing keys or add new ones)
@@ -141,7 +147,8 @@ jobs:
             curl -v http://localhost/.well-known/acme-challenge/test-file 2>&1 || echo 'Local curl failed'
           "
 
-          # Obtain real certificate
+          # Obtain certificate
+          USE_STAGING="${{ github.event.inputs.use_staging }}"
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
             
@@ -153,23 +160,23 @@ jobs:
               ls -la /etc/letsencrypt/live/ || echo \"Live directory cleared\"
             '
             
-            echo '=== Obtaining certificate (staging=${{ github.event.inputs.use_staging }}) ==='
-            STAGING_FLAG=""
-            if [ "${{ github.event.inputs.use_staging }}" = "true" ]; then
-              STAGING_FLAG="--staging"
-              echo "Using Let's Encrypt STAGING environment (test certificates)"
+            echo '=== Obtaining certificate (staging=${USE_STAGING}) ==='
+            STAGING_FLAG=\"\"
+            if [ \"${USE_STAGING}\" = \"true\" ]; then
+              STAGING_FLAG=\"--staging\"
+              echo \"Using Let's Encrypt STAGING environment (test certificates)\"
             else
-              echo "Using Let's Encrypt PRODUCTION environment (real certificates)"
+              echo \"Using Let's Encrypt PRODUCTION environment (real certificates)\"
             fi
             
-            docker compose run --rm certbot certonly \
-              --webroot \
-              --webroot-path=/var/www/certbot \
-              --email ${LETSENCRYPT_EMAIL} \
-              --agree-tos \
-              --no-eff-email \
-              --cert-name ${DOMAIN_NAME} \
-              \$STAGING_FLAG \
+            docker compose run --rm certbot certonly \\
+              --webroot \\
+              --webroot-path=/var/www/certbot \\
+              --email ${LETSENCRYPT_EMAIL} \\
+              --agree-tos \\
+              --no-eff-email \\
+              --cert-name ${DOMAIN_NAME} \\
+              \\\$STAGING_FLAG \\
               -d ${DOMAIN_NAME}
           "
 
