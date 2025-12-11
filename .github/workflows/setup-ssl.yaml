@@ -60,15 +60,15 @@ jobs:
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             echo '=== Before replacement ==='
-            grep 'ssl_certificate' ${DEPLOY_PATH}/nginx/nginx.conf | head -2
+            grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
             
-            sed -i 's/\${DOMAIN_NAME}/${DOMAIN_NAME}/g' ${DEPLOY_PATH}/nginx/nginx.conf
+            sed -i 's/\\\${DOMAIN_NAME}/'"${DOMAIN_NAME}"'/g' \${DEPLOY_PATH}/nginx/nginx.conf
             
             echo '=== After replacement ==='
-            grep 'ssl_certificate' ${DEPLOY_PATH}/nginx/nginx.conf | head -2
+            grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
             
             echo '=== Verifying nginx.conf content ==='
-            grep -n 'resolver\|proxy_pass' ${DEPLOY_PATH}/nginx/nginx.conf || echo 'Config check complete'
+            grep -n 'resolver\|proxy_pass' \${DEPLOY_PATH}/nginx/nginx.conf || echo 'Config check complete'
           "
 
           # Update .env file (update existing keys or add new ones)
@@ -160,24 +160,24 @@ jobs:
               ls -la /etc/letsencrypt/live/ || echo \"Live directory cleared\"
             '
             
-            echo '=== Obtaining certificate (staging=${USE_STAGING}) ==='
-            STAGING_FLAG=\"\"
-            if [ \"${USE_STAGING}\" = \"true\" ]; then
-              STAGING_FLAG=\"--staging\"
-              echo \"Using Let's Encrypt STAGING environment (test certificates)\"
+            echo '=== Obtaining certificate (staging='"${USE_STAGING}"') ==='
+            STAGING_FLAG=''
+            if [ '"${USE_STAGING}"' = 'true' ]; then
+              STAGING_FLAG='--staging'
+              echo 'Using Let'\''s Encrypt STAGING environment (test certificates)'
             else
-              echo \"Using Let's Encrypt PRODUCTION environment (real certificates)\"
+              echo 'Using Let'\''s Encrypt PRODUCTION environment (real certificates)'
             fi
             
             docker compose run --rm certbot certonly \\
               --webroot \\
               --webroot-path=/var/www/certbot \\
-              --email ${LETSENCRYPT_EMAIL} \\
+              --email '"${LETSENCRYPT_EMAIL}"' \\
               --agree-tos \\
               --no-eff-email \\
-              --cert-name ${DOMAIN_NAME} \\
-              \\\$STAGING_FLAG \\
-              -d ${DOMAIN_NAME}
+              --cert-name '"${DOMAIN_NAME}"' \\
+              \$STAGING_FLAG \\
+              -d '"${DOMAIN_NAME}"'
           "
 
           # Reload nginx with real certificate
