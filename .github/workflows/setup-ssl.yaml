@@ -77,15 +77,16 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
             
-            # Generate self-signed certificate using certbot container
+            # Remove any existing certificates to avoid -0001 suffix issue
             docker compose run --rm --entrypoint '' certbot sh -c '
+              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
               mkdir -p /etc/letsencrypt/live/${DOMAIN_NAME}
-              if [ ! -f /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem ]; then
-                openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
-                  -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
-                  -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
-                  -subj \"/CN=localhost\"
-              fi
+              openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+                -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
+                -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
+                -subj \"/CN=localhost\"
             '
           "
 
@@ -108,7 +109,7 @@ jobs:
               --email ${LETSENCRYPT_EMAIL} \
               --agree-tos \
               --no-eff-email \
-              --force-renewal \
+              --cert-name ${DOMAIN_NAME} \
               -d ${DOMAIN_NAME}
           "
 

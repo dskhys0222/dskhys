@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api:
     image: dskhys0222/dskhys-api:${IMAGE_TAG:-latest}
