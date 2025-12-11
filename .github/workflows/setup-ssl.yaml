@@ -59,20 +59,21 @@ jobs:
 
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            DEPLOY_PATH='${DEPLOY_PATH}'
-            DOMAIN_NAME='${DOMAIN_NAME}'
+            set -x
+            cd ${DEPLOY_PATH}/nginx
             
             echo '=== Before replacement ==='
-            grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
+            grep 'ssl_certificate' nginx.conf | head -2 || echo 'Pattern not found'
             
-            sed -i 's/\\\${DOMAIN_NAME}/'\${DOMAIN_NAME}'/g' \${DEPLOY_PATH}/nginx/nginx.conf
+            sed -i 's/\\\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
             
             echo '=== After replacement ==='
-            grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
+            grep 'ssl_certificate' nginx.conf | head -2
             
-            echo '=== Verifying nginx.conf content ==='
-            grep -n 'resolver\|proxy_pass' \${DEPLOY_PATH}/nginx/nginx.conf || echo 'Config check complete'
+            echo '=== Check if domain_name variable still exists ==='
+            grep -i 'domain_name' nginx.conf || echo 'No domain_name variable found (good)'
           "
+
 
           # Update .env file (update existing keys or add new ones)
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
