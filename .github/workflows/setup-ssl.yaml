@@ -59,26 +59,13 @@ jobs:
 
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            set -x
             cd ${DEPLOY_PATH}/nginx
-            
-            echo '=== Before replacement ==='
-            grep 'ssl_certificate' nginx.conf | head -2 || echo 'Pattern not found'
-            
             sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
-            
-            echo '=== After replacement ==='
-            grep 'ssl_certificate' nginx.conf | head -2
-            
-            echo '=== Check if DOMAIN_NAME variable still exists ==='
-            grep 'DOMAIN_NAME' nginx.conf || echo 'No DOMAIN_NAME variable found (good)'
           "
 
           # Restart nginx to load updated config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
-            
-            echo '=== Restarting nginx to load updated config ==='
             docker compose restart nginx
             sleep 3
           "
@@ -120,43 +107,12 @@ jobs:
             '
           "
 
-          # Start nginx with dummy cert (pull images first, start only nginx)
+          # Start nginx with dummy cert
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
             docker compose pull nginx certbot
-            
-            echo '=== Testing nginx configuration ==='
-            docker compose run --rm --no-deps --entrypoint '' nginx nginx -t -c /etc/nginx/nginx.conf || echo 'Config test failed, continuing...'
-            
-            echo '=== Checking nginx.conf ACME challenge location ==='
-            grep -A 2 'location /.well-known/acme-challenge/' ${DEPLOY_PATH}/nginx/nginx.conf || echo 'ACME location not found'
-            
             docker compose up -d --no-deps nginx
             sleep 5
-            
-            echo '=== Container Status ==='
-            docker compose ps
-            
-            echo '=== Nginx Logs ==='
-            docker compose logs nginx
-            
-            echo '=== Port 80 Check ==='
-            ss -tlnp | grep :80 || netstat -tlnp | grep :80 || echo 'Port 80 not listening'
-            
-            echo '=== Check certbot-www volume mount ==='
-            docker compose exec nginx ls -la /var/www/certbot || echo 'Volume not accessible'
-            
-            echo '=== Check nginx.conf inside container ==='
-            docker compose exec nginx cat /etc/nginx/nginx.conf | grep -A 3 'location /.well-known/acme-challenge/'
-            
-            echo '=== Create test file directly ==='
-            docker compose exec nginx sh -c 'echo "test-content" > /var/www/certbot/direct-test && ls -la /var/www/certbot/' || echo 'Cannot write to volume (read-only is expected)'
-            
-            echo '=== Test nginx config syntax ==='
-            docker compose exec nginx nginx -t
-            
-            echo '=== Test Local Access ==='
-            curl -v http://localhost/.well-known/acme-challenge/test-file 2>&1 || echo 'Local curl failed'
           "
 
           # Obtain certificate
@@ -169,16 +125,11 @@ jobs:
               rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
               rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
               rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
-              ls -la /etc/letsencrypt/live/ || echo \"Live directory cleared\"
             '
             
-            echo '=== Obtaining certificate (staging='"${USE_STAGING}"') ==='
             STAGING_FLAG=''
             if [ '"${USE_STAGING}"' = 'true' ]; then
               STAGING_FLAG='--staging'
-              echo 'Using Let'\''s Encrypt STAGING environment (test certificates)'
-            else
-              echo 'Using Let'\''s Encrypt PRODUCTION environment (real certificates)'
             fi
             
             docker compose run --rm certbot certonly \\
@@ -195,18 +146,11 @@ jobs:
           # Reload nginx with real certificate
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
-            
-            echo '=== Verifying certificate files exist ==='
-            docker compose exec nginx ls -la /etc/letsencrypt/live/
-            
-            echo '=== Testing nginx configuration before reload ==='
-            docker compose exec nginx nginx -t || echo 'Config test failed'
-            
-            echo '=== Reloading nginx ==='
+            docker compose exec nginx nginx -t
             docker compose exec nginx nginx -s reload
           "
 
-          # Setup certificate renewal cron
+          # Setup auto-renewal
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             (crontab -l 2>/dev/null | grep -v 'certbot renew'; echo \"0 */12 * * * cd ${DEPLOY_PATH} && docker compose run --rm certbot renew --quiet && docker compose exec nginx nginx -s reload\") | crontab -
           "
