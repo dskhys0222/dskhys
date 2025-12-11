@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       use_staging:
-        description: 'Use Let\'s Encrypt staging environment (to avoid rate limits)'
+        description: 'Use Let''s Encrypt staging environment (to avoid rate limits)'
         required: false
         default: 'false'
         type: choice
