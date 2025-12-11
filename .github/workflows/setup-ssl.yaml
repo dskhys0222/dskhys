@@ -2,6 +2,15 @@ name: Setup SSL Certificate
 
 on:
   workflow_dispatch:
+    inputs:
+      use_staging:
+        description: 'Use Let\'s Encrypt staging environment (to avoid rate limits)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: read
@@ -119,8 +128,14 @@ jobs:
             echo '=== Check certbot-www volume mount ==='
             docker compose exec nginx ls -la /var/www/certbot || echo 'Volume not accessible'
             
-            echo '=== Create test file in certbot-www ==='
-            docker compose run --rm certbot sh -c 'echo \"test\" > /var/www/certbot/test-file && ls -la /var/www/certbot/'
+            echo '=== Check nginx.conf inside container ==='
+            docker compose exec nginx cat /etc/nginx/nginx.conf | grep -A 3 'location /.well-known/acme-challenge/'
+            
+            echo '=== Create test file directly ==='
+            docker compose exec nginx sh -c 'echo "test-content" > /var/www/certbot/direct-test && ls -la /var/www/certbot/' || echo 'Cannot write to volume (read-only is expected)'
+            
+            echo '=== Test nginx config syntax ==='
+            docker compose exec nginx nginx -t
             
             echo '=== Test Local Access ==='
             curl -v http://localhost/.well-known/acme-challenge/test-file 2>&1 || echo 'Local curl failed'
@@ -138,7 +153,15 @@ jobs:
               ls -la /etc/letsencrypt/live/ || echo \"Live directory cleared\"
             '
             
-            echo '=== Obtaining real certificate ==='
+            echo '=== Obtaining certificate (staging=${{ github.event.inputs.use_staging }}) ==='
+            STAGING_FLAG=""
+            if [ "${{ github.event.inputs.use_staging }}" = "true" ]; then
+              STAGING_FLAG="--staging"
+              echo "Using Let's Encrypt STAGING environment (test certificates)"
+            else
+              echo "Using Let's Encrypt PRODUCTION environment (real certificates)"
+            fi
+            
             docker compose run --rm certbot certonly \
               --webroot \
               --webroot-path=/var/www/certbot \
@@ -146,6 +169,7 @@ jobs:
               --agree-tos \
               --no-eff-email \
               --cert-name ${DOMAIN_NAME} \
+              \$STAGING_FLAG \
               -d ${DOMAIN_NAME}
           "
 
