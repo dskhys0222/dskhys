@@ -65,15 +65,14 @@ jobs:
             echo '=== Before replacement ==='
             grep 'ssl_certificate' nginx.conf | head -2 || echo 'Pattern not found'
             
-            sed -i 's/\\\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
+            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
             
             echo '=== After replacement ==='
             grep 'ssl_certificate' nginx.conf | head -2
             
-            echo '=== Check if domain_name variable still exists ==='
-            grep -i 'domain_name' nginx.conf || echo 'No domain_name variable found (good)'
+            echo '=== Check if DOMAIN_NAME variable still exists ==='
+            grep 'DOMAIN_NAME' nginx.conf || echo 'No DOMAIN_NAME variable found (good)'
           "
-
 
           # Update .env file (update existing keys or add new ones)
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
