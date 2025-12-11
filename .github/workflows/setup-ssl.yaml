@@ -59,10 +59,13 @@ jobs:
 
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            DEPLOY_PATH='${DEPLOY_PATH}'
+            DOMAIN_NAME='${DOMAIN_NAME}'
+            
             echo '=== Before replacement ==='
             grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
             
-            sed -i 's/\\\${DOMAIN_NAME}/'"${DOMAIN_NAME}"'/g' \${DEPLOY_PATH}/nginx/nginx.conf
+            sed -i 's/\\\${DOMAIN_NAME}/'\${DOMAIN_NAME}'/g' \${DEPLOY_PATH}/nginx/nginx.conf
             
             echo '=== After replacement ==='
             grep 'ssl_certificate' \${DEPLOY_PATH}/nginx/nginx.conf | head -2
@@ -183,6 +186,14 @@ jobs:
           # Reload nginx with real certificate
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
+            
+            echo '=== Verifying certificate files exist ==='
+            docker compose exec nginx ls -la /etc/letsencrypt/live/
+            
+            echo '=== Testing nginx configuration before reload ==='
+            docker compose exec nginx nginx -t || echo 'Config test failed'
+            
+            echo '=== Reloading nginx ==='
             docker compose exec nginx nginx -s reload
           "
 
