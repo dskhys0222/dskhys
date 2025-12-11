@@ -96,8 +96,18 @@ jobs:
             docker compose pull nginx certbot
             docker compose up -d --no-deps nginx
             sleep 5
+            
+            echo '=== Container Status ==='
             docker compose ps
+            
+            echo '=== Nginx Logs ==='
             docker compose logs nginx
+            
+            echo '=== Port 80 Check ==='
+            ss -tlnp | grep :80 || netstat -tlnp | grep :80 || echo 'Port 80 not listening'
+            
+            echo '=== Test Local Access ==='
+            curl -v http://localhost/.well-known/acme-challenge/test 2>&1 || echo 'Local curl failed'
           "
 
           # Obtain real certificate
