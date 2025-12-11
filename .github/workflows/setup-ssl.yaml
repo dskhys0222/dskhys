@@ -74,6 +74,15 @@ jobs:
             grep 'DOMAIN_NAME' nginx.conf || echo 'No DOMAIN_NAME variable found (good)'
           "
 
+          # Restart nginx to load updated config
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            cd ${DEPLOY_PATH}
+            
+            echo '=== Restarting nginx to load updated config ==='
+            docker compose restart nginx
+            sleep 3
+          "
+
           # Update .env file (update existing keys or add new ones)
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
