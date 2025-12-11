@@ -115,21 +115,33 @@ jobs:
             cd ${DEPLOY_PATH}
             touch .env
             
-            # Function to update or add env var
-            update_env() {
-              local key=\$1
-              local value=\$2
-              if grep -q \"^\${key}=\" .env; then
-                sed -i \"s|^\${key}=.*|\${key}=\${value}|\" .env
-              else
-                echo \"\${key}=\${value}\" >> .env
-              fi
-            }
+            # Update JWT_SECRET
+            if grep -q '^JWT_SECRET=' .env; then
+              sed -i 's|^JWT_SECRET=.*|JWT_SECRET=${JWT_SECRET}|' .env
+            else
+              echo 'JWT_SECRET=${JWT_SECRET}' >> .env
+            fi
             
-            update_env JWT_SECRET '${JWT_SECRET}'
-            update_env JWT_ACCESS_EXPIRATION '${JWT_ACCESS_EXPIRATION}'
-            update_env JWT_REFRESH_EXPIRATION '${JWT_REFRESH_EXPIRATION}'
-            update_env IMAGE_TAG '${IMAGE_TAG}'
+            # Update JWT_ACCESS_EXPIRATION
+            if grep -q '^JWT_ACCESS_EXPIRATION=' .env; then
+              sed -i 's|^JWT_ACCESS_EXPIRATION=.*|JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}|' .env
+            else
+              echo 'JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}' >> .env
+            fi
+            
+            # Update JWT_REFRESH_EXPIRATION
+            if grep -q '^JWT_REFRESH_EXPIRATION=' .env; then
+              sed -i 's|^JWT_REFRESH_EXPIRATION=.*|JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}|' .env
+            else
+              echo 'JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}' >> .env
+            fi
+            
+            # Update IMAGE_TAG
+            if grep -q '^IMAGE_TAG=' .env; then
+              sed -i 's|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|' .env
+            else
+              echo 'IMAGE_TAG=${IMAGE_TAG}' >> .env
+            fi
           "
 
           # Deploy on server

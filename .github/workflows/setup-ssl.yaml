@@ -58,19 +58,19 @@ jobs:
             cd ${DEPLOY_PATH}
             touch .env
             
-            # Function to update or add env var
-            update_env() {
-              local key=\\\$1
-              local value=\\\$2
-              if grep -q \"^\\\${key}=\" .env; then
-                sed -i \"s|^\\\${key}=.*|\\\${key}=\\\${value}|\" .env
-              else
-                echo \"\\\${key}=\\\${value}\" >> .env
-              fi
-            }
+            # Update DOMAIN_NAME
+            if grep -q '^DOMAIN_NAME=' .env; then
+              sed -i 's|^DOMAIN_NAME=.*|DOMAIN_NAME=${DOMAIN_NAME}|' .env
+            else
+              echo 'DOMAIN_NAME=${DOMAIN_NAME}' >> .env
+            fi
             
-            update_env DOMAIN_NAME '${DOMAIN_NAME}'
-            update_env LETSENCRYPT_EMAIL '${LETSENCRYPT_EMAIL}'
+            # Update LETSENCRYPT_EMAIL
+            if grep -q '^LETSENCRYPT_EMAIL=' .env; then
+              sed -i 's|^LETSENCRYPT_EMAIL=.*|LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}|' .env
+            else
+              echo 'LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}' >> .env
+            fi
           "
 
           # Create dummy certificate for initial nginx startup
