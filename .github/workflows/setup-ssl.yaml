@@ -2,6 +2,15 @@ name: Setup SSL Certificate
 
 on:
   workflow_dispatch:
+    inputs:
+      use_staging:
+        description: 'Use Let''s Encrypt staging environment (to avoid rate limits)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: read
@@ -48,9 +57,17 @@ jobs:
             deployment/nginx/nginx.conf \
             "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/nginx/"
 
-          # Replace domain placeholder in nginx config
+          # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' ${DEPLOY_PATH}/nginx/nginx.conf
+            cd ${DEPLOY_PATH}/nginx
+            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
+          "
+
+          # Restart nginx to load updated config
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            cd ${DEPLOY_PATH}
+            docker compose restart nginx
+            sleep 3
           "
 
           # Update .env file (update existing keys or add new ones)
@@ -77,48 +94,63 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
             
-            # Generate self-signed certificate using certbot container
+            # Remove any existing certificates to avoid -0001 suffix issue
             docker compose run --rm --entrypoint '' certbot sh -c '
+              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
               mkdir -p /etc/letsencrypt/live/${DOMAIN_NAME}
-              if [ ! -f /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem ]; then
-                openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
-                  -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
-                  -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
-                  -subj \"/CN=localhost\"
-              fi
+              openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+                -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
+                -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
+                -subj \"/CN=localhost\"
             '
           "
 
-          # Start nginx with dummy cert (pull images first, start only nginx)
+          # Start nginx with dummy cert
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
             docker compose pull nginx certbot
             docker compose up -d --no-deps nginx
             sleep 5
-            docker compose ps
-            docker compose logs nginx
           "
 
-          # Obtain real certificate
+          # Obtain certificate
+          USE_STAGING="${{ github.event.inputs.use_staging }}"
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
-            docker compose run --rm certbot certonly \
-              --webroot \
-              --webroot-path=/var/www/certbot \
-              --email ${LETSENCRYPT_EMAIL} \
-              --agree-tos \
-              --no-eff-email \
-              --force-renewal \
-              -d ${DOMAIN_NAME}
+            
+            echo '=== Removing existing certificates completely ==='
+            docker compose run --rm --entrypoint '' certbot sh -c '
+              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
+            '
+            
+            STAGING_FLAG=''
+            if [ '"${USE_STAGING}"' = 'true' ]; then
+              STAGING_FLAG='--staging'
+            fi
+            
+            docker compose run --rm certbot certonly \\
+              --webroot \\
+              --webroot-path=/var/www/certbot \\
+              --email '"${LETSENCRYPT_EMAIL}"' \\
+              --agree-tos \\
+              --no-eff-email \\
+              --cert-name '"${DOMAIN_NAME}"' \\
+              \$STAGING_FLAG \\
+              -d '"${DOMAIN_NAME}"'
           "
 
           # Reload nginx with real certificate
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}
+            docker compose exec nginx nginx -t
             docker compose exec nginx nginx -s reload
           "
 
-          # Setup certificate renewal cron
+          # Setup auto-renewal
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             (crontab -l 2>/dev/null | grep -v 'certbot renew'; echo \"0 */12 * * * cd ${DEPLOY_PATH} && docker compose run --rm certbot renew --quiet && docker compose exec nginx nginx -s reload\") | crontab -
           "
