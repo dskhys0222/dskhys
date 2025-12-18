@@ -8,11 +8,11 @@ export const router: ExpressRouter = Router();
 
 // 基本的なルート
 router.get('/', (_req, res) => {
-  res.json({
-    message: 'API is running',
-    version: '0.0.1',
-    timestamp: new Date().toISOString(),
-  });
+    res.json({
+        message: 'API is running',
+        timestamp: new Date().toISOString(),
+        version: '0.0.1',
+    });
 });
 
 // 認証ルート

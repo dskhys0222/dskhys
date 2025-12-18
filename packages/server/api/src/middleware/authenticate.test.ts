@@ -4,173 +4,219 @@ import { generateAccessToken } from '../utils/jwt.js';
 import { authenticate } from './authenticate.js';
 
 describe('authenticate middleware', () => {
-  let mockRequest: Partial<Request>;
-  let mockResponse: Partial<Response>;
-  let mockNext: NextFunction;
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<Response>;
+    let mockNext: NextFunction;
 
-  beforeEach(() => {
-    mockRequest = {
-      headers: {},
-    };
-    mockResponse = {};
-    mockNext = vi.fn();
-    vi.clearAllMocks();
-  });
-
-  describe('トークンが提供されている場合', () => {
-    it('有効なトークンでユーザー情報をリクエストに追加する', () => {
-      const payload = { userId: 1, email: 'test@example.com' };
-      const token = generateAccessToken(payload);
-
-      mockRequest.headers = {
-        authorization: `Bearer ${token}`,
-      };
-
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith();
-      expect(mockRequest.user).toEqual({
-        userId: payload.userId,
-        email: payload.email,
-      });
+    beforeEach(() => {
+        mockRequest = {
+            headers: {},
+        };
+        mockResponse = {};
+        mockNext = vi.fn();
+        vi.clearAllMocks();
     });
 
-    it('有効なトークンで次のミドルウェアに進む', () => {
-      const payload = { userId: 2, email: 'user@example.com' };
-      const token = generateAccessToken(payload);
+    describe('トークンが提供されている場合', () => {
+        it('有効なトークンでユーザー情報をリクエストに追加する', () => {
+            const payload = { email: 'test@example.com', userId: 1 };
+            const token = generateAccessToken(payload);
 
-      mockRequest.headers = {
-        authorization: `Bearer ${token}`,
-      };
+            mockRequest.headers = {
+                authorization: `Bearer ${token}`,
+            };
 
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
 
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      expect(mockNext).toHaveBeenCalledWith();
-    });
-  });
+            expect(mockNext).toHaveBeenCalledWith();
+            expect(mockRequest.user).toEqual({
+                email: payload.email,
+                userId: payload.userId,
+            });
+        });
 
-  describe('トークンが提供されていない場合', () => {
-    it('Authorizationヘッダーがない場合はエラーを返す', () => {
-      mockRequest.headers = {};
+        it('有効なトークンで次のミドルウェアに進む', () => {
+            const payload = { email: 'user@example.com', userId: 2 };
+            const token = generateAccessToken(payload);
 
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
+            mockRequest.headers = {
+                authorization: `Bearer ${token}`,
+            };
 
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.message).toBe('No token provided');
-      expect(error.statusCode).toBe(401);
-    });
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
 
-    it('Bearerスキームがない場合はエラーを返す', () => {
-      mockRequest.headers = {
-        authorization: 'InvalidScheme token123',
-      };
-
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
-
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.message).toBe('No token provided');
-      expect(error.statusCode).toBe(401);
-    });
-
-    it('トークンが空の場合はエラーを返す', () => {
-      mockRequest.headers = {
-        authorization: 'Bearer ',
-      };
-
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
-
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.statusCode).toBe(401);
-    });
-  });
-
-  describe('無効なトークンの場合', () => {
-    it('無効な形式のトークンでエラーを返す', () => {
-      mockRequest.headers = {
-        authorization: 'Bearer invalid-token',
-      };
-
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
-
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.message).toBe('Token verification failed');
-      expect(error.statusCode).toBe(401);
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext).toHaveBeenCalledWith();
+        });
     });
 
-    it('改ざんされたトークンでエラーを返す', () => {
-      const payload = { userId: 1, email: 'test@example.com' };
-      const token = generateAccessToken(payload);
-      const tamperedToken = `${token.slice(0, -5)}xxxxx`;
+    describe('トークンが提供されていない場合', () => {
+        it('Authorizationヘッダーがない場合はエラーを返す', () => {
+            mockRequest.headers = {};
 
-      mockRequest.headers = {
-        authorization: `Bearer ${tamperedToken}`,
-      };
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
 
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.message).toBe('No token provided');
+            expect(error.statusCode).toBe(401);
+        });
 
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.statusCode).toBe(401);
+        it('Bearerスキームがない場合はエラーを返す', () => {
+            mockRequest.headers = {
+                authorization: 'InvalidScheme token123',
+            };
+
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.message).toBe('No token provided');
+            expect(error.statusCode).toBe(401);
+        });
+
+        it('トークンが空の場合はエラーを返す', () => {
+            mockRequest.headers = {
+                authorization: 'Bearer ',
+            };
+
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.statusCode).toBe(401);
+        });
     });
-  });
 
-  describe('エッジケース', () => {
-    it('Authorizationヘッダーが小文字の場合も動作する', () => {
-      const payload = { userId: 1, email: 'test@example.com' };
-      const token = generateAccessToken(payload);
+    describe('無効なトークンの場合', () => {
+        it('無効な形式のトークンでエラーを返す', () => {
+            mockRequest.headers = {
+                authorization: 'Bearer invalid-token',
+            };
 
-      mockRequest.headers = {
-        authorization: `Bearer ${token}`,
-      };
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
 
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.message).toBe('Token verification failed');
+            expect(error.statusCode).toBe(401);
+        });
 
-      expect(mockNext).toHaveBeenCalledWith();
-      expect(mockRequest.user).toBeDefined();
+        it('改ざんされたトークンでエラーを返す', () => {
+            const payload = { email: 'test@example.com', userId: 1 };
+            const token = generateAccessToken(payload);
+            const tamperedToken = `${token.slice(0, -5)}xxxxx`;
+
+            mockRequest.headers = {
+                authorization: `Bearer ${tamperedToken}`,
+            };
+
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.statusCode).toBe(401);
+        });
     });
 
-    it('Bearerの後に複数のスペースがある場合も動作する', () => {
-      const payload = { userId: 1, email: 'test@example.com' };
-      const token = generateAccessToken(payload);
+    describe('エッジケース', () => {
+        it('Authorizationヘッダーが小文字の場合も動作する', () => {
+            const payload = { email: 'test@example.com', userId: 1 };
+            const token = generateAccessToken(payload);
 
-      mockRequest.headers = {
-        authorization: `Bearer  ${token}`, // スペース2つ
-      };
+            mockRequest.headers = {
+                authorization: `Bearer ${token}`,
+            };
 
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
 
-      // "Bearer "の7文字分を削除するため、スペースが2つあるとトークンが不正になる
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      const error = (mockNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(error).toBeDefined();
-      expect(error.statusCode).toBe(401);
+            expect(mockNext).toHaveBeenCalledWith();
+            expect(mockRequest.user).toBeDefined();
+        });
+
+        it('Bearerの後に複数のスペースがある場合も動作する', () => {
+            const payload = { email: 'test@example.com', userId: 1 };
+            const token = generateAccessToken(payload);
+
+            mockRequest.headers = {
+                authorization: `Bearer  ${token}`, // スペース2つ
+            };
+
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            // "Bearer "の7文字分を削除するため、スペースが2つあるとトークンが不正になる
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            const error = (mockNext as ReturnType<typeof vi.fn>).mock
+                .calls[0][0];
+            expect(error).toBeDefined();
+            expect(error.statusCode).toBe(401);
+        });
+
+        it('異なるユーザーIDとメールアドレスでも動作する', () => {
+            const payload = { email: 'admin@example.com', userId: 999 };
+            const token = generateAccessToken(payload);
+
+            mockRequest.headers = {
+                authorization: `Bearer ${token}`,
+            };
+
+            authenticate(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockNext).toHaveBeenCalledWith();
+            expect(mockRequest.user).toEqual({
+                email: 'admin@example.com',
+                userId: 999,
+            });
+        });
     });
-
-    it('異なるユーザーIDとメールアドレスでも動作する', () => {
-      const payload = { userId: 999, email: 'admin@example.com' };
-      const token = generateAccessToken(payload);
-
-      mockRequest.headers = {
-        authorization: `Bearer ${token}`,
-      };
-
-      authenticate(mockRequest as Request, mockResponse as Response, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith();
-      expect(mockRequest.user).toEqual({
-        userId: 999,
-        email: 'admin@example.com',
-      });
-    });
-  });
 });

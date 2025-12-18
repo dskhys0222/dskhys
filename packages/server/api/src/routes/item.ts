@@ -4,22 +4,22 @@ import { err, ok } from 'neverthrow';
 import { v4 as uuidv4 } from 'uuid';
 import { authenticate } from '../middleware/authenticate.js';
 import {
-  deleteListItem,
-  findAllListItemsByOwnerId,
-  findListItemByKey,
-  insertListItem,
-  updateListItem,
+    deleteListItem,
+    findAllListItemsByOwnerId,
+    findListItemByKey,
+    insertListItem,
+    updateListItem,
 } from '../repository/listItemsRepository.js';
 import {
-  CreateListItemSchema,
-  DeleteListItemSchema,
-  FindOneListItemSchema,
-  UpdateListItemSchema,
+    CreateListItemSchema,
+    DeleteListItemSchema,
+    FindOneListItemSchema,
+    UpdateListItemSchema,
 } from '../schemas/index.js';
 import {
-  asyncHandler,
-  NotFoundError,
-  UnauthorizedError,
+    asyncHandler,
+    NotFoundError,
+    UnauthorizedError,
 } from '../utils/errors.js';
 import { parseSchema } from '../utils/validation.js';
 
@@ -30,24 +30,26 @@ export const itemRoutes: ExpressRouter = Router();
  * 認証必須
  */
 itemRoutes.post(
-  '/create',
-  authenticate,
-  asyncHandler((req, res) => {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return err(new UnauthorizedError('User not authenticated'));
-    }
+    '/create',
+    authenticate,
+    asyncHandler((req, res) => {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
 
-    return parseSchema(CreateListItemSchema, req.body).asyncAndThen((input) => {
-      const key = uuidv4();
-      return insertListItem(userId, key, input.data).map(() =>
-        res.status(201).json({
-          key,
-          data: input.data,
-        })
-      );
-    });
-  })
+        return parseSchema(CreateListItemSchema, req.body).asyncAndThen(
+            (input) => {
+                const key = uuidv4();
+                return insertListItem(userId, key, input.data).map(() =>
+                    res.status(201).json({
+                        data: input.data,
+                        key,
+                    })
+                );
+            }
+        );
+    })
 );
 
 /**
@@ -55,24 +57,24 @@ itemRoutes.post(
  * 認証必須
  */
 itemRoutes.get(
-  '/findOne',
-  authenticate,
-  asyncHandler((req, res) => {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return err(new UnauthorizedError('User not authenticated'));
-    }
+    '/findOne',
+    authenticate,
+    asyncHandler((req, res) => {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
 
-    const key = req.query.key as string;
+        const key = req.query.key as string;
 
-    return parseSchema(FindOneListItemSchema, { key }).asyncAndThen(() =>
-      findListItemByKey(key, userId)
-        .andThen((item) =>
-          item ? ok(item) : err(new NotFoundError('List item'))
-        )
-        .map((item) => res.json({ key: item.key, data: item.data }))
-    );
-  })
+        return parseSchema(FindOneListItemSchema, { key }).asyncAndThen(() =>
+            findListItemByKey(key, userId)
+                .andThen((item) =>
+                    item ? ok(item) : err(new NotFoundError('List item'))
+                )
+                .map((item) => res.json({ data: item.data, key: item.key }))
+        );
+    })
 );
 
 /**
@@ -80,18 +82,18 @@ itemRoutes.get(
  * 認証必須
  */
 itemRoutes.get(
-  '/findAll',
-  authenticate,
-  asyncHandler((req, res) => {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return err(new UnauthorizedError('User not authenticated'));
-    }
+    '/findAll',
+    authenticate,
+    asyncHandler((req, res) => {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
 
-    return findAllListItemsByOwnerId(userId).map((items) =>
-      res.json(items.map((item) => ({ key: item.key, data: item.data })))
-    );
-  })
+        return findAllListItemsByOwnerId(userId).map((items) =>
+            res.json(items.map((item) => ({ data: item.data, key: item.key })))
+        );
+    })
 );
 
 /**
@@ -99,27 +101,30 @@ itemRoutes.get(
  * 認証必須
  */
 itemRoutes.put(
-  '/update',
-  authenticate,
-  asyncHandler((req, res) => {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return err(new UnauthorizedError('User not authenticated'));
-    }
+    '/update',
+    authenticate,
+    asyncHandler((req, res) => {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
 
-    return parseSchema(UpdateListItemSchema, req.body).asyncAndThen((input) =>
-      findListItemByKey(input.key, userId)
-        .andThen((item) =>
-          item ? ok(item) : err(new NotFoundError('List item'))
-        )
-        .andThen(() => updateListItem(input.key, input.data, userId))
-        .map(() =>
-          res.json({
-            message: 'List item updated successfully',
-          })
-        )
-    );
-  })
+        return parseSchema(UpdateListItemSchema, req.body).asyncAndThen(
+            (input) =>
+                findListItemByKey(input.key, userId)
+                    .andThen((item) =>
+                        item ? ok(item) : err(new NotFoundError('List item'))
+                    )
+                    .andThen(() =>
+                        updateListItem(input.key, input.data, userId)
+                    )
+                    .map(() =>
+                        res.json({
+                            message: 'List item updated successfully',
+                        })
+                    )
+        );
+    })
 );
 
 /**
@@ -127,27 +132,27 @@ itemRoutes.put(
  * 認証必須
  */
 itemRoutes.delete(
-  '/delete',
-  authenticate,
-  asyncHandler((req, res) => {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return err(new UnauthorizedError('User not authenticated'));
-    }
+    '/delete',
+    authenticate,
+    asyncHandler((req, res) => {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
 
-    const key = req.query.key as string;
+        const key = req.query.key as string;
 
-    return parseSchema(DeleteListItemSchema, { key }).asyncAndThen(() =>
-      findListItemByKey(key, userId)
-        .andThen((item) =>
-          item ? ok(item) : err(new NotFoundError('List item'))
-        )
-        .andThen(() => deleteListItem(key, userId))
-        .map(() =>
-          res.json({
-            message: 'List item deleted successfully',
-          })
-        )
-    );
-  })
+        return parseSchema(DeleteListItemSchema, { key }).asyncAndThen(() =>
+            findListItemByKey(key, userId)
+                .andThen((item) =>
+                    item ? ok(item) : err(new NotFoundError('List item'))
+                )
+                .andThen(() => deleteListItem(key, userId))
+                .map(() =>
+                    res.json({
+                        message: 'List item deleted successfully',
+                    })
+                )
+        );
+    })
 );

@@ -8,23 +8,23 @@ const SALT_ROUNDS = 10;
  * パスワードをハッシュ化
  */
 export const hashPassword = (
-  password: string
+    password: string
 ): ResultAsync<string, InternalServerError> => {
-  return ResultAsync.fromPromise(
-    bcrypt.hash(password, SALT_ROUNDS),
-    () => new InternalServerError('Password hashing failed')
-  );
+    return ResultAsync.fromPromise(
+        bcrypt.hash(password, SALT_ROUNDS),
+        () => new InternalServerError('Password hashing failed')
+    );
 };
 
 /**
  * パスワードを検証
  */
 export const verifyPassword = (
-  password: string,
-  hash: string
+    password: string,
+    hash: string
 ): ResultAsync<boolean, InternalServerError> => {
-  return ResultAsync.fromPromise(
-    bcrypt.compare(password, hash),
-    () => new InternalServerError('Password verification failed')
-  );
+    return ResultAsync.fromPromise(
+        bcrypt.compare(password, hash),
+        () => new InternalServerError('Password verification failed')
+    );
 };

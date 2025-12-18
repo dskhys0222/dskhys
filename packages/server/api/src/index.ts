@@ -12,7 +12,7 @@ app.use(express.json());
 
 // ヘルスチェック（エラーハンドラーの前に配置）
 app.get('/health', (_req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+    res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // ルーティング
@@ -22,5 +22,5 @@ app.use('/api', router);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
