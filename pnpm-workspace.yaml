@@ -1,5 +1,6 @@
 packages:
   - packages/server/api
+  - packages/client/list
 
 minimumReleaseAge: 2880
 
