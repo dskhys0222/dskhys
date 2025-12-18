@@ -1,5 +1,5 @@
 # 1. ビルドステージ
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN pnpm --filter @dskhys/api run build
 
 
 # 2. プロダクションステージ
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
