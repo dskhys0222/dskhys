@@ -32,7 +32,7 @@ describe('Validation Utils', () => {
             if (result.isErr()) {
                 expect(result.error.name).toBe('ValidationError');
                 expect(result.error.statusCode).toBe(400);
-                expect(result.error.message).toContain('Expected number');
+                expect(result.error.message).toContain('expected number');
             }
         });
 
@@ -77,7 +77,9 @@ describe('Validation Utils', () => {
 
             expect(result.isErr()).toBe(true);
             if (result.isErr()) {
-                expect(result.error.message).toContain('at least 8');
+                expect(result.error.message).toContain(
+                    'expected string to have >=8 characters'
+                );
             }
         });
 
@@ -182,7 +184,7 @@ describe('Validation Utils', () => {
 
             expect(result.isErr()).toBe(true);
             if (result.isErr()) {
-                expect(result.error.message).toContain('Expected number');
+                expect(result.error.message).toContain('expected number');
             }
         });
 

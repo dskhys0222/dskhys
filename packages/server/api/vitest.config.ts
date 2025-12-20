@@ -2,14 +2,9 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
+        dir: 'src',
         coverage: {
-            exclude: [
-                'src/index.ts', // アプリケーション起動ファイルは除外
-                '**/*.test.ts',
-                '**/__mocks__/**',
-                '**/*.config.*',
-                'node_modules/**',
-            ],
+            exclude: ['index.ts'],
             reporter: ['text', 'json', 'html'],
             thresholds: {
                 branches: 88,
@@ -23,6 +18,6 @@ export default defineConfig({
         },
         environment: 'node',
         globals: true,
-        include: ['src/**/*.test.ts'],
+        include: ['**/*.test.ts'],
     },
 });

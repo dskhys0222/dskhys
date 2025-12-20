@@ -15,7 +15,7 @@ export const parseSchema = <T>(
         return ok(result.data);
     }
 
-    return err(new ValidationError(result.error.errors[0].message));
+    return err(new ValidationError(result.error.issues[0].message));
 };
 
 /**
@@ -31,6 +31,6 @@ export const parseSchemaAll = <T>(
         return ok(result.data);
     }
 
-    const messages = result.error.errors.map((e) => e.message).join(', ');
+    const messages = result.error.issues.map((e) => e.message).join(', ');
     return err(new ValidationError(messages));
 };
