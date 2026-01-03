@@ -1,8 +1,3 @@
 export default function Header() {
-    return (
-        <>
-            <header>Budget</header>
-            予算管理
-        </>
-    );
+    return <header>Budget</header>;
 }
