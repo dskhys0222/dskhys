@@ -1,6 +1,7 @@
 packages:
   - packages/server/api
   - packages/client/web
+  - packages/client/budget
 
 minimumReleaseAge: 2880
 
