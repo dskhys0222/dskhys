@@ -11,6 +11,9 @@ export function BudgetItem({ name }: BudgetItemProps) {
     >(null);
     const [deltaAmountInput, setDeltaAmountInput] = useState('');
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const [hasHydratedFromStorage, setHasHydratedFromStorage] = useState(false);
+
+    const storageKey = name;
 
     const deltaAmount = useMemo(() => {
         if (!/^\d+$/.test(deltaAmountInput)) return null;
@@ -35,6 +38,18 @@ export function BudgetItem({ name }: BudgetItemProps) {
         );
         closeDialog();
     }, [canConfirm, closeDialog, deltaAmount, dialogMode]);
+
+    useEffect(() => {
+        setHasHydratedFromStorage(false);
+        const storedAmount = readAmountFromLocalStorage(storageKey);
+        setAmount(storedAmount ?? 0);
+        setHasHydratedFromStorage(true);
+    }, [storageKey]);
+
+    useEffect(() => {
+        if (!hasHydratedFromStorage) return;
+        writeAmountToLocalStorage(storageKey, amount);
+    }, [amount, hasHydratedFromStorage, storageKey]);
 
     useEffect(() => {
         if (!dialogMode) return;
@@ -71,35 +86,40 @@ export function BudgetItem({ name }: BudgetItemProps) {
                     aria-modal="true"
                     aria-label={dialogMode === 'increase' ? '増額' : '減額'}
                 >
-                    <h2>{dialogMode === 'increase' ? '増額' : '減額'}</h2>
-                    <div>
-                        <label htmlFor={`${name}-delta-amount`}>差分金額</label>
-                        <input
-                            ref={inputRef}
-                            id={`${name}-delta-amount`}
-                            name="deltaAmount"
-                            type="number"
-                            inputMode="numeric"
-                            step={1}
-                            min={1}
-                            value={deltaAmountInput}
-                            onChange={(e) =>
-                                setDeltaAmountInput(e.target.value)
-                            }
-                        />
-                    </div>
-                    <div>
-                        <button type="button" onClick={closeDialog}>
-                            キャンセル
-                        </button>
-                        <button
-                            type="button"
-                            onClick={confirm}
-                            disabled={!canConfirm}
-                        >
-                            確定
-                        </button>
-                    </div>
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            confirm();
+                        }}
+                    >
+                        <h2>{dialogMode === 'increase' ? '増額' : '減額'}</h2>
+                        <div>
+                            <label htmlFor={`${name}-delta-amount`}>
+                                差分金額
+                            </label>
+                            <input
+                                ref={inputRef}
+                                id={`${name}-delta-amount`}
+                                name="deltaAmount"
+                                type="number"
+                                inputMode="numeric"
+                                step={1}
+                                min={1}
+                                value={deltaAmountInput}
+                                onChange={(e) =>
+                                    setDeltaAmountInput(e.target.value)
+                                }
+                            />
+                        </div>
+                        <div>
+                            <button type="button" onClick={closeDialog}>
+                                キャンセル
+                            </button>
+                            <button type="submit" disabled={!canConfirm}>
+                                確定
+                            </button>
+                        </div>
+                    </form>
                 </div>
             ) : null}
         </div>
@@ -108,4 +128,23 @@ export function BudgetItem({ name }: BudgetItemProps) {
 
 function formatCurrency(value: number) {
     return `￥${value.toLocaleString()}`;
+}
+
+function readAmountFromLocalStorage(key: string): number | null {
+    if (typeof window === 'undefined') return null;
+    if (!('localStorage' in window)) return null;
+
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return null;
+
+    const parsed = Number(raw);
+    if (!Number.isSafeInteger(parsed)) return null;
+    return parsed;
+}
+
+function writeAmountToLocalStorage(key: string, amount: number): void {
+    if (typeof window === 'undefined') return;
+    if (!('localStorage' in window)) return;
+
+    window.localStorage.setItem(key, String(amount));
 }

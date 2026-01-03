@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { BudgetItem } from '@/components/BudgetItem';
 
 afterEach(() => {
+    localStorage.clear();
     cleanup();
 });
 
@@ -23,6 +24,54 @@ function renderBudgetItems() {
 }
 
 describe('Budget / route', () => {
+    it('Enter で確定できる', async () => {
+        renderBudgetItems();
+
+        const plusButtons = screen.getAllByRole('button', { name: '+' });
+        const firstPlus = plusButtons.at(0);
+        if (!firstPlus) throw new Error('plus button not found');
+        fireEvent.click(firstPlus);
+
+        const input = screen.getByLabelText('差分金額') as HTMLInputElement;
+        await waitFor(() => expect(document.activeElement).toBe(input));
+
+        fireEvent.change(input, { target: { value: '1000' } });
+        fireEvent.submit(input);
+
+        expect(screen.queryByRole('dialog')).toBeNull();
+        expect(screen.getAllByText('￥1,000').length).toBe(1);
+    });
+
+    it('永続化: localStorage から初期金額を復元する（キーは name）', () => {
+        localStorage.setItem('モノ', '1234');
+
+        renderBudgetItems();
+
+        const firstItemLabel = screen.getAllByText('モノ').at(0);
+        if (!firstItemLabel) throw new Error('first item label not found');
+        const firstItem = firstItemLabel.parentElement;
+        if (!firstItem) throw new Error('first item not found');
+
+        expect(within(firstItem).getByText('￥1,234')).toBeTruthy();
+    });
+
+    it('永続化: 確定後に localStorage へ保存する（キーは name）', () => {
+        renderBudgetItems();
+
+        const firstItemLabel = screen.getAllByText('モノ').at(0);
+        if (!firstItemLabel) throw new Error('first item label not found');
+        const firstItem = firstItemLabel.parentElement;
+        if (!firstItem) throw new Error('first item not found');
+
+        fireEvent.click(within(firstItem).getByRole('button', { name: '+' }));
+        fireEvent.change(screen.getByLabelText('差分金額'), {
+            target: { value: '1000' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: '確定' }));
+
+        expect(localStorage.getItem('モノ')).toBe('1000');
+    });
+
     it('増額: + -> ダイアログ -> 入力 -> 確定で金額が増える', async () => {
         renderBudgetItems();
 

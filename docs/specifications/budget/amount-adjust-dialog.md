@@ -16,11 +16,18 @@
 ## 状態
 
 - `currentAmount: number`
-  - 初期値：0
+  - 初期値：`localStorage` に保存値があればそれを復元し、なければ 0
 - `dialogMode: 'increase' | 'decrease' | null`
   - ダイアログの表示モード（`null` のとき非表示）
 - `deltaAmountInput: string`
   - 入力値（表示/入力用）
+
+## 永続化（localStorage）
+
+- `currentAmount` はブラウザの `localStorage` に永続化する
+- 永続化キーは BudgetItem の `name` をそのまま使用する
+- 保存値は 10 進整数の文字列（例：`"1000"`）とする
+- 復元時に値が不正（数値化できない / 整数でない等）の場合は 0 として扱う
 
 ## 操作フロー
 
@@ -61,4 +68,5 @@
 ## アクセシビリティ
 
 - ダイアログ表示時、フォーカスがダイアログ内に移る
+- Enter で確定できる（確定可能な場合）
 - Esc で閉じられる
