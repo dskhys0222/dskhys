@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styles } from './styles';
@@ -7,6 +8,7 @@ export interface BudgetItemProps {
 }
 
 export function BudgetItem({ name }: BudgetItemProps) {
+    const navigate = useNavigate();
     const [amount, setAmount] = useState(0);
     const [dialogMode, setDialogMode] = useState<
         'increase' | 'decrease' | null
@@ -16,6 +18,7 @@ export function BudgetItem({ name }: BudgetItemProps) {
     const [hasHydratedFromStorage, setHasHydratedFromStorage] = useState(false);
 
     const storageKey = name;
+    const historyStorageKey = `budget:history:${name}`;
 
     const deltaAmount = useMemo(() => {
         if (!/^\d+$/.test(deltaAmountInput)) return null;
@@ -35,11 +38,22 @@ export function BudgetItem({ name }: BudgetItemProps) {
         if (!dialogMode) return;
         if (!canConfirm || deltaAmount === null) return;
 
-        setAmount((prev) =>
-            dialogMode === 'increase' ? prev + deltaAmount : prev - deltaAmount
-        );
+        setAmount((prev) => {
+            const nextAmount =
+                dialogMode === 'increase'
+                    ? prev + deltaAmount
+                    : prev - deltaAmount;
+
+            appendHistoryEntry(historyStorageKey, {
+                kind: dialogMode,
+                delta: deltaAmount,
+                after: nextAmount,
+            });
+
+            return nextAmount;
+        });
         closeDialog();
-    }, [canConfirm, closeDialog, deltaAmount, dialogMode]);
+    }, [canConfirm, closeDialog, deltaAmount, dialogMode, historyStorageKey]);
 
     useEffect(() => {
         setHasHydratedFromStorage(false);
@@ -93,6 +107,18 @@ export function BudgetItem({ name }: BudgetItemProps) {
                     onClick={() => setDialogMode('decrease')}
                 >
                     -
+                </button>
+                <button
+                    type="button"
+                    className={styles.actionButton({
+                        kind: 'history',
+                    })}
+                    aria-label="履歴"
+                    onClick={() =>
+                        navigate({ to: '/history/$name', params: { name } })
+                    }
+                >
+                    履歴
                 </button>
             </div>
 
@@ -162,6 +188,77 @@ export function BudgetItem({ name }: BudgetItemProps) {
             ) : null}
         </fieldset>
     );
+}
+
+export interface HistoryEntry {
+    id: string;
+    at: string;
+    kind: 'increase' | 'decrease';
+    delta: number;
+    after: number;
+}
+
+function appendHistoryEntry(
+    historyStorageKey: string,
+    input: Pick<HistoryEntry, 'kind' | 'delta' | 'after'>
+) {
+    const current = readHistoryFromLocalStorage(historyStorageKey);
+    const next: HistoryEntry[] = [
+        {
+            id: createHistoryEntryId(),
+            at: new Date().toISOString(),
+            ...input,
+        },
+        ...current,
+    ];
+
+    writeHistoryToLocalStorage(historyStorageKey, next);
+}
+
+function createHistoryEntryId() {
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function readHistoryFromLocalStorage(key: string): HistoryEntry[] {
+    if (typeof window === 'undefined') return [];
+    if (!('localStorage' in window)) return [];
+
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return [];
+
+    try {
+        const parsed = JSON.parse(raw) as unknown;
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(isHistoryEntry);
+    } catch {
+        return [];
+    }
+}
+
+function isHistoryEntry(value: unknown): value is HistoryEntry {
+    if (!value || typeof value !== 'object') return false;
+
+    const record = value as Record<string, unknown>;
+    return (
+        typeof record.id === 'string' &&
+        typeof record.at === 'string' &&
+        (record.kind === 'increase' || record.kind === 'decrease') &&
+        typeof record.delta === 'number' &&
+        Number.isSafeInteger(record.delta) &&
+        record.delta > 0 &&
+        typeof record.after === 'number' &&
+        Number.isSafeInteger(record.after)
+    );
+}
+
+function writeHistoryToLocalStorage(
+    key: string,
+    entries: HistoryEntry[]
+): void {
+    if (typeof window === 'undefined') return;
+    if (!('localStorage' in window)) return;
+
+    window.localStorage.setItem(key, JSON.stringify(entries));
 }
 
 function formatCurrency(value: number) {
