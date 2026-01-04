@@ -6,6 +6,7 @@
         "useIgnoreFile": true
     },
     "files": {
+        "includes": ["**", "!**/*.gen.*"],
         "ignoreUnknown": false
     },
     "linter": {
