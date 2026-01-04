@@ -5,6 +5,7 @@ export const styles = {
         display: 'flex',
         flexDirection: 'column',
         gap: '3',
+        minWidth: 0,
         p: '4',
         borderWidth: '1px',
         borderStyle: 'solid',

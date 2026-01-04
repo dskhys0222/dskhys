@@ -70,7 +70,7 @@ export function BudgetItem({ name }: BudgetItemProps) {
     }, [closeDialog, dialogMode]);
 
     return (
-        <div className={styles.container}>
+        <fieldset aria-label={name} className={styles.container}>
             <div className={styles.headerRow}>
                 <div className={styles.name}>{name}</div>
                 <div className={styles.amount}>{formatCurrency(amount)}</div>
@@ -160,7 +160,7 @@ export function BudgetItem({ name }: BudgetItemProps) {
                     </div>
                 </div>
             ) : null}
-        </div>
+        </fieldset>
     );
 }
 

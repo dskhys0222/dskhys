@@ -27,10 +27,8 @@ describe('Budget / route', () => {
     it('Enter で確定できる', async () => {
         renderBudgetItems();
 
-        const plusButtons = screen.getAllByRole('button', { name: '+' });
-        const firstPlus = plusButtons.at(0);
-        if (!firstPlus) throw new Error('plus button not found');
-        fireEvent.click(firstPlus);
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
+        fireEvent.click(within(firstItem).getByRole('button', { name: '+' }));
 
         const input = screen.getByLabelText('差分金額') as HTMLInputElement;
         await waitFor(() => expect(document.activeElement).toBe(input));
@@ -47,21 +45,14 @@ describe('Budget / route', () => {
 
         renderBudgetItems();
 
-        const firstItemLabel = screen.getAllByText('モノ').at(0);
-        if (!firstItemLabel) throw new Error('first item label not found');
-        const firstItem = firstItemLabel.parentElement;
-        if (!firstItem) throw new Error('first item not found');
-
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
         expect(within(firstItem).getByText('￥1,234')).toBeTruthy();
     });
 
     it('永続化: 確定後に localStorage へ保存する（キーは name）', () => {
         renderBudgetItems();
 
-        const firstItemLabel = screen.getAllByText('モノ').at(0);
-        if (!firstItemLabel) throw new Error('first item label not found');
-        const firstItem = firstItemLabel.parentElement;
-        if (!firstItem) throw new Error('first item not found');
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
 
         fireEvent.click(within(firstItem).getByRole('button', { name: '+' }));
         fireEvent.change(screen.getByLabelText('差分金額'), {
@@ -75,10 +66,8 @@ describe('Budget / route', () => {
     it('増額: + -> ダイアログ -> 入力 -> 確定で金額が増える', async () => {
         renderBudgetItems();
 
-        const plusButtons = screen.getAllByRole('button', { name: '+' });
-        const firstPlus = plusButtons.at(0);
-        if (!firstPlus) throw new Error('plus button not found');
-        fireEvent.click(firstPlus);
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
+        fireEvent.click(within(firstItem).getByRole('button', { name: '+' }));
 
         expect(screen.getByRole('dialog', { name: '増額' })).toBeTruthy();
         expect(screen.getByText('増額')).toBeTruthy();
@@ -96,11 +85,7 @@ describe('Budget / route', () => {
     it('減額: - -> ダイアログ -> 入力 -> 確定で金額が減る', () => {
         renderBudgetItems();
 
-        const firstItemLabel = screen.getAllByText('モノ').at(0);
-        if (!firstItemLabel) throw new Error('first item label not found');
-
-        const firstItem = firstItemLabel.parentElement;
-        if (!firstItem) throw new Error('first item not found');
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
 
         fireEvent.click(within(firstItem).getByRole('button', { name: '+' }));
         fireEvent.change(screen.getByLabelText('差分金額'), {
@@ -121,11 +106,7 @@ describe('Budget / route', () => {
     it('キャンセル: 金額は変わらない', () => {
         renderBudgetItems();
 
-        const firstItemLabel = screen.getAllByText('モノ').at(0);
-        if (!firstItemLabel) throw new Error('first item label not found');
-
-        const firstItem = firstItemLabel.parentElement;
-        if (!firstItem) throw new Error('first item not found');
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
 
         expect(within(firstItem).getByText('￥0')).toBeTruthy();
 
@@ -169,8 +150,9 @@ describe('Budget / route', () => {
     it('Esc で閉じられ、入力はリセットされる', () => {
         renderBudgetItems();
 
-        const firstPlus = screen.getAllByRole('button', { name: '+' }).at(0);
-        if (!firstPlus) throw new Error('plus button not found');
+        const firstItem = screen.getByRole('group', { name: 'モノ' });
+        const firstPlus = within(firstItem).getByRole('button', { name: '+' });
+
         fireEvent.click(firstPlus);
         fireEvent.change(screen.getByLabelText('差分金額'), {
             target: { value: '1000' },
