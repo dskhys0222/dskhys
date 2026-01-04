@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { styles } from './styles';
+
 export interface BudgetItemProps {
     name: string;
 }
@@ -68,58 +70,94 @@ export function BudgetItem({ name }: BudgetItemProps) {
     }, [closeDialog, dialogMode]);
 
     return (
-        <div>
-            <div>{name}</div>
-            <div>{formatCurrency(amount)}</div>
-            <div>
-                <button type="button" onClick={() => setDialogMode('increase')}>
+        <div className={styles.container}>
+            <div className={styles.headerRow}>
+                <div className={styles.name}>{name}</div>
+                <div className={styles.amount}>{formatCurrency(amount)}</div>
+            </div>
+            <div className={styles.actions}>
+                <button
+                    type="button"
+                    className={styles.actionButton({
+                        kind: 'increase',
+                    })}
+                    onClick={() => setDialogMode('increase')}
+                >
                     +
                 </button>
-                <button type="button" onClick={() => setDialogMode('decrease')}>
+                <button
+                    type="button"
+                    className={styles.actionButton({
+                        kind: 'decrease',
+                    })}
+                    onClick={() => setDialogMode('decrease')}
+                >
                     -
                 </button>
             </div>
 
             {dialogMode !== null ? (
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label={dialogMode === 'increase' ? '増額' : '減額'}
-                >
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            confirm();
-                        }}
+                <div className={styles.dialogOverlay}>
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={dialogMode === 'increase' ? '増額' : '減額'}
+                        className={styles.dialog}
                     >
-                        <h2>{dialogMode === 'increase' ? '増額' : '減額'}</h2>
-                        <div>
-                            <label htmlFor={`${name}-delta-amount`}>
-                                差分金額
-                            </label>
-                            <input
-                                ref={inputRef}
-                                id={`${name}-delta-amount`}
-                                name="deltaAmount"
-                                type="number"
-                                inputMode="numeric"
-                                step={1}
-                                min={1}
-                                value={deltaAmountInput}
-                                onChange={(e) =>
-                                    setDeltaAmountInput(e.target.value)
-                                }
-                            />
-                        </div>
-                        <div>
-                            <button type="button" onClick={closeDialog}>
-                                キャンセル
-                            </button>
-                            <button type="submit" disabled={!canConfirm}>
-                                確定
-                            </button>
-                        </div>
-                    </form>
+                        <form
+                            className={styles.form}
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                confirm();
+                            }}
+                        >
+                            <h2 className={styles.dialogTitle}>
+                                {dialogMode === 'increase' ? '増額' : '減額'}
+                            </h2>
+                            <div className={styles.field}>
+                                <label
+                                    className={styles.label}
+                                    htmlFor={`${name}-delta-amount`}
+                                >
+                                    差分金額
+                                </label>
+                                <input
+                                    ref={inputRef}
+                                    id={`${name}-delta-amount`}
+                                    name="deltaAmount"
+                                    type="number"
+                                    inputMode="numeric"
+                                    step={1}
+                                    min={1}
+                                    value={deltaAmountInput}
+                                    className={styles.input}
+                                    onChange={(e) =>
+                                        setDeltaAmountInput(e.target.value)
+                                    }
+                                />
+                            </div>
+                            <div className={styles.footer}>
+                                <button
+                                    type="button"
+                                    className={styles.footerButton({
+                                        intent: 'ghost',
+                                    })}
+                                    onClick={closeDialog}
+                                >
+                                    キャンセル
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={styles.footerButton({
+                                        intent: 'primary',
+                                    })}
+                                    disabled={!canConfirm}
+                                >
+                                    確定
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             ) : null}
         </div>
