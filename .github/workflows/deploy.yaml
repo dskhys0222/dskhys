@@ -299,13 +299,21 @@ jobs:
           # Replace domain placeholder in nginx.conf
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}/nginx
-            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
+            sed -i 's/__DOMAIN_NAME__/${DOMAIN_NAME}/g' nginx.conf
           "
 
-          # Upload dist atomically
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "rm -rf ${DEPLOY_PATH}/static/budget.tmp && mkdir -p ${DEPLOY_PATH}/static/budget.tmp"
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22}" budget-dist/ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/static/budget.tmp/"
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "rm -rf ${DEPLOY_PATH}/static/budget && mv ${DEPLOY_PATH}/static/budget.tmp ${DEPLOY_PATH}/static/budget"
+          # Upload dist atomically (tar + scp to avoid requiring rsync on the server)
+          tar -C budget-dist -czf budget-dist.tgz .
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" budget-dist.tgz "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/static/budget-dist.tgz"
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            set -e
+            rm -rf ${DEPLOY_PATH}/static/budget.tmp
+            mkdir -p ${DEPLOY_PATH}/static/budget.tmp
+            tar -xzf ${DEPLOY_PATH}/static/budget-dist.tgz -C ${DEPLOY_PATH}/static/budget.tmp
+            rm -f ${DEPLOY_PATH}/static/budget-dist.tgz
+            rm -rf ${DEPLOY_PATH}/static/budget
+            mv ${DEPLOY_PATH}/static/budget.tmp ${DEPLOY_PATH}/static/budget
+          "
 
           # Start/reload nginx
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "set -e; cd ${DEPLOY_PATH}; docker compose up -d --no-deps nginx; docker compose exec nginx nginx -t; docker compose exec nginx nginx -s reload"

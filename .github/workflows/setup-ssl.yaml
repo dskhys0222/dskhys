@@ -60,7 +60,7 @@ jobs:
           # Replace domain placeholder and verify nginx config
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             cd ${DEPLOY_PATH}/nginx
-            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
+            sed -i 's/__DOMAIN_NAME__/${DOMAIN_NAME}/g' nginx.conf
           "
 
           # Restart nginx to load updated config
