@@ -4,11 +4,12 @@
 
 ## 概要
 
-GitHub Actions ワークフローは以下の 3 つのジョブで構成されています：
+GitHub Actions ワークフローは以下の順序で実行されます：
 
-1. **Test** - コードのリントとテストを実行
-2. **Build** - TypeScript のビルドを実行
-3. **Deploy** - Linux サーバーへ SSH でデプロイ
+1. **Lint** - コードのリントを実行
+2. **Test** - テストを実行
+3. **Build** - `api` と `budget` をそれぞれビルド（成果物作成）
+4. **Deploy** - `api` と `budget` を並列でデプロイ
 
 ## 必要な GitHub Secrets
 

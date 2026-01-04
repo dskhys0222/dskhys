@@ -30,6 +30,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static/budget:/usr/share/nginx/html/budget:ro
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
     networks:

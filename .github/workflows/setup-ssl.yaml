@@ -140,7 +140,8 @@ jobs:
               --no-eff-email \\
               --cert-name '"${DOMAIN_NAME}"' \\
               \$STAGING_FLAG \\
-              -d '"${DOMAIN_NAME}"'
+              -d '"${DOMAIN_NAME}"' \\
+              -d '"budget.${DOMAIN_NAME}"'
           "
 
           # Reload nginx with real certificate

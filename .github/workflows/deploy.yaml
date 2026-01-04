@@ -10,15 +10,21 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: Test
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    outputs:
+      api_changed: ${{ steps.changes.outputs.api }}
+      budget_changed: ${{ steps.changes.outputs.budget }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,16 +41,71 @@ jobs:
       - name: Run linter
         run: pnpm run lint
 
-      - name: Run tests
-        run: pnpm --filter @dskhys/api run test
+      - name: Detect changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'packages/server/api/**'
+              - 'deployment/Dockerfile'
+              - 'deployment/compose.yaml'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
+            budget:
+              - 'packages/client/budget/**'
+              - 'deployment/compose.yaml'
+              - 'deployment/nginx/nginx.conf'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
 
-  build:
-    name: Build and Push Docker Image
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    needs: test
+    needs: lint
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: |
+          if [ "${{ needs.lint.outputs.api_changed }}" = "true" ]; then
+            pnpm --filter @dskhys/api run test
+          else
+            echo "Skip api tests (no changes)"
+          fi
+
+          if [ "${{ needs.lint.outputs.budget_changed }}" = "true" ]; then
+            pnpm --filter @dskhys/budget run test
+          else
+            echo "Skip budget tests (no changes)"
+          fi
+
+  build_api:
+    name: Build API
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: needs.lint.outputs.api_changed == 'true'
     outputs:
       tag: ${{ steps.meta.outputs.version }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,27 +133,59 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  deploy:
-    name: Deploy
+  build_budget:
+    name: Build Budget
     runs-on: ubuntu-latest
-    needs: build
+    needs: [lint, test]
+    if: needs.lint.outputs.budget_changed == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter @dskhys/budget run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: budget-dist
+          path: packages/client/budget/dist
+          if-no-files-found: error
+
+  deploy_api:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    needs: [lint, test, build_api]
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout files
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            deployment/compose.yaml
 
       - name: Deploy to server
+        if: needs.lint.outputs.api_changed == 'true'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          IMAGE_TAG: ${{ needs.build.outputs.tag }}
+          IMAGE_TAG: ${{ needs.build_api.outputs.tag }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
           JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
@@ -148,7 +241,71 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
             set -e
             cd ${DEPLOY_PATH}
-            docker compose pull
-            docker compose up -d --force-recreate
+            docker compose pull api
+            docker compose up -d --force-recreate api
             docker compose ps
           "
+
+  deploy_budget:
+    name: Deploy Budget
+    runs-on: ubuntu-latest
+    needs: [lint, test, build_budget]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout files
+        if: needs.lint.outputs.budget_changed == 'true'
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            deployment/compose.yaml
+            deployment/nginx/nginx.conf
+
+      - name: Download dist artifact
+        if: needs.lint.outputs.budget_changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: budget-dist
+          path: budget-dist
+
+      - name: Deploy to server
+        if: needs.lint.outputs.budget_changed == 'true'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+        run: |
+          set -e
+
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+
+          # Ensure directories exist
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}/nginx ${DEPLOY_PATH}/static"
+
+          # Copy compose.yaml and nginx.conf
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" deployment/compose.yaml "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" deployment/nginx/nginx.conf "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/nginx/"
+
+          # Replace domain placeholder in nginx.conf
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            cd ${DEPLOY_PATH}/nginx
+            sed -i 's/\\\${DOMAIN_NAME}/${DOMAIN_NAME}/g' nginx.conf
+          "
+
+          # Upload dist atomically
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "rm -rf ${DEPLOY_PATH}/static/budget.tmp && mkdir -p ${DEPLOY_PATH}/static/budget.tmp"
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT:-22}" budget-dist/ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/static/budget.tmp/"
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "rm -rf ${DEPLOY_PATH}/static/budget && mv ${DEPLOY_PATH}/static/budget.tmp ${DEPLOY_PATH}/static/budget"
+
+          # Start/reload nginx
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "set -e; cd ${DEPLOY_PATH}; docker compose up -d --no-deps nginx; docker compose exec nginx nginx -t; docker compose exec nginx nginx -s reload"
