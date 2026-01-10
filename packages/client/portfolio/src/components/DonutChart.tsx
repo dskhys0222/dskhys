@@ -29,24 +29,24 @@ const DEFAULT_COLORS = [
 
 const CATEGORY_COLORS: Record<string, string> = {
     // クラス
-    現金: '#F57C00',
-    株式: '#2E7D32',
-    コモディティ: '#FFD700',
+    現金: '#757575',
+    株式: '#C62828',
+    コモディティ: '#ffd9009c',
     // 地域
     日本: '#C62828',
     米国: '#1976D2',
-    全世界: '#7B1FA2',
+    全世界: '#2E7D32',
     // 属性
-    インデックス: '#2E7D32',
-    増配: '#1976D2',
-    ゴールド: '#FFD700',
-    暗号通貨: '#F57C00',
+    インデックス: '#1976D2',
+    増配: '#C62828',
+    ゴールド: '#ffd900ce',
+    暗号通貨: '#7B1FA2',
     // 口座
-    預金: '#F57C00',
-    特定: '#1976D2',
-    NISA: '#2E7D32',
-    DC: '#7B1FA2',
-    暗号資産: '#C62828',
+    預金: '#757575',
+    特定: '#C62828',
+    NISA: '#F57C00',
+    DC: '#2E7D32',
+    暗号資産: '#7B1FA2',
 };
 
 function formatCurrency(value: number): string {
@@ -55,6 +55,42 @@ function formatCurrency(value: number): string {
         currency: 'JPY',
         maximumFractionDigits: 0,
     }).format(value);
+}
+
+interface CustomLabelProps {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    outerRadius: number;
+    name: string;
+    percentage: number;
+}
+
+function renderCustomLabel({
+    cx,
+    cy,
+    midAngle,
+    outerRadius,
+    name,
+    percentage,
+}: CustomLabelProps) {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 25;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+        <text
+            x={x}
+            y={y}
+            fill="gray"
+            textAnchor={x > cx ? 'start' : 'end'}
+            dominantBaseline="central"
+            fontSize="14"
+        >
+            {`${name} ${percentage}%`}
+        </text>
+    );
 }
 
 const styles = {
@@ -102,7 +138,6 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
 
     return (
         <div className={styles.container}>
-            <h3 className={styles.title}>{title}</h3>
             <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -113,9 +148,12 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
                             cx="50%"
                             cy="50%"
                             innerRadius={50}
-                            outerRadius={80}
-                            label={({ percentage }) => `${percentage}%`}
-                            labelLine={false}
+                            outerRadius={100}
+                            label={renderCustomLabel}
+                            labelLine={{
+                                stroke: 'gray',
+                                strokeWidth: 1,
+                            }}
                         >
                             {data.map((entry, index) => (
                                 <Cell
@@ -130,7 +168,17 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
                                 name,
                             ]}
                         />
-                        <Legend />
+                        <text
+                            x="50%"
+                            y="50%"
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            fontSize="16"
+                            fontWeight="600"
+                            fill="gray"
+                        >
+                            {title}
+                        </text>
                     </PieChart>
                 </ResponsiveContainer>
             </div>
