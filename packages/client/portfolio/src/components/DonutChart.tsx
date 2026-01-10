@@ -79,7 +79,7 @@ function renderCustomLabel({
             fill="gray"
             textAnchor={x > cx ? 'start' : 'end'}
             dominantBaseline="central"
-            fontSize="14"
+            fontSize="12"
         >
             {`${name} ${percentage}%`}
         </text>
@@ -101,13 +101,13 @@ const styles = {
         textAlign: 'center',
     }),
     chartContainer: css({
-        height: '250px',
+        height: '180px',
     }),
     emptyState: css({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '250px',
+        height: '200px',
         color: 'gray.500',
         fontSize: 'sm',
     }),
@@ -140,8 +140,8 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
                             nameKey="name"
                             cx="50%"
                             cy="50%"
-                            innerRadius={50}
-                            outerRadius={100}
+                            innerRadius={40}
+                            outerRadius={80}
                             label={renderCustomLabel}
                             labelLine={{
                                 stroke: 'gray',
@@ -166,7 +166,7 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
                             y="50%"
                             textAnchor="middle"
                             dominantBaseline="central"
-                            fontSize="16"
+                            fontSize="14"
                             fontWeight="600"
                             fill="gray"
                         >
