@@ -20,7 +20,7 @@ function StocksPage() {
     const deleteStock = useStocksStore((state) => state.deleteStock);
     const navigate = useNavigate();
 
-    const [sortBy, setSortBy] = useState<string>('ticker');
+    const [sortBy, setSortBy] = useState<string>('account');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [touchStartX, setTouchStartX] = useState<number>(0);
     const [swipingId, setSwipingId] = useState<string | null>(null);
@@ -38,6 +38,15 @@ function StocksPage() {
     // ソート
     const sortedStocks = useMemo(() => {
         const result = [...stocks];
+
+        // 口座の順序定義
+        const accountOrder: Record<string, number> = {
+            預金: 1,
+            暗号資産: 2,
+            特定: 3,
+            NISA: 4,
+            DC: 5,
+        };
 
         result.sort((a, b) => {
             let comparison = 0;
@@ -61,7 +70,9 @@ function StocksPage() {
                     comparison = a.attribute.localeCompare(b.attribute);
                     break;
                 case 'account':
-                    comparison = a.account.localeCompare(b.account);
+                    comparison =
+                        (accountOrder[a.account] || 999) -
+                        (accountOrder[b.account] || 999);
                     break;
                 default:
                     comparison = 0;
