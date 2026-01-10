@@ -1,11 +1,4 @@
-import {
-    Cell,
-    Legend,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-} from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { AggregatedData } from '@/types';
 import { css } from '../../styled-system/css';
 

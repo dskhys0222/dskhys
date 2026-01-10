@@ -135,7 +135,6 @@ export const stocksStyles = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: '0.5rem',
     }),
     cardTicker: css({
         fontWeight: 'bold',
@@ -147,10 +146,10 @@ export const stocksStyles = {
         color: 'gray.600',
     }),
     cardBody: css({
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '0.5rem',
-        fontSize: 'sm',
+        display: 'flex',
+        justifyContent: 'space-between',
+        color: '#6b7280',
+        fontSize: 'xs',
     }),
     cardLabel: css({
         color: 'gray.500',
@@ -166,5 +165,27 @@ export const stocksStyles = {
         paddingTop: '0.75rem',
         borderTop: '1px solid',
         borderColor: 'gray.100',
+    }),
+    swipeContainer: css({
+        position: 'relative',
+        overflow: 'hidden',
+    }),
+    deleteBackground: css({
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: '100px',
+        backgroundColor: 'red.600',
+        borderRadius: 'xl',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '2rem',
+    }),
+    cardValueAmount: css({
+        fontWeight: '600',
+        fontSize: '1rem',
     }),
 };

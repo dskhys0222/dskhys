@@ -20,44 +20,57 @@ function StocksPage() {
     const deleteStock = useStocksStore((state) => state.deleteStock);
     const navigate = useNavigate();
 
-    const [filterAccount, setFilterAccount] = useState<string>('all');
-    const [filterAssetClass, setFilterAssetClass] = useState<string>('all');
     const [sortBy, setSortBy] = useState<string>('ticker');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [touchStartX, setTouchStartX] = useState<number>(0);
+    const [swipingId, setSwipingId] = useState<string | null>(null);
+    const [swipeOffset, setSwipeOffset] = useState<number>(0);
 
-    // ユニークな値を取得
-    const accounts = useMemo(
-        () => [...new Set(stocks.map((s) => s.account).filter(Boolean))],
-        [stocks]
-    );
-    const assetClasses = useMemo(
-        () => [...new Set(stocks.map((s) => s.assetClass).filter(Boolean))],
-        [stocks]
-    );
-
-    // フィルタリングとソート
-    const filteredStocks = useMemo(() => {
-        let result = [...stocks];
-
-        if (filterAccount !== 'all') {
-            result = result.filter((s) => s.account === filterAccount);
+    const handleSort = (column: string) => {
+        if (sortBy === column) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortOrder('asc');
         }
-        if (filterAssetClass !== 'all') {
-            result = result.filter((s) => s.assetClass === filterAssetClass);
-        }
+    };
+
+    // ソート
+    const sortedStocks = useMemo(() => {
+        const result = [...stocks];
 
         result.sort((a, b) => {
+            let comparison = 0;
             switch (sortBy) {
                 case 'ticker':
-                    return a.ticker.localeCompare(b.ticker);
+                    comparison = a.ticker.localeCompare(b.ticker);
+                    break;
+                case 'name':
+                    comparison = a.name.localeCompare(b.name);
+                    break;
                 case 'value':
-                    return b.value - a.value;
+                    comparison = a.value - b.value;
+                    break;
+                case 'assetClass':
+                    comparison = a.assetClass.localeCompare(b.assetClass);
+                    break;
+                case 'region':
+                    comparison = a.region.localeCompare(b.region);
+                    break;
+                case 'attribute':
+                    comparison = a.attribute.localeCompare(b.attribute);
+                    break;
+                case 'account':
+                    comparison = a.account.localeCompare(b.account);
+                    break;
                 default:
-                    return 0;
+                    comparison = 0;
             }
+            return sortOrder === 'asc' ? comparison : -comparison;
         });
 
         return result;
-    }, [stocks, filterAccount, filterAssetClass, sortBy]);
+    }, [stocks, sortBy, sortOrder]);
 
     const handleDelete = (id: string, ticker: string) => {
         if (confirm(`${ticker}を削除しますか？`)) {
@@ -67,6 +80,43 @@ function StocksPage() {
 
     const handleEdit = (id: string) => {
         navigate({ to: '/stocks/$id/edit', params: { id } });
+    };
+
+    const handleSwipe = (
+        stockId: string,
+        ticker: string,
+        e: React.TouchEvent<HTMLDivElement>
+    ) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const swipeDistance = touchStartX - touchEndX;
+
+        // 右から左へのスワイプ（100px以上）
+        if (swipeDistance > 100) {
+            handleDelete(stockId, ticker);
+        }
+
+        // リセット
+        setSwipingId(null);
+        setSwipeOffset(0);
+    };
+
+    const handleTouchStart = (
+        stockId: string,
+        e: React.TouchEvent<HTMLDivElement>
+    ) => {
+        setTouchStartX(e.touches[0].clientX);
+        setSwipingId(stockId);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+        if (swipingId) {
+            const currentX = e.touches[0].clientX;
+            const offset = currentX - touchStartX;
+            // 左方向のみ許可（負の値）
+            if (offset < 0) {
+                setSwipeOffset(offset);
+            }
+        }
     };
 
     if (stocks.length === 0) {
@@ -89,115 +139,97 @@ function StocksPage() {
         <div className={stocksStyles.page}>
             <div className={stocksStyles.header}>
                 <h2 className={stocksStyles.title}>
-                    銘柄一覧（{filteredStocks.length}件）
+                    銘柄一覧（{sortedStocks.length}件）
                 </h2>
                 <Link to="/stocks/new" className={stocksStyles.addButton}>
                     銘柄を追加
                 </Link>
             </div>
 
-            {/* フィルター */}
+            {/* ソート */}
             <div className={stocksStyles.filters}>
-                <select
-                    className={stocksStyles.filterSelect}
-                    value={filterAccount}
-                    onChange={(e) => setFilterAccount(e.target.value)}
-                >
-                    <option value="all">全ての口座</option>
-                    {accounts.map((account) => (
-                        <option key={account} value={account}>
-                            {account}
-                        </option>
-                    ))}
-                </select>
-                <select
-                    className={stocksStyles.filterSelect}
-                    value={filterAssetClass}
-                    onChange={(e) => setFilterAssetClass(e.target.value)}
-                >
-                    <option value="all">全てのクラス</option>
-                    {assetClasses.map((cls) => (
-                        <option key={cls} value={cls}>
-                            {cls}
-                        </option>
-                    ))}
-                </select>
                 <select
                     className={stocksStyles.filterSelect}
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                 >
                     <option value="ticker">ティッカー順</option>
+                    <option value="name">銘柄名順</option>
                     <option value="value">評価額順</option>
+                    <option value="assetClass">クラス順</option>
+                    <option value="region">地域順</option>
+                    <option value="attribute">属性順</option>
+                    <option value="account">口座順</option>
+                </select>
+                <select
+                    className={stocksStyles.filterSelect}
+                    value={sortOrder}
+                    onChange={(e) =>
+                        setSortOrder(e.target.value as 'asc' | 'desc')
+                    }
+                >
+                    <option value="asc">昇順</option>
+                    <option value="desc">降順</option>
                 </select>
             </div>
 
             {/* モバイル用カードリスト */}
             <div className={stocksStyles.mobileCard}>
                 <div className={stocksStyles.cardList}>
-                    {filteredStocks.map((stock) => (
-                        <div key={stock.id} className={stocksStyles.card}>
-                            <div className={stocksStyles.cardHeader}>
-                                <div>
+                    {sortedStocks.map((stock) => (
+                        <div
+                            key={stock.id}
+                            className={stocksStyles.swipeContainer}
+                        >
+                            {/* 削除背景 */}
+                            <div className={stocksStyles.deleteBackground}>
+                                🗑️
+                            </div>
+                            {/* カード本体 */}
+                            {/** biome-ignore lint/a11y/useKeyWithClickEvents: スマホ専用UIのため不要 */}
+                            {/** biome-ignore lint/a11y/noStaticElementInteractions: しかたなし */}
+                            <div
+                                className={stocksStyles.card}
+                                onClick={() => handleEdit(stock.id)}
+                                onTouchStart={(e) =>
+                                    handleTouchStart(stock.id, e)
+                                }
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={(e) =>
+                                    handleSwipe(stock.id, stock.ticker, e)
+                                }
+                                style={{
+                                    cursor: 'pointer',
+                                    transform:
+                                        swipingId === stock.id
+                                            ? `translateX(${swipeOffset}px)`
+                                            : 'translateX(0)',
+                                    transition:
+                                        swipingId === stock.id
+                                            ? 'none'
+                                            : 'transform 0.3s ease',
+                                    position: 'relative',
+                                }}
+                            >
+                                <div className={stocksStyles.cardHeader}>
                                     <div className={stocksStyles.cardTicker}>
                                         {stock.ticker}
                                     </div>
-                                    <div className={stocksStyles.cardName}>
-                                        {stock.name}
+                                    <div
+                                        className={stocksStyles.cardValueAmount}
+                                    >
+                                        {formatCurrency(stock.value)}
                                     </div>
                                 </div>
-                            </div>
-                            <div className={stocksStyles.cardBody}>
-                                <span className={stocksStyles.cardLabel}>
-                                    評価額
-                                </span>
-                                <span className={stocksStyles.cardValue}>
-                                    {formatCurrency(stock.value)}
-                                </span>
-                                {stock.units && (
-                                    <>
-                                        <span
-                                            className={stocksStyles.cardLabel}
-                                        >
-                                            口数
-                                        </span>
-                                        <span
-                                            className={stocksStyles.cardValue}
-                                        >
-                                            {stock.units}
-                                        </span>
-                                    </>
-                                )}
-                                <span className={stocksStyles.cardLabel}>
-                                    クラス
-                                </span>
-                                <span className={stocksStyles.cardValue}>
-                                    {stock.assetClass}
-                                </span>
-                                <span className={stocksStyles.cardLabel}>
-                                    口座
-                                </span>
-                                <span className={stocksStyles.cardValue}>
-                                    {stock.account}
-                                </span>
-                            </div>
-                            <div className={stocksStyles.cardActions}>
-                                <button
-                                    type="button"
-                                    className={`${stocksStyles.actionButton} ${stocksStyles.editButton}`}
-                                    onClick={() => handleEdit(stock.id)}
-                                >
-                                    編集
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`${stocksStyles.actionButton} ${stocksStyles.deleteButton}`}
-                                    onClick={() =>
-                                        handleDelete(stock.id, stock.ticker)
-                                    }
-                                >
-                                    削除
-                                </button>
+                                <div className={stocksStyles.cardName}>
+                                    {stock.name}
+                                </div>
+                                <div className={stocksStyles.cardBody}>
+                                    <span>{stock.assetClass}</span>
+                                    <span>{stock.region}</span>
+                                    <span>{stock.attribute}</span>
+                                    <span>{stock.account}</span>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -210,19 +242,74 @@ function StocksPage() {
                     <table className={stocksStyles.table}>
                         <thead>
                             <tr>
-                                <th className={stocksStyles.th}>ティッカー</th>
-                                <th className={stocksStyles.th}>銘柄名</th>
-                                <th className={stocksStyles.th}>評価額</th>
-                                <th className={stocksStyles.th}>口数</th>
-                                <th className={stocksStyles.th}>クラス</th>
-                                <th className={stocksStyles.th}>地域</th>
-                                <th className={stocksStyles.th}>属性</th>
-                                <th className={stocksStyles.th}>口座</th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('ticker')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    ティッカー{' '}
+                                    {sortBy === 'ticker' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('name')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    銘柄名{' '}
+                                    {sortBy === 'name' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('value')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    評価額{' '}
+                                    {sortBy === 'value' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('assetClass')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    クラス{' '}
+                                    {sortBy === 'assetClass' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('region')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    地域{' '}
+                                    {sortBy === 'region' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('attribute')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    属性{' '}
+                                    {sortBy === 'attribute' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
+                                <th
+                                    className={stocksStyles.th}
+                                    onClick={() => handleSort('account')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    口座{' '}
+                                    {sortBy === 'account' &&
+                                        (sortOrder === 'asc' ? '▲' : '▼')}
+                                </th>
                                 <th className={stocksStyles.th}>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredStocks.map((stock) => (
+                            {sortedStocks.map((stock) => (
                                 <tr key={stock.id}>
                                     <td
                                         className={`${stocksStyles.td} ${stocksStyles.ticker}`}
@@ -234,9 +321,6 @@ function StocksPage() {
                                     </td>
                                     <td className={stocksStyles.td}>
                                         {formatCurrency(stock.value)}
-                                    </td>
-                                    <td className={stocksStyles.td}>
-                                        {stock.units ?? '-'}
                                     </td>
                                     <td className={stocksStyles.td}>
                                         {stock.assetClass}
