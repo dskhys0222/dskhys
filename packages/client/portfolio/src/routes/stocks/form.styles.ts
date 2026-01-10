@@ -4,6 +4,7 @@ export const formStyles = {
     page: css({
         maxWidth: '600px',
         marginInline: 'auto',
+        paddingBottom: '80px',
     }),
     title: css({
         fontSize: 'xl',
@@ -107,13 +108,19 @@ export const formStyles = {
         color: 'red.500',
     }),
     buttons: css({
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
         display: 'flex',
         gap: '0.75rem',
-        justifyContent: 'flex-end',
-        marginTop: '1rem',
-        paddingTop: '1rem',
+        justifyContent: 'center',
+        padding: '1rem',
+        backgroundColor: 'white',
         borderTop: '1px solid',
         borderColor: 'gray.200',
+        boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+        zIndex: 10,
     }),
     submitButton: css({
         backgroundColor: 'green.600',
