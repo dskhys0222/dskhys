@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { type StockFormData, stockSchema } from '../../../schemas/stock';
 import { useStocksStore } from '../../../stores';
@@ -22,28 +21,24 @@ function EditStockPage() {
     const {
         register,
         handleSubmit,
-        reset,
         formState: { errors, isSubmitting },
     } = useForm<StockFormData>({
         resolver: zodResolver(stockSchema),
+        defaultValues: stock
+            ? {
+                  name: stock.name,
+                  ticker: stock.ticker,
+                  value: stock.value,
+                  units: stock.units,
+                  averageCost: stock.averageCost,
+                  assetClass: stock.assetClass,
+                  region: stock.region,
+                  attribute: stock.attribute,
+                  account: stock.account,
+                  note: stock.note ?? '',
+              }
+            : undefined,
     });
-
-    useEffect(() => {
-        if (stock) {
-            reset({
-                name: stock.name,
-                ticker: stock.ticker,
-                value: stock.value,
-                units: stock.units,
-                averageCost: stock.averageCost,
-                assetClass: stock.assetClass,
-                region: stock.region,
-                attribute: stock.attribute,
-                account: stock.account,
-                note: stock.note ?? '',
-            });
-        }
-    }, [stock, reset]);
 
     const onSubmit = (data: StockFormData) => {
         updateStock(id, data);

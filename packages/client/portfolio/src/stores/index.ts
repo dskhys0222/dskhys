@@ -32,19 +32,19 @@ export const useStocksStore = create<StocksStore>((set, get) => ({
     },
 
     updateStock: (id, updates) => {
-        set((state) => ({
-            stocks: state.stocks.map((stock) =>
-                stock.id === id
-                    ? {
-                          ...stock,
-                          ...updates,
-                          updatedAt: new Date().toISOString(),
-                      }
-                    : stock
-            ),
-        }));
+        const updatedStocks = get().stocks.map((stock) =>
+            stock.id === id
+                ? {
+                      ...stock,
+                      ...updates,
+                      updatedAt: new Date().toISOString(),
+                  }
+                : stock
+        );
 
-        get().saveStocks();
+        set({ stocks: updatedStocks });
+
+        saveToLocalStorage(STORAGE_KEY, updatedStocks);
     },
 
     deleteStock: (id) => {
@@ -61,7 +61,8 @@ export const useStocksStore = create<StocksStore>((set, get) => ({
     },
 
     saveStocks: () => {
-        saveToLocalStorage(STORAGE_KEY, get().stocks);
+        const stocks = get().stocks;
+        saveToLocalStorage(STORAGE_KEY, stocks);
     },
 }));
 
