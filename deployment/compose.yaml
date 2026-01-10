@@ -31,6 +31,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./static/budget:/usr/share/nginx/html/budget:ro
+      - ./static/portfolio:/usr/share/nginx/html/portfolio:ro
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
     networks:

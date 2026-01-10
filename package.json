@@ -12,7 +12,8 @@
         "format": "biome check --write .",
         "api": "pnpm --filter @dskhys/api",
         "web": "pnpm --filter @dskhys/web",
-        "budget": "pnpm --filter @dskhys/budget"
+        "budget": "pnpm --filter @dskhys/budget",
+        "portfolio": "pnpm --filter @dskhys/portfolio"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.3.10"

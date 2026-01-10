@@ -2,6 +2,7 @@ packages:
   - packages/server/api
   - packages/client/web
   - packages/client/budget
+  - packages/client/portfolio
 
 minimumReleaseAge: 2880
 
