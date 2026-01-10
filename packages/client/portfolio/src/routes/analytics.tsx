@@ -1,12 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import {
-    Cell,
-    Legend,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-} from 'recharts';
 import { useStocksStore } from '../stores';
 import { aggregateByField } from '../utils/aggregation';
 import { analyticsStyles } from './analytics.styles';
@@ -14,19 +6,6 @@ import { analyticsStyles } from './analytics.styles';
 export const Route = createFileRoute('/analytics')({
     component: AnalyticsPage,
 });
-
-const COLORS = [
-    '#2E7D32',
-    '#1976D2',
-    '#F57C00',
-    '#7B1FA2',
-    '#C62828',
-    '#00838F',
-    '#558B2F',
-    '#6D4C41',
-    '#283593',
-    '#AD1457',
-];
 
 function formatCurrency(value: number): string {
     return new Intl.NumberFormat('ja-JP', {
@@ -59,149 +38,6 @@ function AnalyticsPage() {
     return (
         <div className={analyticsStyles.page}>
             <h2 className={analyticsStyles.title}>分析</h2>
-
-            {/* グラフセクション */}
-            <div className={analyticsStyles.chartsGrid}>
-                {/* クラス別 */}
-                <div className={analyticsStyles.chartCard}>
-                    <h3 className={analyticsStyles.chartTitle}>クラス別</h3>
-                    <div className={analyticsStyles.chartContainer}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={assetClassData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={90}
-                                    label={({ name, percentage }) =>
-                                        `${name}: ${percentage.toFixed(1)}%`
-                                    }
-                                >
-                                    {assetClassData.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${entry.name}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: number) =>
-                                        formatCurrency(value)
-                                    }
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* 地域別 */}
-                <div className={analyticsStyles.chartCard}>
-                    <h3 className={analyticsStyles.chartTitle}>地域別</h3>
-                    <div className={analyticsStyles.chartContainer}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={regionData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={90}
-                                    label={({ name, percentage }) =>
-                                        `${name}: ${percentage.toFixed(1)}%`
-                                    }
-                                >
-                                    {regionData.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${entry.name}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: number) =>
-                                        formatCurrency(value)
-                                    }
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* 属性別 */}
-                <div className={analyticsStyles.chartCard}>
-                    <h3 className={analyticsStyles.chartTitle}>属性別</h3>
-                    <div className={analyticsStyles.chartContainer}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={attributeData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={90}
-                                    label={({ name, percentage }) =>
-                                        `${name}: ${percentage.toFixed(1)}%`
-                                    }
-                                >
-                                    {attributeData.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${entry.name}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: number) =>
-                                        formatCurrency(value)
-                                    }
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* 口座別 */}
-                <div className={analyticsStyles.chartCard}>
-                    <h3 className={analyticsStyles.chartTitle}>口座別</h3>
-                    <div className={analyticsStyles.chartContainer}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={accountData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={90}
-                                    label={({ name, percentage }) =>
-                                        `${name}: ${percentage.toFixed(1)}%`
-                                    }
-                                >
-                                    {accountData.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${entry.name}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: number) =>
-                                        formatCurrency(value)
-                                    }
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
 
             {/* テーブルセクション */}
             <div className={analyticsStyles.tablesSection}>
