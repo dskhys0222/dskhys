@@ -141,7 +141,8 @@ jobs:
               --cert-name '"${DOMAIN_NAME}"' \\
               \$STAGING_FLAG \\
               -d '"${DOMAIN_NAME}"' \\
-              -d '"budget.${DOMAIN_NAME}"'
+              -d '"budget.${DOMAIN_NAME}"' \\
+              -d '"portfolio.${DOMAIN_NAME}"'
           "
 
           # Reload nginx with real certificate
