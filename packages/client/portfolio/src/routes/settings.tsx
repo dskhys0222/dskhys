@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
-import { useSettingsStore, useStocksStore } from '../stores';
+import {
+    useCustomAggregationsStore,
+    useSettingsStore,
+    useStocksStore,
+} from '../stores';
 import { exportToJSON, importFromJSON } from '../utils/storage';
 import { settingsStyles } from './settings.styles';
 
@@ -11,6 +15,9 @@ export const Route = createFileRoute('/settings')({
 function SettingsPage() {
     const stocks = useStocksStore((state) => state.stocks);
     const settings = useSettingsStore((state) => state.settings);
+    const customAggregations = useCustomAggregationsStore(
+        (state) => state.customAggregations
+    );
     const [message, setMessage] = useState<{
         type: 'success' | 'error';
         text: string;
@@ -22,6 +29,7 @@ function SettingsPage() {
             const data = {
                 stocks,
                 settings,
+                customAggregations,
                 exportedAt: new Date().toISOString(),
                 version: '1.0.0',
             };
@@ -62,6 +70,7 @@ function SettingsPage() {
                 const data = importFromJSON<{
                     stocks: typeof stocks;
                     settings: typeof settings;
+                    customAggregations: typeof customAggregations;
                 }>(json);
 
                 if (data.stocks && Array.isArray(data.stocks)) {
@@ -74,9 +83,21 @@ function SettingsPage() {
                     useSettingsStore.getState().saveSettings();
                 }
 
+                if (
+                    data.customAggregations &&
+                    Array.isArray(data.customAggregations)
+                ) {
+                    useCustomAggregationsStore.setState({
+                        customAggregations: data.customAggregations,
+                    });
+                    useCustomAggregationsStore
+                        .getState()
+                        .saveCustomAggregations();
+                }
+
                 setMessage({
                     type: 'success',
-                    text: `${data.stocks?.length || 0}件の銘柄データをインポートしました。`,
+                    text: `${data.stocks?.length || 0}件の銘柄データと${data.customAggregations?.length || 0}件のカスタム集計をインポートしました。`,
                 });
             } catch (_error) {
                 setMessage({
@@ -103,6 +124,8 @@ function SettingsPage() {
                 },
             });
             useSettingsStore.getState().saveSettings();
+            useCustomAggregationsStore.setState({ customAggregations: [] });
+            useCustomAggregationsStore.getState().saveCustomAggregations();
             setMessage({
                 type: 'success',
                 text: 'すべてのデータを削除しました。',
@@ -151,6 +174,12 @@ function SettingsPage() {
                             登録銘柄数:
                         </span>{' '}
                         {stocks.length}件
+                    </p>
+                    <p>
+                        <span className={settingsStyles.infoLabel}>
+                            カスタム集計数:
+                        </span>{' '}
+                        {customAggregations.length}個
                     </p>
                 </div>
 
