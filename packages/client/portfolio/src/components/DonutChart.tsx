@@ -7,6 +7,7 @@ interface DonutChartProps {
     data: AggregatedData[];
     colors?: Record<string, string>;
     showLegendTable?: boolean;
+    showTotal?: boolean;
 }
 
 const DEFAULT_COLORS = [
@@ -82,7 +83,7 @@ function renderCustomLabel({
             dominantBaseline="central"
             fontSize="12"
         >
-            {`${name} ${percentage}%`}
+            {`${name} ${percentage.toFixed(1)}%`}
         </text>
     );
 }
@@ -157,6 +158,7 @@ export function DonutChart({
     data,
     colors,
     showLegendTable = false,
+    showTotal = false,
 }: DonutChartProps) {
     const getColor = (name: string, index: number): string => {
         if (colors?.[name]) return colors[name];
@@ -248,6 +250,32 @@ export function DonutChart({
                                 </td>
                             </tr>
                         ))}
+                        {showTotal && (
+                            <tr
+                                style={{
+                                    borderTop: '2px solid',
+                                    borderColor: '#d1d5db',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                <td className={styles.legendTd}>合計</td>
+                                <td
+                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                >
+                                    {formatCurrency(
+                                        data.reduce(
+                                            (sum, item) => sum + item.value,
+                                            0
+                                        )
+                                    )}
+                                </td>
+                                <td
+                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                >
+                                    100.0%
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             )}

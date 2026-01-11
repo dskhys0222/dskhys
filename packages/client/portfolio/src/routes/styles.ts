@@ -10,4 +10,9 @@ export const styles = {
         maxWidth: '1200px',
         marginInline: 'auto',
     }),
+    notFound: css({
+        textAlign: 'center',
+        padding: '3rem',
+        color: 'gray.500',
+    }),
 };

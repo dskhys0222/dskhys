@@ -45,3 +45,25 @@ export interface AggregatedData {
     value: number;
     percentage: number;
 }
+
+// カスタム集計の属性設定
+export interface CustomAggregationAttribute {
+    name: string; // 属性名（例: "サテライト", "コア"）
+    color: string; // グラフの色
+}
+
+// カスタム集計での銘柄への属性割り当て
+export interface CustomAggregationStockAssignment {
+    stockId: string;
+    attributeName: string; // 割り当てられた属性名
+}
+
+// カスタム集計定義
+export interface CustomAggregation {
+    id: string;
+    name: string; // 集計名称（例: "コア・サテライト"）
+    attributes: CustomAggregationAttribute[]; // 属性一覧
+    stockAssignments: CustomAggregationStockAssignment[]; // 銘柄への属性割り当て
+    createdAt: string;
+    updatedAt: string;
+}

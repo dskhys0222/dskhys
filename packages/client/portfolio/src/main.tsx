@@ -2,11 +2,16 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { routeTree } from './routeTree.gen';
-import { useSettingsStore, useStocksStore } from './stores';
+import {
+    useCustomAggregationsStore,
+    useSettingsStore,
+    useStocksStore,
+} from './stores';
 
 // ストアの初期化
 useStocksStore.getState().loadStocks();
 useSettingsStore.getState().loadSettings();
+useCustomAggregationsStore.getState().loadCustomAggregations();
 
 // Create a new router instance
 const router = createRouter({

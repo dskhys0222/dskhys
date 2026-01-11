@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AppSettings, Stock } from '@/types';
+import type { AppSettings, CustomAggregation, Stock } from '@/types';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/storage';
 
 const STORAGE_KEY = 'portfolio-stocks';
@@ -93,3 +93,85 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         saveToLocalStorage(SETTINGS_STORAGE_KEY, get().settings);
     },
 }));
+
+// カスタム集計ストア
+const CUSTOM_AGGREGATIONS_STORAGE_KEY = 'portfolio-custom-aggregations';
+
+interface CustomAggregationsStore {
+    customAggregations: CustomAggregation[];
+    addCustomAggregation: (
+        aggregation: Omit<CustomAggregation, 'id' | 'createdAt' | 'updatedAt'>
+    ) => void;
+    updateCustomAggregation: (
+        id: string,
+        updates: Partial<Omit<CustomAggregation, 'id' | 'createdAt'>>
+    ) => void;
+    deleteCustomAggregation: (id: string) => void;
+    loadCustomAggregations: () => void;
+    saveCustomAggregations: () => void;
+}
+
+export const useCustomAggregationsStore = create<CustomAggregationsStore>(
+    (set, get) => ({
+        customAggregations: [],
+
+        addCustomAggregation: (aggregation) => {
+            const newAggregation: CustomAggregation = {
+                ...aggregation,
+                id: crypto.randomUUID(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
+
+            set((state) => ({
+                customAggregations: [
+                    ...state.customAggregations,
+                    newAggregation,
+                ],
+            }));
+
+            get().saveCustomAggregations();
+        },
+
+        updateCustomAggregation: (id, updates) => {
+            const updatedAggregations = get().customAggregations.map(
+                (aggregation) =>
+                    aggregation.id === id
+                        ? {
+                              ...aggregation,
+                              ...updates,
+                              updatedAt: new Date().toISOString(),
+                          }
+                        : aggregation
+            );
+
+            set({ customAggregations: updatedAggregations });
+            get().saveCustomAggregations();
+        },
+
+        deleteCustomAggregation: (id) => {
+            set((state) => ({
+                customAggregations: state.customAggregations.filter(
+                    (a) => a.id !== id
+                ),
+            }));
+
+            get().saveCustomAggregations();
+        },
+
+        loadCustomAggregations: () => {
+            const customAggregations = loadFromLocalStorage<
+                CustomAggregation[]
+            >(CUSTOM_AGGREGATIONS_STORAGE_KEY, []);
+            set({ customAggregations });
+        },
+
+        saveCustomAggregations: () => {
+            const customAggregations = get().customAggregations;
+            saveToLocalStorage(
+                CUSTOM_AGGREGATIONS_STORAGE_KEY,
+                customAggregations
+            );
+        },
+    })
+);

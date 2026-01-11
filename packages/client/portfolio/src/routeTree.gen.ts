@@ -9,17 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SummaryIndexRouteImport } from './routes/summary/index'
+import { Route as SummaryNewRouteImport } from './routes/summary/new'
 import { Route as StocksNewRouteImport } from './routes/stocks/new'
+import { Route as SummaryIdEditRouteImport } from './routes/summary/$id/edit'
 import { Route as StocksIdEditRouteImport } from './routes/stocks/$id/edit'
 
-const SummaryRoute = SummaryRouteImport.update({
-  id: '/summary',
-  path: '/summary',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -30,9 +27,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SummaryIndexRoute = SummaryIndexRouteImport.update({
+  id: '/summary/',
+  path: '/summary/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryNewRoute = SummaryNewRouteImport.update({
+  id: '/summary/new',
+  path: '/summary/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StocksNewRoute = StocksNewRouteImport.update({
   id: '/stocks/new',
   path: '/stocks/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryIdEditRoute = SummaryIdEditRouteImport.update({
+  id: '/summary/$id/edit',
+  path: '/summary/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StocksIdEditRoute = StocksIdEditRouteImport.update({
@@ -44,56 +56,73 @@ const StocksIdEditRoute = StocksIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/settings': typeof SettingsRoute
-  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
+  '/summary/new': typeof SummaryNewRoute
+  '/summary': typeof SummaryIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
+  '/summary/$id/edit': typeof SummaryIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/settings': typeof SettingsRoute
-  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
+  '/summary/new': typeof SummaryNewRoute
+  '/summary': typeof SummaryIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
+  '/summary/$id/edit': typeof SummaryIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/settings': typeof SettingsRoute
-  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
+  '/summary/new': typeof SummaryNewRoute
+  '/summary/': typeof SummaryIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
+  '/summary/$id/edit': typeof SummaryIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/settings' | '/summary' | '/stocks/new' | '/stocks/$id/edit'
+  fullPaths:
+    | '/'
+    | '/settings'
+    | '/stocks/new'
+    | '/summary/new'
+    | '/summary'
+    | '/stocks/$id/edit'
+    | '/summary/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/settings' | '/summary' | '/stocks/new' | '/stocks/$id/edit'
+  to:
+    | '/'
+    | '/settings'
+    | '/stocks/new'
+    | '/summary/new'
+    | '/summary'
+    | '/stocks/$id/edit'
+    | '/summary/$id/edit'
   id:
     | '__root__'
     | '/'
     | '/settings'
-    | '/summary'
     | '/stocks/new'
+    | '/summary/new'
+    | '/summary/'
     | '/stocks/$id/edit'
+    | '/summary/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SettingsRoute: typeof SettingsRoute
-  SummaryRoute: typeof SummaryRoute
   StocksNewRoute: typeof StocksNewRoute
+  SummaryNewRoute: typeof SummaryNewRoute
+  SummaryIndexRoute: typeof SummaryIndexRoute
   StocksIdEditRoute: typeof StocksIdEditRoute
+  SummaryIdEditRoute: typeof SummaryIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/summary': {
-      id: '/summary'
-      path: '/summary'
-      fullPath: '/summary'
-      preLoaderRoute: typeof SummaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -108,11 +137,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/summary/': {
+      id: '/summary/'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary/new': {
+      id: '/summary/new'
+      path: '/summary/new'
+      fullPath: '/summary/new'
+      preLoaderRoute: typeof SummaryNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stocks/new': {
       id: '/stocks/new'
       path: '/stocks/new'
       fullPath: '/stocks/new'
       preLoaderRoute: typeof StocksNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary/$id/edit': {
+      id: '/summary/$id/edit'
+      path: '/summary/$id/edit'
+      fullPath: '/summary/$id/edit'
+      preLoaderRoute: typeof SummaryIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stocks/$id/edit': {
@@ -128,9 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SettingsRoute: SettingsRoute,
-  SummaryRoute: SummaryRoute,
   StocksNewRoute: StocksNewRoute,
+  SummaryNewRoute: SummaryNewRoute,
+  SummaryIndexRoute: SummaryIndexRoute,
   StocksIdEditRoute: StocksIdEditRoute,
+  SummaryIdEditRoute: SummaryIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
