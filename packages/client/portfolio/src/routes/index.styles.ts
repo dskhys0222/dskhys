@@ -117,12 +117,12 @@ export const indexStyles = {
     cardList: css({
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.75rem',
+        gap: '0.5rem',
     }),
     card: css({
         backgroundColor: 'white',
         borderRadius: 'lg',
-        padding: '1rem',
+        padding: '0.5rem 1rem',
         boxShadow: 'sm',
     }),
     cardHeader: css({
@@ -136,13 +136,14 @@ export const indexStyles = {
         fontSize: 'lg',
     }),
     cardName: css({
-        fontSize: 'sm',
+        fontSize: 'xs',
         color: 'gray.600',
     }),
     cardBody: css({
-        display: 'flex',
-        justifyContent: 'space-between',
-        color: '#6b7280',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '0.5rem',
+        color: 'gray.400',
         fontSize: 'xs',
     }),
     swipeContainer: css({
