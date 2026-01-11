@@ -36,7 +36,7 @@ function NewStockPage() {
 
     const onSubmit = (data: StockFormData) => {
         addStock(data);
-        navigate({ to: '/stocks' });
+        navigate({ to: '/' });
     };
 
     return (
@@ -269,7 +269,7 @@ function NewStockPage() {
 
                 {/* ボタン */}
                 <div className={formStyles.buttons}>
-                    <Link to="/stocks" className={formStyles.cancelButton}>
+                    <Link to="/" className={formStyles.cancelButton}>
                         キャンセル
                     </Link>
                     <button

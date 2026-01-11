@@ -23,14 +23,8 @@ export default function Header() {
                     <Link to="/" className={getLinkClass('/')}>
                         ホーム
                     </Link>
-                    <Link to="/stocks" className={getLinkClass('/stocks')}>
-                        銘柄
-                    </Link>
-                    <Link
-                        to="/analytics"
-                        className={getLinkClass('/analytics')}
-                    >
-                        分析
+                    <Link to="/summary" className={getLinkClass('/summary')}>
+                        集計
                     </Link>
                     <Link to="/settings" className={getLinkClass('/settings')}>
                         設定

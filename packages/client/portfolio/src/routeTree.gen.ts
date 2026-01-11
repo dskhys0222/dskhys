@@ -9,31 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as StocksIndexRouteImport } from './routes/stocks/index'
 import { Route as StocksNewRouteImport } from './routes/stocks/new'
 import { Route as StocksIdEditRouteImport } from './routes/stocks/$id/edit'
 
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StocksIndexRoute = StocksIndexRouteImport.update({
-  id: '/stocks/',
-  path: '/stocks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StocksNewRoute = StocksNewRouteImport.update({
@@ -49,67 +43,57 @@ const StocksIdEditRoute = StocksIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
-  '/stocks': typeof StocksIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
-  '/stocks': typeof StocksIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/stocks/new': typeof StocksNewRoute
-  '/stocks/': typeof StocksIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/analytics'
-    | '/settings'
-    | '/stocks/new'
-    | '/stocks'
-    | '/stocks/$id/edit'
+  fullPaths: '/' | '/settings' | '/summary' | '/stocks/new' | '/stocks/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/analytics'
-    | '/settings'
-    | '/stocks/new'
-    | '/stocks'
-    | '/stocks/$id/edit'
+  to: '/' | '/settings' | '/summary' | '/stocks/new' | '/stocks/$id/edit'
   id:
     | '__root__'
     | '/'
-    | '/analytics'
     | '/settings'
+    | '/summary'
     | '/stocks/new'
-    | '/stocks/'
     | '/stocks/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnalyticsRoute: typeof AnalyticsRoute
   SettingsRoute: typeof SettingsRoute
+  SummaryRoute: typeof SummaryRoute
   StocksNewRoute: typeof StocksNewRoute
-  StocksIndexRoute: typeof StocksIndexRoute
   StocksIdEditRoute: typeof StocksIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -117,25 +101,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/stocks/': {
-      id: '/stocks/'
-      path: '/stocks'
-      fullPath: '/stocks'
-      preLoaderRoute: typeof StocksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stocks/new': {
@@ -157,10 +127,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnalyticsRoute: AnalyticsRoute,
   SettingsRoute: SettingsRoute,
+  SummaryRoute: SummaryRoute,
   StocksNewRoute: StocksNewRoute,
-  StocksIndexRoute: StocksIndexRoute,
   StocksIdEditRoute: StocksIdEditRoute,
 }
 export const routeTree = rootRouteImport

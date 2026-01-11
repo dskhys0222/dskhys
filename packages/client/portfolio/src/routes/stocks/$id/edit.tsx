@@ -42,14 +42,14 @@ function EditStockPage() {
 
     const onSubmit = (data: StockFormData) => {
         updateStock(id, data);
-        navigate({ to: '/stocks' });
+        navigate({ to: '/' });
     };
 
     if (!stock) {
         return (
             <div className={formStyles.page}>
                 <h2 className={formStyles.title}>銘柄が見つかりません</h2>
-                <Link to="/stocks" className={formStyles.cancelButton}>
+                <Link to="/" className={formStyles.cancelButton}>
                     銘柄一覧に戻る
                 </Link>
             </div>
@@ -284,7 +284,7 @@ function EditStockPage() {
 
                 {/* ボタン */}
                 <div className={formStyles.buttons}>
-                    <Link to="/stocks" className={formStyles.cancelButton}>
+                    <Link to="/" className={formStyles.cancelButton}>
                         キャンセル
                     </Link>
                     <button

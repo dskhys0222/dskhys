@@ -6,6 +6,7 @@ interface DonutChartProps {
     title: string;
     data: AggregatedData[];
     colors?: Record<string, string>;
+    showLegendTable?: boolean;
 }
 
 const DEFAULT_COLORS = [
@@ -111,9 +112,52 @@ const styles = {
         color: 'gray.500',
         fontSize: 'sm',
     }),
+    legendTable: css({
+        width: '100%',
+        borderCollapse: 'collapse',
+        fontSize: 'sm',
+        marginTop: '0.5rem',
+    }),
+    legendTh: css({
+        padding: '0.375rem 0.5rem',
+        textAlign: 'left',
+        backgroundColor: 'gray.100',
+        fontWeight: 'semibold',
+        color: 'gray.700',
+        whiteSpace: 'nowrap',
+        borderBottom: '1px solid',
+        borderColor: 'gray.200',
+        fontSize: 'xs',
+    }),
+    legendThRight: css({
+        textAlign: 'right',
+    }),
+    legendTd: css({
+        padding: '0.375rem 0.5rem',
+        borderBottom: '1px solid',
+        borderColor: 'gray.100',
+        whiteSpace: 'nowrap',
+        fontSize: 'xs',
+    }),
+    legendTdRight: css({
+        textAlign: 'right',
+    }),
+    colorIndicator: css({
+        display: 'inline-block',
+        width: '10px',
+        height: '10px',
+        borderRadius: '2px',
+        marginRight: '0.5rem',
+        verticalAlign: 'middle',
+    }),
 };
 
-export function DonutChart({ title, data, colors }: DonutChartProps) {
+export function DonutChart({
+    title,
+    data,
+    colors,
+    showLegendTable = false,
+}: DonutChartProps) {
     const getColor = (name: string, index: number): string => {
         if (colors?.[name]) return colors[name];
         if (CATEGORY_COLORS[name]) return CATEGORY_COLORS[name];
@@ -175,6 +219,38 @@ export function DonutChart({ title, data, colors }: DonutChartProps) {
                     </PieChart>
                 </ResponsiveContainer>
             </div>
+            {showLegendTable && (
+                <table className={styles.legendTable}>
+                    <tbody>
+                        {data.map((item, index) => (
+                            <tr key={item.name}>
+                                <td className={styles.legendTd}>
+                                    <span
+                                        className={styles.colorIndicator}
+                                        style={{
+                                            backgroundColor: getColor(
+                                                item.name,
+                                                index
+                                            ),
+                                        }}
+                                    />
+                                    {item.name}
+                                </td>
+                                <td
+                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                >
+                                    {formatCurrency(item.value)}
+                                </td>
+                                <td
+                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                >
+                                    {item.percentage.toFixed(1)}%
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 }
