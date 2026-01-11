@@ -1,6 +1,6 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { AggregatedData } from '@/types';
-import { css } from '../../styled-system/css';
+import { donutChartStyles } from './DonutChart.styles';
 
 interface DonutChartProps {
     title: string;
@@ -52,107 +52,6 @@ function formatCurrency(value: number): string {
     }).format(value);
 }
 
-interface CustomLabelProps {
-    cx: number;
-    cy: number;
-    midAngle: number;
-    outerRadius: number;
-    name: string;
-    percentage: number;
-}
-
-function renderCustomLabel({
-    cx,
-    cy,
-    midAngle,
-    outerRadius,
-    name,
-    percentage,
-}: CustomLabelProps) {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius + 25;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-        <text
-            x={x}
-            y={y}
-            fill="gray"
-            textAnchor={x > cx ? 'start' : 'end'}
-            dominantBaseline="central"
-            fontSize="12"
-        >
-            {`${name} ${percentage.toFixed(1)}%`}
-        </text>
-    );
-}
-
-const styles = {
-    container: css({
-        backgroundColor: 'white',
-        borderRadius: 'lg',
-        padding: '1rem',
-        boxShadow: 'sm',
-    }),
-    title: css({
-        fontSize: 'md',
-        fontWeight: 'semibold',
-        color: 'gray.700',
-        marginBottom: '0.5rem',
-        textAlign: 'center',
-    }),
-    chartContainer: css({
-        height: '180px',
-    }),
-    emptyState: css({
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '200px',
-        color: 'gray.500',
-        fontSize: 'sm',
-    }),
-    legendTable: css({
-        width: '100%',
-        borderCollapse: 'collapse',
-        fontSize: 'sm',
-        marginTop: '0.5rem',
-    }),
-    legendTh: css({
-        padding: '0.375rem 0.5rem',
-        textAlign: 'left',
-        backgroundColor: 'gray.100',
-        fontWeight: 'semibold',
-        color: 'gray.700',
-        whiteSpace: 'nowrap',
-        borderBottom: '1px solid',
-        borderColor: 'gray.200',
-        fontSize: 'xs',
-    }),
-    legendThRight: css({
-        textAlign: 'right',
-    }),
-    legendTd: css({
-        padding: '0.375rem 0.5rem',
-        borderBottom: '1px solid',
-        borderColor: 'gray.100',
-        whiteSpace: 'nowrap',
-        fontSize: 'xs',
-    }),
-    legendTdRight: css({
-        textAlign: 'right',
-    }),
-    colorIndicator: css({
-        display: 'inline-block',
-        width: '10px',
-        height: '10px',
-        borderRadius: '2px',
-        marginRight: '0.5rem',
-        verticalAlign: 'middle',
-    }),
-};
-
 export function DonutChart({
     title,
     data,
@@ -168,16 +67,18 @@ export function DonutChart({
 
     if (data.length === 0) {
         return (
-            <div className={styles.container}>
-                <h3 className={styles.title}>{title}</h3>
-                <div className={styles.emptyState}>データがありません</div>
+            <div className={donutChartStyles.container}>
+                <h3 className={donutChartStyles.title}>{title}</h3>
+                <div className={donutChartStyles.emptyState}>
+                    データがありません
+                </div>
             </div>
         );
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.chartContainer}>
+        <div className={donutChartStyles.container}>
+            <div className={donutChartStyles.chartContainer}>
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
@@ -188,11 +89,8 @@ export function DonutChart({
                             cy="50%"
                             innerRadius={40}
                             outerRadius={80}
-                            label={renderCustomLabel}
-                            labelLine={{
-                                stroke: 'gray',
-                                strokeWidth: 1,
-                            }}
+                            startAngle={90}
+                            endAngle={-270}
                         >
                             {data.map((entry, index) => (
                                 <Cell
@@ -203,7 +101,7 @@ export function DonutChart({
                         </Pie>
                         <Tooltip
                             formatter={(value: number, name: string) => [
-                                `${formatCurrency(value)} (${data.find((d) => d.name === name)?.percentage}%)`,
+                                `${formatCurrency(value)} (${(data.find((d) => d.name === name)?.percentage ?? 0).toFixed(1)}%)`,
                                 name,
                             ]}
                         />
@@ -222,13 +120,15 @@ export function DonutChart({
                 </ResponsiveContainer>
             </div>
             {showLegendTable && (
-                <table className={styles.legendTable}>
+                <table className={donutChartStyles.legendTable}>
                     <tbody>
                         {data.map((item, index) => (
                             <tr key={item.name}>
-                                <td className={styles.legendTd}>
+                                <td className={donutChartStyles.legendTd}>
                                     <span
-                                        className={styles.colorIndicator}
+                                        className={
+                                            donutChartStyles.colorIndicator
+                                        }
                                         style={{
                                             backgroundColor: getColor(
                                                 item.name,
@@ -239,12 +139,12 @@ export function DonutChart({
                                     {item.name}
                                 </td>
                                 <td
-                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                 >
                                     {formatCurrency(item.value)}
                                 </td>
                                 <td
-                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                 >
                                     {item.percentage.toFixed(1)}%
                                 </td>
@@ -258,9 +158,11 @@ export function DonutChart({
                                     fontWeight: 'bold',
                                 }}
                             >
-                                <td className={styles.legendTd}>合計</td>
+                                <td className={donutChartStyles.legendTd}>
+                                    合計
+                                </td>
                                 <td
-                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                 >
                                     {formatCurrency(
                                         data.reduce(
@@ -270,7 +172,7 @@ export function DonutChart({
                                     )}
                                 </td>
                                 <td
-                                    className={`${styles.legendTd} ${styles.legendTdRight}`}
+                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                 >
                                     100.0%
                                 </td>
