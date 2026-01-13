@@ -3,6 +3,7 @@ packages:
   - packages/client/web
   - packages/client/budget
   - packages/client/portfolio
+  - packages/client/mf-scraper
 
 minimumReleaseAge: 2880
 

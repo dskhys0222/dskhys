@@ -10,10 +10,14 @@
     "scripts": {
         "lint": "biome check .",
         "format": "biome check --write .",
+        "test": "pnpm api test && pnpm web test && pnpm budget test && pnpm portfolio test && pnpm mf-scraper test",
+        "build": "pnpm api build && pnpm web build && pnpm budget build && pnpm portfolio build && pnpm mf-scraper build",
+        "check": "pnpm format && pnpm test && pnpm build",
         "api": "pnpm --filter @dskhys/api",
         "web": "pnpm --filter @dskhys/web",
         "budget": "pnpm --filter @dskhys/budget",
-        "portfolio": "pnpm --filter @dskhys/portfolio"
+        "portfolio": "pnpm --filter @dskhys/portfolio",
+        "mf-scraper": "pnpm --filter @dskhys/mf-scraper"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.3.10"
