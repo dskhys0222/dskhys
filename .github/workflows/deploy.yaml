@@ -377,9 +377,6 @@ jobs:
             mv ${DEPLOY_PATH}/static/budget.tmp ${DEPLOY_PATH}/static/budget
           "
 
-          # Start/reload nginx
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "set -e; cd ${DEPLOY_PATH}; docker compose up -d --no-deps --force-recreate nginx; docker compose exec nginx nginx -t; docker compose exec nginx nginx -s reload"
-
   deploy_portfolio:
     name: Deploy Portfolio
     runs-on: ubuntu-latest
@@ -449,5 +446,58 @@ jobs:
             mv ${DEPLOY_PATH}/static/portfolio.tmp ${DEPLOY_PATH}/static/portfolio
           "
 
-          # Start/reload nginx
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "set -e; cd ${DEPLOY_PATH}; docker compose up -d --no-deps --force-recreate nginx; docker compose exec nginx nginx -t; docker compose exec nginx nginx -s reload"
+  deploy_nginx:
+    name: Deploy Nginx
+    runs-on: ubuntu-latest
+    needs: [lint, deploy_api, deploy_budget, deploy_portfolio]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            deployment/compose.yaml
+            deployment/nginx/nginx.conf
+
+      - name: Deploy Nginx
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+        run: |
+          set -e
+
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+
+          # Ensure directories exist
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}/nginx"
+
+          # Copy compose.yaml and nginx.conf
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" deployment/compose.yaml "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" deployment/nginx/nginx.conf "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/nginx/"
+
+          # Replace domain placeholder in nginx.conf
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            cd ${DEPLOY_PATH}/nginx
+            sed -i 's/__DOMAIN_NAME__/${DOMAIN_NAME}/g' nginx.conf
+          "
+
+          # Reload nginx (all services are already deployed)
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+            set -e
+            cd ${DEPLOY_PATH}
+            docker compose up -d --no-deps --force-recreate nginx
+            docker compose exec nginx nginx -t
+            docker compose exec nginx nginx -s reload
+          "

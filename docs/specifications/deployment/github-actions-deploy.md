@@ -14,11 +14,17 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ## デプロイパイプライン
 
 ```txt
-1. Lint → 2. Test → 3. Build → 4. Deploy
-         ↓          ↓          ↓
-    変更検知   テスト実行   ビルド成果物   サーバーデプロイ
-                         アップロード
+1. Lint → 2. Test → 3. Build → 4. Deploy Apps → 5. Deploy Nginx
+         ↓          ↓          ↓                ↓
+    変更検知   テスト実行   ビルド成果物    API/Budget/         最後にNginx
+                         アップロード    Portfolio同時実行    一括再起動
 ```
+
+**Nginx デプロイの特徴:**
+
+- API、Budget、Portfolio のデプロイが**すべて完了**してから実行
+- すべてのアプリが準備完了した状態で Nginx を再起動
+- Nginx の設定競合を防止
 
 ## 必須 GitHub Secrets（デプロイ用）
 
@@ -96,7 +102,7 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 
 1. Budget をビルド
 2. `dist/` を `static/budget/` にアップロード
-3. Nginx をリロード
+3. Nginx の再起動は `deploy_nginx` で実行
 
 ### 3. Portfolio デプロイ（deploy_portfolio）
 
@@ -108,7 +114,29 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 
 1. Portfolio をビルド
 2. `dist/` を `static/portfolio/` にアップロード
-3. Nginx をリロード
+3. Nginx の再起動は `deploy_nginx` で実行
+
+### 4. Nginx デプロイ（deploy_nginx）
+
+**実行タイミング:**
+
+- API、Budget、Portfolio のデプロイ**すべてが完了後**に実行
+- 変更がない場合でも、compose.yaml と nginx.conf は常に更新
+
+**処理内容:**
+
+1. compose.yaml を転送
+2. nginx.conf を転送
+3. ドメイン名プレースホルダを置換
+4. Nginx コンテナを再起動・リロード
+   - `docker compose up -d --no-deps --force-recreate nginx`
+   - `nginx -t` で設定構文チェック
+   - `nginx -s reload` でホットリロード
+
+**利点:**
+
+- 複数アプリの静的ファイル更新と Nginx 設定を原子的に処理
+- Nginx の再起動競合を排除
 
 ## 環境変数管理
 
