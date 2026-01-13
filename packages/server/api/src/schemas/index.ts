@@ -98,3 +98,27 @@ export type CreateListItem = z.infer<typeof CreateListItemSchema>;
 export type UpdateListItem = z.infer<typeof UpdateListItemSchema>;
 export type FindOneListItem = z.infer<typeof FindOneListItemSchema>;
 export type DeleteListItem = z.infer<typeof DeleteListItemSchema>;
+
+// 暗号化ポートフォリオ関連のスキーマ
+export const EncryptedPortfolioSchema = z.object({
+    auth_tag: z.string().min(1, 'Auth tag is required'),
+    created_at: z.string().datetime().optional(),
+    encrypted_data: z.string().min(1, 'Encrypted data is required'),
+    id: z.number().int().positive().optional(),
+    iv: z.string().min(1, 'IV is required'),
+    scraped_at: z.string().datetime(),
+    updated_at: z.string().datetime().optional(),
+    user_id: z.number().int().positive(),
+});
+
+export const CreateEncryptedPortfolioSchema = z.object({
+    data: z.string().min(1, 'Data is required'),
+    iv: z.string().min(1, 'IV is required'),
+    scrapedAt: z.string().datetime(),
+    tag: z.string().min(1, 'Tag is required'),
+});
+
+export type EncryptedPortfolio = z.infer<typeof EncryptedPortfolioSchema>;
+export type CreateEncryptedPortfolio = z.infer<
+    typeof CreateEncryptedPortfolioSchema
+>;

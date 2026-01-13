@@ -2,6 +2,7 @@ import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { authRoutes } from './auth.js';
 import { itemRoutes } from './item.js';
+import { portfolioRoutes } from './portfolio.js';
 import { userRoutes } from './users.js';
 
 export const router: ExpressRouter = Router();
@@ -23,6 +24,9 @@ router.use('/users', userRoutes);
 
 // アイテムルート
 router.use('/item', itemRoutes);
+
+// ポートフォリオルート
+router.use('/portfolio', portfolioRoutes);
 
 // TODO: 他のルートを追加
 // router.use('/posts', postRoutes)
