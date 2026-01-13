@@ -1,10 +1,15 @@
 import cors from 'cors';
 import express from 'express';
 import { errorHandler } from './middleware/errorHandler.js';
+import { loggingMiddleware } from './middleware/logging.js';
 import { router } from './routes/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+console.log('[API] NODE_ENV:', process.env.NODE_ENV);
+console.log('[API] PORT:', PORT);
+console.log('[API] ALLOWED_DOMAIN:', process.env.ALLOWED_DOMAIN || 'not set');
 
 // CORS設定：サブドメインからのリクエストを許可
 const corsOptions = {
@@ -52,6 +57,7 @@ const corsOptions = {
 };
 
 // ミドルウェア
+app.use(loggingMiddleware);
 app.use(cors(corsOptions));
 app.use(express.json());
 
