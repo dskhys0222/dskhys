@@ -23,12 +23,14 @@ function EditStockPage() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = useForm<StockFormData>({
-        resolver: zodResolver(stockSchema),
+        // biome-ignore lint/suspicious/noExplicitAny: 互換性不足らしい
+        resolver: zodResolver(stockSchema as any),
         defaultValues: stock
             ? {
                   name: stock.name,
                   ticker: stock.ticker,
                   value: stock.value,
+                  currentPrice: stock.currentPrice,
                   units: stock.units,
                   averageCost: stock.averageCost,
                   assetClass: stock.assetClass,
@@ -56,9 +58,34 @@ function EditStockPage() {
         );
     }
 
+    // MF由来の銘柄の場合、編集不可のフィールドがあることを警告
+    const isMFStock = stock.source === 'mf';
+
     return (
         <div className={formStyles.page}>
             <h2 className={formStyles.title}>{stock.ticker} を編集</h2>
+
+            {isMFStock && (
+                <div
+                    style={{
+                        marginBottom: '1.5rem',
+                        padding: '1rem',
+                        backgroundColor: '#fef3c7',
+                        border: '1px solid #fcd34d',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        color: '#92400e',
+                    }}
+                >
+                    <strong>
+                        ℹ この銘柄はMoneyForwardから自動取得されています。
+                    </strong>
+                    <p style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+                        ティッカーと属性情報のみ変更できます。
+                        評価額・基準価額・口数・平均取得単価は同期時に上書きされます。
+                    </p>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} className={formStyles.form}>
                 {/* 基本情報 */}
@@ -72,7 +99,8 @@ function EditStockPage() {
                                 <input
                                     type="text"
                                     {...register('name')}
-                                    className={`${formStyles.input} ${errors.name ? formStyles.inputError : ''}`}
+                                    disabled={isMFStock}
+                                    className={`${formStyles.input} ${errors.name ? formStyles.inputError : ''} ${isMFStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
                             </label>
                             {errors.name && (
@@ -107,7 +135,8 @@ function EditStockPage() {
                                     {...register('value', {
                                         valueAsNumber: true,
                                     })}
-                                    className={`${formStyles.input} ${errors.value ? formStyles.inputError : ''}`}
+                                    disabled={isMFStock}
+                                    className={`${formStyles.input} ${errors.value ? formStyles.inputError : ''} ${isMFStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
                             </label>
                             {errors.value && (
@@ -127,6 +156,25 @@ function EditStockPage() {
                     <div className={formStyles.fieldGroup}>
                         <div className={formStyles.field}>
                             <label className={formStyles.label}>
+                                基準価額
+                                <input
+                                    type="number"
+                                    step="any"
+                                    {...register('currentPrice', {
+                                        valueAsNumber: true,
+                                    })}
+                                    disabled={isMFStock}
+                                    className={`${formStyles.input} ${errors.currentPrice ? formStyles.inputError : ''} ${isMFStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                />
+                            </label>
+                            {errors.currentPrice && (
+                                <span className={formStyles.error}>
+                                    {errors.currentPrice.message}
+                                </span>
+                            )}
+                        </div>
+                        <div className={formStyles.field}>
+                            <label className={formStyles.label}>
                                 口数
                                 <input
                                     type="number"
@@ -134,7 +182,8 @@ function EditStockPage() {
                                     {...register('units', {
                                         valueAsNumber: true,
                                     })}
-                                    className={`${formStyles.input} ${errors.units ? formStyles.inputError : ''}`}
+                                    disabled={isMFStock}
+                                    className={`${formStyles.input} ${errors.units ? formStyles.inputError : ''} ${isMFStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
                             </label>
                             {errors.units && (
@@ -152,7 +201,8 @@ function EditStockPage() {
                                     {...register('averageCost', {
                                         valueAsNumber: true,
                                     })}
-                                    className={`${formStyles.input} ${errors.averageCost ? formStyles.inputError : ''}`}
+                                    disabled={isMFStock}
+                                    className={`${formStyles.input} ${errors.averageCost ? formStyles.inputError : ''} ${isMFStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
                             </label>
                             {errors.averageCost && (

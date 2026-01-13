@@ -7,7 +7,10 @@
 export function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
     try {
         const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
+        if (!item || item === 'undefined') {
+            return defaultValue;
+        }
+        return JSON.parse(item);
     } catch (error) {
         console.error(`Failed to load from localStorage (${key}):`, error);
         return defaultValue;

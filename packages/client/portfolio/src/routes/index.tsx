@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-import { useStocksStore } from '../stores';
+import { useEffect, useMemo, useState } from 'react';
+import { useMFDataStore, useStocksStore } from '../stores';
 import { indexStyles } from './index.styles';
 
 export const Route = createFileRoute('/')({
@@ -20,11 +20,41 @@ function HomePage() {
     const deleteStock = useStocksStore((state) => state.deleteStock);
     const navigate = useNavigate();
 
+    const isLoading = useMFDataStore((state) => state.isLoading);
+    const syncConfig = useMFDataStore((state) => state.syncConfig);
+    const accessToken = useMFDataStore((state) => state.accessToken);
+    const encryptionKey = useMFDataStore((state) => state.encryptionKey);
+    const fetchAndDecrypt = useMFDataStore((state) => state.fetchAndDecrypt);
+    const applySync = useMFDataStore((state) => state.applySync);
+    const loadEncryptionKey = useMFDataStore(
+        (state) => state.loadEncryptionKey
+    );
+    const loadSyncConfig = useMFDataStore((state) => state.loadSyncConfig);
+    const loadTokens = useMFDataStore((state) => state.loadTokens);
+
     const [sortBy, setSortBy] = useState<string>('account');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [touchStartX, setTouchStartX] = useState<number>(0);
     const [swipingId, setSwipingId] = useState<string | null>(null);
     const [swipeOffset, setSwipeOffset] = useState<number>(0);
+
+    // 初期化
+    useEffect(() => {
+        loadEncryptionKey();
+        loadSyncConfig();
+        loadTokens();
+    }, [loadEncryptionKey, loadSyncConfig, loadTokens]);
+
+    const isConfigured = encryptionKey && syncConfig.apiUrl;
+    const isLoggedIn = !!accessToken;
+
+    const handleQuickUpdate = async () => {
+        await fetchAndDecrypt(syncConfig.apiUrl, accessToken);
+        setTimeout(() => {
+            const updateStock = useStocksStore.getState().updateStock;
+            applySync(updateStock);
+        }, 100);
+    };
 
     const handleSort = (column: string) => {
         if (sortBy === column) {
@@ -83,7 +113,13 @@ function HomePage() {
         return result;
     }, [stocks, sortBy, sortOrder]);
 
-    const handleDelete = (id: string, ticker: string) => {
+    const handleDelete = (id: string, ticker: string, source: string) => {
+        if (source === 'mf') {
+            alert(
+                'MoneyForwardから自動取得された銘柄は削除できません。\n同期を実行して削除するか、別アプリで削除してください。'
+            );
+            return;
+        }
         if (confirm(`${ticker}を削除しますか？`)) {
             deleteStock(id);
         }
@@ -96,6 +132,7 @@ function HomePage() {
     const handleSwipe = (
         stockId: string,
         ticker: string,
+        source: string,
         e: React.TouchEvent<HTMLDivElement>
     ) => {
         const touchEndX = e.changedTouches[0].clientX;
@@ -103,7 +140,7 @@ function HomePage() {
 
         // 右から左へのスワイプ（100px以上）
         if (swipeDistance > 100) {
-            handleDelete(stockId, ticker);
+            handleDelete(stockId, ticker, source);
         }
 
         // リセット
@@ -149,12 +186,32 @@ function HomePage() {
     return (
         <div className={indexStyles.page}>
             <div className={indexStyles.header}>
-                <h2 className={indexStyles.title}>
-                    銘柄一覧（{sortedStocks.length}件）
-                </h2>
-                <Link to="/stocks/new" className={indexStyles.addButton}>
-                    銘柄を追加
-                </Link>
+                <h2 className={indexStyles.title}>銘柄一覧</h2>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {isConfigured && isLoggedIn && (
+                        <button
+                            type="button"
+                            onClick={handleQuickUpdate}
+                            disabled={isLoading}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                backgroundColor: '#22c55e',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '0.375rem',
+                                fontSize: '0.875rem',
+                                fontWeight: 600,
+                                cursor: isLoading ? 'not-allowed' : 'pointer',
+                                opacity: isLoading ? 0.6 : 1,
+                            }}
+                        >
+                            {isLoading ? '更新中' : '更新'}
+                        </button>
+                    )}
+                    <Link to="/stocks/new" className={indexStyles.addButton}>
+                        追加
+                    </Link>
+                </div>
             </div>
 
             {/* ソート */}
@@ -207,7 +264,12 @@ function HomePage() {
                                 }
                                 onTouchMove={handleTouchMove}
                                 onTouchEnd={(e) =>
-                                    handleSwipe(stock.id, stock.ticker, e)
+                                    handleSwipe(
+                                        stock.id,
+                                        stock.ticker,
+                                        stock.source,
+                                        e
+                                    )
                                 }
                                 style={{
                                     cursor: 'pointer',
@@ -359,7 +421,8 @@ function HomePage() {
                                             onClick={() =>
                                                 handleDelete(
                                                     stock.id,
-                                                    stock.ticker
+                                                    stock.ticker,
+                                                    stock.source
                                                 )
                                             }
                                         >

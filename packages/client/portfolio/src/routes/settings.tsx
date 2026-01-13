@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     useCustomAggregationsStore,
+    useMFDataStore,
     useSettingsStore,
     useStocksStore,
 } from '../stores';
@@ -23,6 +24,38 @@ function SettingsPage() {
         text: string;
     } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // MF同期設定
+    const encryptionKey = useMFDataStore((state) => state.encryptionKey);
+    const syncConfig = useMFDataStore((state) => state.syncConfig);
+    const mfData = useMFDataStore((state) => state.mfData);
+    const isLoading = useMFDataStore((state) => state.isLoading);
+    const accessToken = useMFDataStore((state) => state.accessToken);
+    const setEncryptionKey = useMFDataStore((state) => state.setEncryptionKey);
+    const saveSyncConfig = useMFDataStore((state) => state.saveSyncConfig);
+    const loadEncryptionKey = useMFDataStore(
+        (state) => state.loadEncryptionKey
+    );
+    const loadSyncConfig = useMFDataStore((state) => state.loadSyncConfig);
+    const loadTokens = useMFDataStore((state) => state.loadTokens);
+    const login = useMFDataStore((state) => state.login);
+    const logout = useMFDataStore((state) => state.logout);
+
+    const [mfApiUrl, setMfApiUrl] = useState('');
+    const [mfEncryptionKey, setMfEncryptionKey] = useState('');
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+
+    useEffect(() => {
+        loadEncryptionKey();
+        loadSyncConfig();
+        loadTokens();
+    }, [loadEncryptionKey, loadSyncConfig, loadTokens]);
+
+    useEffect(() => {
+        setMfApiUrl(syncConfig.apiUrl);
+        setMfEncryptionKey(encryptionKey);
+    }, [syncConfig.apiUrl, encryptionKey]);
 
     const handleExport = () => {
         try {
@@ -133,6 +166,43 @@ function SettingsPage() {
         }
     };
 
+    const handleSaveMFConfig = () => {
+        saveSyncConfig({ apiUrl: mfApiUrl });
+        setEncryptionKey(mfEncryptionKey);
+        setMessage({
+            type: 'success',
+            text: 'マネーフォワード同期設定を保存しました。',
+        });
+    };
+
+    const handleLogin = async () => {
+        const success = await login(
+            syncConfig.apiUrl,
+            loginEmail,
+            loginPassword
+        );
+        if (success) {
+            setLoginPassword('');
+            setMessage({
+                type: 'success',
+                text: 'ログインしました。',
+            });
+        } else {
+            setMessage({
+                type: 'error',
+                text: 'ログインに失敗しました。',
+            });
+        }
+    };
+
+    const handleLogout = () => {
+        logout();
+        setMessage({
+            type: 'success',
+            text: 'ログアウトしました。',
+        });
+    };
+
     return (
         <div className={settingsStyles.page}>
             <h2 className={settingsStyles.title}>設定</h2>
@@ -194,6 +264,141 @@ function SettingsPage() {
                         {message.text}
                     </div>
                 )}
+            </div>
+
+            {/* マネーフォワード同期設定 */}
+            <div className={settingsStyles.section}>
+                <h3 className={settingsStyles.sectionTitle}>
+                    マネーフォワード同期
+                </h3>
+                <p className={settingsStyles.sectionDescription}>
+                    マネーフォワードからデータを取得するための設定を行います。
+                </p>
+
+                {/* 最終更新情報 */}
+                {mfData && (
+                    <div className={settingsStyles.mfDataInfo}>
+                        <p className={settingsStyles.mfDataInfoPrimary}>
+                            <strong>最終更新:</strong>{' '}
+                            {new Date(mfData.scrapedAt).toLocaleString()}
+                        </p>
+                        <p className={settingsStyles.mfDataInfoSecondary}>
+                            <strong>登録銘柄数:</strong> {mfData.stocks.length}
+                        </p>
+                    </div>
+                )}
+
+                {/* ログイン・ログアウト */}
+                {accessToken ? (
+                    <div className={settingsStyles.mfLoginInfo}>
+                        <div className={settingsStyles.mfLoginStatus}>
+                            ✓ ログイン済み
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            className={settingsStyles.mfLogoutButton}
+                        >
+                            ログアウト
+                        </button>
+                    </div>
+                ) : (
+                    <div className={settingsStyles.mfLoginForm}>
+                        <div className={settingsStyles.mfFormGroup}>
+                            <label
+                                htmlFor="login-email"
+                                className={settingsStyles.mfLabel}
+                            >
+                                メールアドレス
+                            </label>
+                            <input
+                                id="login-email"
+                                type="email"
+                                value={loginEmail}
+                                onChange={(e) => setLoginEmail(e.target.value)}
+                                placeholder="user@example.com"
+                                className={settingsStyles.mfInput}
+                            />
+                        </div>
+                        <div className={settingsStyles.mfFormGroup}>
+                            <label
+                                htmlFor="login-password"
+                                className={settingsStyles.mfLabel}
+                            >
+                                パスワード
+                            </label>
+                            <input
+                                id="login-password"
+                                type="password"
+                                value={loginPassword}
+                                onChange={(e) =>
+                                    setLoginPassword(e.target.value)
+                                }
+                                placeholder="パスワード"
+                                className={settingsStyles.mfInput}
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleLogin}
+                            disabled={
+                                isLoading || !loginEmail || !loginPassword
+                            }
+                            className={settingsStyles.mfLoginButton}
+                        >
+                            {isLoading ? 'ログイン中...' : 'ログイン'}
+                        </button>
+                    </div>
+                )}
+
+                <div className={settingsStyles.mfConfigForm}>
+                    <div className={settingsStyles.mfConfigGroup}>
+                        <label
+                            htmlFor="mf-api-url"
+                            className={settingsStyles.mfConfigLabel}
+                        >
+                            API URL
+                        </label>
+                        <input
+                            id="mf-api-url"
+                            type="url"
+                            value={mfApiUrl}
+                            onChange={(e) => setMfApiUrl(e.target.value)}
+                            placeholder="https://example.com"
+                            className={settingsStyles.mfConfigInput}
+                        />
+                    </div>
+
+                    <div className={settingsStyles.mfConfigGroup}>
+                        <label
+                            htmlFor="mf-api-username"
+                            className={settingsStyles.mfConfigLabel}
+                        >
+                            暗号化キー
+                        </label>
+                        <input
+                            id="mf-encryption-key"
+                            type="password"
+                            value={mfEncryptionKey}
+                            onChange={(e) => setMfEncryptionKey(e.target.value)}
+                            placeholder="暗号化キーを入力"
+                            className={settingsStyles.mfConfigInput}
+                        />
+                        <p className={settingsStyles.mfConfigNote}>
+                            バッチ処理で使用しているのと同じ暗号化キーを入力してください。
+                        </p>
+                    </div>
+
+                    <div>
+                        <button
+                            type="button"
+                            onClick={handleSaveMFConfig}
+                            className={`${settingsStyles.button} ${settingsStyles.exportButton}`}
+                        >
+                            💾 設定を保存
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* 危険な操作 */}

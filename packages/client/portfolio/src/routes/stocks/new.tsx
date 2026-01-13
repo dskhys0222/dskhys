@@ -19,11 +19,13 @@ function NewStockPage() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = useForm<StockFormData>({
-        resolver: zodResolver(stockSchema),
+        // biome-ignore lint/suspicious/noExplicitAny: 互換性不足らしい
+        resolver: zodResolver(stockSchema as any),
         defaultValues: {
             name: '',
             ticker: '',
             value: 0,
+            currentPrice: undefined,
             units: undefined,
             averageCost: undefined,
             assetClass: undefined,
@@ -35,7 +37,7 @@ function NewStockPage() {
     });
 
     const onSubmit = (data: StockFormData) => {
-        addStock(data);
+        addStock({ ...data, source: 'manual' });
         navigate({ to: '/' });
     };
 
@@ -110,6 +112,24 @@ function NewStockPage() {
                         保有情報（任意）
                     </h3>
                     <div className={formStyles.fieldGroup}>
+                        <div className={formStyles.field}>
+                            <label className={formStyles.label}>
+                                基準価額
+                                <input
+                                    type="number"
+                                    step="any"
+                                    {...register('currentPrice', {
+                                        valueAsNumber: true,
+                                    })}
+                                    className={`${formStyles.input} ${errors.currentPrice ? formStyles.inputError : ''}`}
+                                />
+                            </label>
+                            {errors.currentPrice && (
+                                <span className={formStyles.error}>
+                                    {errors.currentPrice.message}
+                                </span>
+                            )}
+                        </div>
                         <div className={formStyles.field}>
                             <label className={formStyles.label}>
                                 口数

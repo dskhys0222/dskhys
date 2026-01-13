@@ -22,9 +22,11 @@ export type Account = (typeof ACCOUNTS)[number];
 
 export interface Stock {
     id: string;
+    source: 'manual' | 'mf'; // 手動入力またはMoneyForwardから取得
     name: string; // 銘柄名（必須）
     ticker: string; // ティッカーシンボル（必須）
     value: number; // 評価額（必須）
+    currentPrice?: number; // 基準価額（任意、MoneyForward同期時に更新）
     units?: number; // 口数（任意）
     averageCost?: number; // 平均取得単価（任意）
     assetClass: AssetClass; // クラス（必須）
@@ -66,4 +68,54 @@ export interface CustomAggregation {
     stockAssignments: CustomAggregationStockAssignment[]; // 銘柄への属性割り当て
     createdAt: string;
     updatedAt: string;
+}
+
+// マネーフォワード連携用の型定義
+
+/** マネーフォワードから取得した銘柄情報 */
+export interface MFStock {
+    id: string; // 一意のID（銘柄名_金融機関名、重複時は_2, _3...）
+    name: string; // 銘柄名
+    units: number; // 保有数
+    averageCost: number; // 平均取得単価
+    currentPrice: number; // 基準価額
+    value: number; // 評価額
+    profitLoss: number; // 評価損益
+    account: string; // 保有金融機関
+}
+
+/** マネーフォワードから取得したポートフォリオデータ */
+export interface MFPortfolioData {
+    stocks: MFStock[];
+    scrapedAt: string; // ISO 8601
+}
+
+/** APIから取得した暗号化データ */
+export interface EncryptedPortfolioResponse {
+    iv: string;
+    data: string;
+    tag: string;
+    scrapedAt: string;
+}
+
+/** 銘柄マッピング（MF銘柄とportfolio銘柄の紐づけ） */
+export interface StockMapping {
+    id: string;
+    mfStockId: string; // MFStock.id（バッチ側で割り当てられたID）
+    stockId: string | null; // portfolio側の銘柄ID（null=未マッピング）
+    action: 'update' | 'skip' | 'new'; // 同期時のアクション
+    createdAt: string;
+    updatedAt: string;
+}
+
+/** MF同期設定 */
+export interface MFSyncConfig {
+    apiUrl: string;
+    encryptionKey: string;
+}
+
+/** 認証トークン */
+export interface AuthTokens {
+    accessToken: string;
+    refreshToken: string;
 }

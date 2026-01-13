@@ -2,7 +2,11 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { DonutChart } from '../../components/DonutChart';
 import { useCustomAggregationsStore, useStocksStore } from '../../stores';
 import type { AggregatedData, CustomAggregation, Stock } from '../../types';
-import { aggregateByField, calculateTotalValue } from '../../utils/aggregation';
+import {
+    aggregateByField,
+    calculateTotalProfitLoss,
+    calculateTotalValue,
+} from '../../utils/aggregation';
 import { summaryStyles } from './index.styles';
 
 export const Route = createFileRoute('/summary/')({
@@ -72,6 +76,7 @@ function SummaryLayout() {
     );
 
     const totalValue = calculateTotalValue(stocks);
+    const totalProfitLoss = calculateTotalProfitLoss(stocks);
 
     // 各カテゴリ別の集計データ
     const assetClassData = aggregateByField(stocks, 'assetClass');
@@ -109,6 +114,22 @@ function SummaryLayout() {
                         </div>
                         <div className={summaryStyles.summaryValue}>
                             {formatCurrency(totalValue)}
+                        </div>
+                    </div>
+                    <div className={summaryStyles.summaryCard}>
+                        <div className={summaryStyles.summaryLabel}>
+                            総評価損益
+                        </div>
+                        <div
+                            className={summaryStyles.summaryValue}
+                            style={{
+                                color:
+                                    totalProfitLoss >= 0
+                                        ? '#16a34a'
+                                        : '#dc2626',
+                            }}
+                        >
+                            {formatCurrency(totalProfitLoss)}
                         </div>
                     </div>
                 </div>

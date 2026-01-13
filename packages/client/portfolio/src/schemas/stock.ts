@@ -20,6 +20,7 @@ export const stockSchema = z.object({
     value: z
         .number({ invalid_type_error: '評価額は数値で入力してください' })
         .nonnegative('評価額は0以上で入力してください'),
+    currentPrice: optionalNumber,
     units: optionalNumber,
     averageCost: optionalNumber,
     assetClass: z.enum(ASSET_CLASSES, {

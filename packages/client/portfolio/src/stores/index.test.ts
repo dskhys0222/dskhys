@@ -62,6 +62,7 @@ describe('stores', () => {
                     region: '米国' as const,
                     attribute: 'インデックス' as const,
                     account: '特定' as const,
+                    source: 'manual' as const,
                 };
 
                 useStocksStore.getState().addStock(newStock);
@@ -85,6 +86,7 @@ describe('stores', () => {
                     region: '米国' as const,
                     attribute: 'インデックス' as const,
                     account: 'NISA' as const,
+                    source: 'manual' as const,
                 };
 
                 useStocksStore.getState().addStock(newStock);
@@ -110,6 +112,7 @@ describe('stores', () => {
                     region: '米国',
                     attribute: 'インデックス',
                     account: '特定',
+                    source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
 
@@ -138,6 +141,7 @@ describe('stores', () => {
                     region: '米国',
                     attribute: 'インデックス',
                     account: '特定',
+                    source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
 
@@ -163,6 +167,7 @@ describe('stores', () => {
                     region: '米国',
                     attribute: 'インデックス',
                     account: '特定',
+                    source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
 
@@ -184,6 +189,7 @@ describe('stores', () => {
                     region: '米国',
                     attribute: 'インデックス',
                     account: '特定',
+                    source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
 
@@ -207,6 +213,7 @@ describe('stores', () => {
                         region: '米国',
                         attribute: 'インデックス',
                         account: '特定',
+                        source: 'manual',
                         createdAt: '2024-01-01T00:00:00Z',
                         updatedAt: '2024-01-01T00:00:00Z',
                     },
