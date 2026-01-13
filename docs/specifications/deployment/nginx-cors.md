@@ -121,7 +121,7 @@ curl -H "Origin: https://budget.example.com" \
 
 ## CORS ヘッダーの流れ
 
-```
+```txt
 1. ブラウザ（budget.example.com）
         ↓
    OPTIONS リクエスト送信
