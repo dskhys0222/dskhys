@@ -1,0 +1,58 @@
+name: Publish npm Packages
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'packages/client/mf-scraper/package.json'
+      - 'packages/client/mf-scraper/src/**'
+      - '.github/workflows/publish.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm mf-scraper test
+
+      - name: Build mf-scraper
+        run: pnpm mf-scraper build
+
+      - name: Publish to npm
+        run: |
+          cd packages/client/mf-scraper
+          npm publish --access public

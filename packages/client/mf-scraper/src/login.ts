@@ -11,7 +11,10 @@ import { ensureConfigDir, getAuthFilePath } from './config.js';
 
 const MF_LOGIN_URL = 'https://moneyforward.com/users/sign_in';
 
-const main = async (): Promise<void> => {
+/**
+ * ログイン処理を実行
+ */
+export const login = async (): Promise<void> => {
     console.log('=== マネーフォワード ログインスクリプト ===\n');
 
     // 設定ディレクトリを作成
@@ -64,7 +67,7 @@ const main = async (): Promise<void> => {
 
         console.log(`セッション情報を保存しました: ${authFilePath}`);
         console.log('\nこれで自動スクレイピングが可能になりました。');
-        console.log('`pnpm start` でスクレイピングを実行できます。\n');
+        console.log('`mf-scraper` でスクレイピングを実行できます。\n');
     } catch (error) {
         if (error instanceof Error && error.name === 'TimeoutError') {
             console.error(
@@ -79,4 +82,7 @@ const main = async (): Promise<void> => {
     }
 };
 
-main().catch(console.error);
+// 直接実行された場合（開発時）
+if (import.meta.url === `file://${process.argv[1]}`) {
+    login().catch(console.error);
+}

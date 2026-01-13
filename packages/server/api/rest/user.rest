@@ -1,8 +1,8 @@
-POST http://localhost:3000/api/auth/register HTTP/1.1
+POST https://dskhys.com/api/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "email": "test@example.com",
-    "name": "Test User",
-    "password": "password123"
+    "email": "dskhys@outlook.com",
+    "name": "Daisuke Hayashi",
+    "password": "tmn8Y6xO0SsmtBuXEJfS69B8IQfNiLnK"
 }

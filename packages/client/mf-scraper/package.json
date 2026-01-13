@@ -6,7 +6,11 @@
     "author": "",
     "type": "module",
     "main": "dist/index.js",
+    "bin": {
+        "mf-scraper": "dist/index.js"
+    },
     "scripts": {
+        "prebuild": "node scripts/generate-version.js",
         "build": "tsc",
         "login": "tsx src/login.ts",
         "start": "tsx src/index.ts",

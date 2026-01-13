@@ -1,25 +1,75 @@
+#!/usr/bin/env node
+
 /**
  * mf-scraper メインエントリポイント
  *
- * 1. 設定ファイルの読み込み
- * 2. APIサーバーへのログイン
- * 3. マネーフォワードからポートフォリオデータをスクレイピング
- * 4. データを暗号化
- * 5. APIサーバーへ送信
+ * サブコマンド:
+ * - mf-scraper              : ポートフォリオスクレイピングを実行
+ * - mf-scraper login        : マネーフォワードにログイン
+ * - mf-scraper --help/-h    : ヘルプを表示
+ * - mf-scraper --version/-v : バージョンを表示
  */
 
 import * as fs from 'node:fs';
 import { ApiClient } from './api.js';
 import { getAuthFilePath, loadConfig } from './config.js';
 import { encrypt } from './encrypt.js';
+import { login } from './login.js';
 import {
     checkLoginStatus,
     createContextWithSession,
     launchBrowser,
     scrapePortfolio,
 } from './scraper.js';
+import { VERSION } from './version.js';
 
-const main = async (): Promise<void> => {
+const printHelp = (): void => {
+    console.log(`
+=== mf-scraper ===
+
+MoneyForward からポートフォリオデータをスクレイピングして、
+APIサーバーに送信するバッチアプリケーション
+
+【使用方法】
+
+  mf-scraper              ポートフォリオをスクレイピング
+  mf-scraper login        マネーフォワードにログイン（初回必須）
+  mf-scraper --help       このヘルプを表示
+  mf-scraper --version    バージョン情報を表示
+
+【セットアップ手順】
+
+  1. 設定ファイルを作成
+     ~/.config/mf-scraper/config.json
+
+  2. マネーフォワードにログイン
+     mf-scraper login
+     ブラウザが開くので、手動でログインしてください。
+
+  3. スクレイピングを実行
+     mf-scraper
+
+【クロンジョブでの定期実行】
+
+  毎日午前 3 時に実行する場合:
+  0 3 * * * /usr/local/bin/mf-scraper
+
+【トラブルシューティング】
+
+  セッションが期限切れの場合:
+  mf-scraper login
+
+  Playwright ブラウザをリセット:
+  rm -rf ~/.cache/ms-playwright
+  mf-scraper
+`);
+};
+
+const printVersion = (): void => {
+    console.log(`mf-scraper ${VERSION}`);
+};
+
+const scrape = async (): Promise<void> => {
     console.log('=== mf-scraper ===');
     console.log(`実行日時: ${new Date().toISOString()}\n`);
 
@@ -32,7 +82,9 @@ const main = async (): Promise<void> => {
     const authFilePath = getAuthFilePath();
     if (!fs.existsSync(authFilePath)) {
         console.error('エラー: セッションファイルが見つかりません。');
-        console.error('先に `pnpm login` を実行してログインしてください。');
+        console.error(
+            '先に `mf-scraper login` を実行してログインしてください。'
+        );
         process.exit(1);
     }
 
@@ -61,7 +113,7 @@ const main = async (): Promise<void> => {
         if (!isLoggedIn) {
             console.error('エラー: マネーフォワードにログインしていません。');
             console.error('セッションが期限切れの可能性があります。');
-            console.error('`pnpm login` で再ログインしてください。');
+            console.error('`mf-scraper login` で再ログインしてください。');
             process.exit(1);
         }
         console.log('ログイン状態OK\n');
@@ -90,6 +142,34 @@ const main = async (): Promise<void> => {
         console.log('=== 処理完了 ===');
     } finally {
         await browser.close();
+    }
+};
+
+const main = async (): Promise<void> => {
+    const args = process.argv.slice(2);
+    const command = args[0];
+
+    switch (command) {
+        case 'login':
+            await login();
+            break;
+        case '--help':
+        case '-h':
+        case 'help':
+            printHelp();
+            break;
+        case '--version':
+        case '-v':
+            printVersion();
+            break;
+        case undefined:
+            // デフォルト: スクレイピング実行
+            await scrape();
+            break;
+        default:
+            console.error(`エラー: 不明なコマンド '${command}'`);
+            console.error('ヘルプを表示: mf-scraper --help');
+            process.exit(1);
     }
 };
 
