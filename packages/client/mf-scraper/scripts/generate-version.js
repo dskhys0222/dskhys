@@ -18,7 +18,7 @@ try {
     // package.json からバージョンを読込
     const packageJsonPath = join(packageDir, 'package.json');
     const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-    const baseVersion = packageJson.version;
+    const baseVersion = packageJson.version.split('+')[0];
 
     // Git コミットハッシュを取得（短い形式）
     const gitHash = execSync('git rev-parse --short HEAD', {
@@ -31,6 +31,14 @@ try {
 
     // バージョンスト文字列
     const version = `${baseVersion}+git.${gitHash}`;
+
+    // package.json の version フィールドを更新
+    packageJson.version = version;
+    writeFileSync(
+        packageJsonPath,
+        `${JSON.stringify(packageJson, null, 2)}\n`,
+        'utf-8'
+    );
 
     // version.ts の内容
     const versionContent = `/**

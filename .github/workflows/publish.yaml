@@ -52,6 +52,9 @@ jobs:
       - name: Build mf-scraper
         run: pnpm mf-scraper build
 
+      - name: Check version.ts
+        run: cat packages/client/mf-scraper/src/version.ts
+
       - name: Publish to npm
         run: |
           cd packages/client/mf-scraper

@@ -1,29 +1,29 @@
 {
-    "name": "@dskhys/mf-scraper",
-    "version": "0.0.1",
-    "description": "MoneyForward portfolio scraper",
-    "license": "ISC",
-    "author": "",
-    "type": "module",
-    "main": "dist/index.js",
-    "bin": {
-        "mf-scraper": "dist/index.js"
-    },
-    "scripts": {
-        "prebuild": "node scripts/generate-version.js",
-        "build": "tsc",
-        "login": "tsx src/login.ts",
-        "start": "tsx src/index.ts",
-        "test": "vitest run",
-        "typecheck": "tsc --noEmit"
-    },
-    "dependencies": {
-        "playwright": "^1.40.0"
-    },
-    "devDependencies": {
-        "@types/node": "^24.10.4",
-        "tsx": "^4.21.0",
-        "typescript": "~5.9.3",
-        "vitest": "^4.0.16"
-    }
+  "name": "@dskhys/mf-scraper",
+  "version": "0.0.1+git.a241474",
+  "description": "MoneyForward portfolio scraper",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mf-scraper": "dist/index.js"
+  },
+  "scripts": {
+    "prebuild": "node scripts/generate-version.js",
+    "build": "tsc",
+    "login": "tsx src/login.ts",
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.4",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.16"
+  }
 }
