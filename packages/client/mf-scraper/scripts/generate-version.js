@@ -7,11 +7,16 @@
 
 import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// スクリプトのディレクトリを取得
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageDir = dirname(__dirname); // packages/client/mf-scraper
 
 try {
     // package.json からバージョンを読込
-    const packageJsonPath = join(process.cwd(), 'package.json');
+    const packageJsonPath = join(packageDir, 'package.json');
     const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
     const baseVersion = packageJson.version;
 
@@ -39,7 +44,7 @@ export const BUILD_DATE = '${buildDate}';
 `;
 
     // ファイルに書き込み
-    const versionFile = join(process.cwd(), 'src', 'version.ts');
+    const versionFile = join(packageDir, 'src', 'version.ts');
     writeFileSync(versionFile, versionContent, 'utf-8');
 
     console.log(`✓ Version generated: ${version}`);
@@ -50,7 +55,7 @@ export const BUILD_DATE = '${buildDate}';
         if (error.message.includes('fatal: not a git repository')) {
             // Git リポジトリでない場合（例：npm tar ball）は package.json のバージョンを使用
             console.warn('⚠ Not a git repository, using default version');
-            const packageJsonPath = join(process.cwd(), 'package.json');
+            const packageJsonPath = join(packageDir, 'package.json');
             const packageJson = JSON.parse(
                 readFileSync(packageJsonPath, 'utf-8')
             );
@@ -64,7 +69,7 @@ export const VERSION = '${baseVersion}+git.unknown';
 export const GIT_HASH = 'unknown';
 export const BUILD_DATE = '${new Date().toISOString()}';
 `;
-            const versionFile = join(process.cwd(), 'src', 'version.ts');
+            const versionFile = join(packageDir, 'src', 'version.ts');
             writeFileSync(versionFile, versionContent, 'utf-8');
         } else {
             console.error('✗ Error generating version:', error.message);
