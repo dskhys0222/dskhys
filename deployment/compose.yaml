@@ -13,7 +13,7 @@ services:
       - ALLOWED_DOMAIN=${ALLOWED_DOMAIN:-localhost}
       - CORS_WHITELIST=${CORS_WHITELIST:-}
     volumes:
-      - ./data:/app/data/packages/server/api/data
+      - ./data:/app/data
     healthcheck:
       test: ["CMD", "/healthcheck.sh"]
       interval: 30s
