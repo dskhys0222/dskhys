@@ -99,6 +99,34 @@ cat ~/.ssh/github_deploy.pub
 
 **注意:** SSL セットアップワークフロー (`setup-ssl.yaml`) でのみ使用されます。
 
+### ALLOWED_DOMAIN
+
+**説明:** CORS で許可するメインドメイン（サブドメインからのリクエストを許可）
+
+**設定例:**
+
+- `example.com` → `portfolio.example.com`, `budget.example.com` などを許可
+- `myapp.local` → `api.myapp.local` などを許可
+
+**デフォルト:** `localhost`
+
+**動作:**
+
+- 環境変数で指定したドメイン配下のすべてのサブドメインからのリクエストを許可
+- `http://localhost:5173` (開発環境) を常に許可
+- 同一オリジン、モバイルアプリなど (オリジンなし) も許可
+
+### CORS_WHITELIST
+
+**説明:** 明示的に許可する追加オリジンのカンマ区切りリスト
+
+**設定例:**
+
+- `https://external-service.com,https://trusted-partner.com`
+- `http://staging.example.com,https://production.example.com`
+
+**注意:** `ALLOWED_DOMAIN` で許可されていない特定のドメインを追加で許可したい場合に使用します。
+
 ## 検証
 
 すべてのシークレットを設定した後、以下の方法で検証できます:

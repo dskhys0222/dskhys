@@ -235,6 +235,8 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ACCESS_EXPIRATION: ${{ secrets.JWT_ACCESS_EXPIRATION }}
           JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+          ALLOWED_DOMAIN: ${{ secrets.ALLOWED_DOMAIN }}
+          CORS_WHITELIST: ${{ secrets.CORS_WHITELIST }}
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
@@ -280,6 +282,20 @@ jobs:
               sed -i 's|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|' .env
             else
               echo 'IMAGE_TAG=${IMAGE_TAG}' >> .env
+            fi
+            
+            # Update ALLOWED_DOMAIN
+            if grep -q '^ALLOWED_DOMAIN=' .env; then
+              sed -i 's|^ALLOWED_DOMAIN=.*|ALLOWED_DOMAIN=${ALLOWED_DOMAIN}|' .env
+            else
+              echo 'ALLOWED_DOMAIN=${ALLOWED_DOMAIN}' >> .env
+            fi
+            
+            # Update CORS_WHITELIST
+            if grep -q '^CORS_WHITELIST=' .env; then
+              sed -i 's|^CORS_WHITELIST=.*|CORS_WHITELIST=${CORS_WHITELIST}|' .env
+            else
+              echo 'CORS_WHITELIST=${CORS_WHITELIST}' >> .env
             fi
           "
 

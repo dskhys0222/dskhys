@@ -10,6 +10,8 @@ services:
       - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION:-15m}
       - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-7d}
       - DATABASE_PATH=/app/data/database.sqlite
+      - ALLOWED_DOMAIN=${ALLOWED_DOMAIN:-localhost}
+      - CORS_WHITELIST=${CORS_WHITELIST:-}
     volumes:
       - ./data:/app/data
     healthcheck:

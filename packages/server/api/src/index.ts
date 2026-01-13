@@ -6,8 +6,53 @@ import { router } from './routes/index.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS設定：サブドメインからのリクエストを許可
+const corsOptions = {
+    origin: (
+        origin: string | undefined,
+        callback: (err: Error | null, allow?: boolean) => void
+    ) => {
+        // オリジンがない場合（同一オリジン、モバイルアプリなど）を許可
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        // localhost と 127.0.0.1 を許可（開発環境用）
+        if (
+            origin === 'http://localhost:5173' ||
+            origin === 'http://127.0.0.1:5173'
+        ) {
+            return callback(null, true);
+        }
+
+        // メインドメイン配下のサブドメインを許可
+        const allowedDomain = process.env.ALLOWED_DOMAIN || 'localhost';
+        if (
+            origin.endsWith(`.${allowedDomain}`) ||
+            origin === `http://${allowedDomain}` ||
+            origin === `https://${allowedDomain}`
+        ) {
+            return callback(null, true);
+        }
+
+        // ホワイトリストに明示的に設定されたオリジンを許可
+        const whitelist = (process.env.CORS_WHITELIST || '')
+            .split(',')
+            .filter(Boolean);
+        if (whitelist.includes(origin)) {
+            return callback(null, true);
+        }
+
+        callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400, // 24時間
+};
+
 // ミドルウェア
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ヘルスチェック（エラーハンドラーの前に配置）
