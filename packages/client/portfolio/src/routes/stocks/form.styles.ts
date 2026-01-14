@@ -53,6 +53,20 @@ export const formStyles = {
         fontWeight: 'medium',
         color: 'gray.700',
     }),
+    checkboxLabel: css({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        fontSize: 'sm',
+        fontWeight: 'medium',
+        color: 'gray.700',
+        cursor: 'pointer',
+    }),
+    checkbox: css({
+        width: '1rem',
+        height: '1rem',
+        cursor: 'pointer',
+    }),
     required: css({
         color: 'red.500',
         marginLeft: '0.25rem',

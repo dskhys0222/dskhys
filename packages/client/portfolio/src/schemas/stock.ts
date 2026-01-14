@@ -36,6 +36,9 @@ export const stockSchema = z.object({
         errorMap: () => ({ message: '口座を選択してください' }),
     }),
     note: z.string().max(500, '備考は500文字以内で入力してください').optional(),
+    // 配当金関連
+    includeDividend: z.boolean().optional().default(false),
+    dividendAmount: optionalNumber,
 });
 
 export type StockFormData = z.infer<typeof stockSchema>;

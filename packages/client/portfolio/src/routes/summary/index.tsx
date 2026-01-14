@@ -7,6 +7,7 @@ import {
     calculateTotalProfitLoss,
     calculateTotalValue,
 } from '../../utils/aggregation';
+import { aggregateDividendInfo } from '../../utils/dividend';
 import { summaryStyles } from './index.styles';
 
 export const Route = createFileRoute('/summary/')({
@@ -77,6 +78,7 @@ function SummaryLayout() {
 
     const totalValue = calculateTotalValue(stocks);
     const totalProfitLoss = calculateTotalProfitLoss(stocks);
+    const dividendInfo = aggregateDividendInfo(stocks);
 
     // 各カテゴリ別の集計データ
     const assetClassData = aggregateByField(stocks, 'assetClass');
@@ -109,16 +111,14 @@ function SummaryLayout() {
                 {/* サマリーカード */}
                 <div className={summaryStyles.summaryGrid}>
                     <div className={summaryStyles.summaryCard}>
-                        <div className={summaryStyles.summaryLabel}>
-                            総評価額
-                        </div>
+                        <div className={summaryStyles.summaryLabel}>評価額</div>
                         <div className={summaryStyles.summaryValue}>
                             {formatCurrency(totalValue)}
                         </div>
                     </div>
                     <div className={summaryStyles.summaryCard}>
                         <div className={summaryStyles.summaryLabel}>
-                            総評価損益
+                            評価損益
                         </div>
                         <div
                             className={summaryStyles.summaryValue}
@@ -132,6 +132,16 @@ function SummaryLayout() {
                             {formatCurrency(totalProfitLoss)}
                         </div>
                     </div>
+                    {dividendInfo.stockCount > 0 && (
+                        <div className={summaryStyles.summaryCard}>
+                            <div className={summaryStyles.summaryLabel}>
+                                年間配当
+                            </div>
+                            <div className={summaryStyles.summaryValue}>
+                                {formatCurrency(dividendInfo.annualAmount)}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* ドーナツグラフ + 凡例テーブル */}

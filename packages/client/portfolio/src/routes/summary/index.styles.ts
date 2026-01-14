@@ -29,6 +29,7 @@ export const summaryStyles = {
         fontSize: 'xl',
         fontWeight: 'bold',
         color: 'gray.900',
+        textAlign: 'right',
     }),
     chartsGrid: css({
         display: 'grid',

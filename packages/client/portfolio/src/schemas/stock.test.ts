@@ -10,6 +10,7 @@ describe('schemas', () => {
                 value: 25000,
                 units: 100,
                 averageCost: 200,
+                includeDividend: false,
                 assetClass: '株式' as const,
                 region: '米国' as const,
                 attribute: 'インデックス' as const,

@@ -34,6 +34,9 @@ export interface Stock {
     attribute: Attribute; // 属性（必須）
     account: Account; // 口座（必須）
     note?: string; // 備考（任意）
+    // 配当金関連
+    includeDividend?: boolean; // 配当金集計対象フラグ（デフォルト: false）
+    dividendAmount?: number; // 1口あたりの年間配当金額（円）
     createdAt: string;
     updatedAt: string;
 }
@@ -46,6 +49,20 @@ export interface AggregatedData {
     name: string;
     value: number;
     percentage: number;
+}
+
+// 配当金情報
+export interface DividendInfo {
+    annualAmount: number; // 年間配当金額（円）
+    yieldPercent: number; // 配当利回り（%）
+    stockCount: number; // 配当対象銘柄数
+    stockDetails: {
+        stockId: string;
+        name: string;
+        ticker: string;
+        amount: number;
+        yield: number;
+    }[];
 }
 
 // カスタム集計の属性設定

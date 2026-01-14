@@ -38,6 +38,8 @@ function EditStockPage() {
                   attribute: stock.attribute,
                   account: stock.account,
                   note: stock.note ?? '',
+                  includeDividend: stock.includeDividend ?? false,
+                  dividendAmount: stock.dividendAmount,
               }
             : undefined,
     });
@@ -326,6 +328,44 @@ function EditStockPage() {
                             {errors.note && (
                                 <span className={formStyles.error}>
                                     {errors.note.message}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 配当金情報（任意） */}
+                <div className={formStyles.section}>
+                    <h3 className={formStyles.sectionTitle}>
+                        配当金情報（任意）
+                    </h3>
+                    <div className={formStyles.fieldGroup}>
+                        <div className={formStyles.field}>
+                            <label className={formStyles.checkboxLabel}>
+                                <input
+                                    type="checkbox"
+                                    {...register('includeDividend')}
+                                    className={formStyles.checkbox}
+                                />
+                                配当金集計に含める
+                            </label>
+                        </div>
+                        <div className={formStyles.field}>
+                            <label className={formStyles.label}>
+                                1口あたりの年間配当金額
+                                <input
+                                    type="number"
+                                    step="any"
+                                    {...register('dividendAmount', {
+                                        valueAsNumber: true,
+                                    })}
+                                    className={`${formStyles.input} ${errors.dividendAmount ? formStyles.inputError : ''}`}
+                                    placeholder="例: 500"
+                                />
+                            </label>
+                            {errors.dividendAmount && (
+                                <span className={formStyles.error}>
+                                    {errors.dividendAmount.message}
                                 </span>
                             )}
                         </div>
