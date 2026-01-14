@@ -172,9 +172,36 @@ function HomePage() {
             <div className={indexStyles.page}>
                 <div className={indexStyles.header}>
                     <h2 className={indexStyles.title}>銘柄一覧</h2>
-                    <Link to="/stocks/new" className={indexStyles.addButton}>
-                        銘柄を追加
-                    </Link>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {isConfigured && isLoggedIn && (
+                            <button
+                                type="button"
+                                onClick={handleQuickUpdate}
+                                disabled={isLoading}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#22c55e',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '0.375rem',
+                                    fontSize: '0.875rem',
+                                    fontWeight: 600,
+                                    cursor: isLoading
+                                        ? 'not-allowed'
+                                        : 'pointer',
+                                    opacity: isLoading ? 0.6 : 1,
+                                }}
+                            >
+                                {isLoading ? '更新中' : '更新'}
+                            </button>
+                        )}
+                        <Link
+                            to="/stocks/new"
+                            className={indexStyles.addButton}
+                        >
+                            追加
+                        </Link>
+                    </div>
                 </div>
                 <div className={indexStyles.emptyState}>
                     <p>まだ銘柄が登録されていません。</p>
