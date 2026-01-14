@@ -3,6 +3,16 @@ import type { AggregatedData, Stock } from '@/types';
 type AggregationField = 'assetClass' | 'region' | 'attribute' | 'account';
 
 /**
+ * フィールド別のソート順序を定義
+ */
+const sortOrderMap: Record<AggregationField, string[]> = {
+    assetClass: ['現金', '株式', 'コモディティ'],
+    region: ['日本', '米国', '全世界'],
+    attribute: ['現金', 'インデックス', '増配', 'ゴールド', '暗号通貨'],
+    account: ['預金', '暗号資産', '特定', 'NISA', 'DC'],
+};
+
+/**
  * フィールド別に評価額を集計（ドーナツグラフ用）
  * @param stocks 銘柄リスト
  * @param field 集計対象フィールド
@@ -32,7 +42,22 @@ export function aggregateByField(
 
     if (totalValue === 0) return [];
 
-    return Object.entries(aggregated).map(([name, value]) => ({
+    const sortOrder = sortOrderMap[field];
+    const entries = Object.entries(aggregated);
+
+    // ソート順序に基づいて並び替え
+    entries.sort((a, b) => {
+        const indexA = sortOrder.indexOf(a[0]);
+        const indexB = sortOrder.indexOf(b[0]);
+
+        // 定義されている順序に基づいてソート
+        const aPos = indexA === -1 ? sortOrder.length : indexA;
+        const bPos = indexB === -1 ? sortOrder.length : indexB;
+
+        return aPos - bPos;
+    });
+
+    return entries.map(([name, value]) => ({
         name,
         value,
         percentage: Number(((value / totalValue) * 100).toFixed(1)),
