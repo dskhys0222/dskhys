@@ -386,4 +386,155 @@ describe('Auth Routes', () => {
             expect(response.body).toHaveProperty('error');
         });
     });
+
+    describe('POST /api/auth/changePassword', () => {
+        let accessToken: string;
+
+        beforeEach(async () => {
+            // ユーザーを登録してログイン
+            await request(app).post('/api/auth/register').send(testUser);
+            await new Promise((resolve) => setTimeout(resolve, 1100));
+            const response = await request(app).post('/api/auth/login').send({
+                email: testUser.email,
+                password: testUser.password,
+            });
+            accessToken = response.body.accessToken;
+        });
+
+        it('should change password successfully', async () => {
+            const newPassword = 'newpassword123';
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    currentPassword: testUser.password,
+                    newPassword,
+                })
+                .expect(200);
+
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toBe('Password changed successfully');
+
+            // 新しいパスワードでログインできることを確認
+            await new Promise((resolve) => setTimeout(resolve, 1100));
+            const loginResponse = await request(app)
+                .post('/api/auth/login')
+                .send({
+                    email: testUser.email,
+                    password: newPassword,
+                })
+                .expect(200);
+
+            expect(loginResponse.body).toHaveProperty('accessToken');
+        });
+
+        it('should fail with incorrect current password', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    currentPassword: 'wrongpassword',
+                    newPassword: 'newpassword123',
+                })
+                .expect(401);
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error.message).toBe(
+                'Current password is incorrect'
+            );
+        });
+
+        it('should fail with short new password', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    currentPassword: testUser.password,
+                    newPassword: 'short',
+                })
+                .expect(400);
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error.message).toContain('8 characters');
+        });
+
+        it('should fail without authentication', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .send({
+                    currentPassword: testUser.password,
+                    newPassword: 'newpassword123',
+                })
+                .expect(401);
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error.message).toBe('No token provided');
+        });
+
+        it('should fail with invalid token', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', 'Bearer invalid-token')
+                .send({
+                    currentPassword: testUser.password,
+                    newPassword: 'newpassword123',
+                })
+                .expect(401);
+
+            expect(response.body).toHaveProperty('error');
+        });
+
+        it('should fail without current password', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    newPassword: 'newpassword123',
+                })
+                .expect(400);
+
+            expect(response.body).toHaveProperty('error');
+        });
+
+        it('should fail without new password', async () => {
+            const response = await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    currentPassword: testUser.password,
+                })
+                .expect(400);
+
+            expect(response.body).toHaveProperty('error');
+        });
+
+        it('old password should not work after password change', async () => {
+            const newPassword = 'newpassword123';
+
+            // パスワードを変更
+            await request(app)
+                .post('/api/auth/changePassword')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({
+                    currentPassword: testUser.password,
+                    newPassword,
+                })
+                .expect(200);
+
+            // 古いパスワードでのログインが失敗することを確認
+            await new Promise((resolve) => setTimeout(resolve, 1100));
+            const loginResponse = await request(app)
+                .post('/api/auth/login')
+                .send({
+                    email: testUser.email,
+                    password: testUser.password,
+                })
+                .expect(401);
+
+            expect(loginResponse.body).toHaveProperty('error');
+            expect(loginResponse.body.error.message).toBe(
+                'Invalid credentials'
+            );
+        });
+    });
 });

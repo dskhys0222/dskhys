@@ -23,3 +23,10 @@ export const insertUser = (
         [name, email, passwordHash]
     );
 };
+
+export const updateUserPassword = (userId: number, passwordHash: string) => {
+    return runQuery<{ changes: number }>(
+        'UPDATE users SET password_hash = ? WHERE id = ?',
+        [passwordHash, userId]
+    );
+};

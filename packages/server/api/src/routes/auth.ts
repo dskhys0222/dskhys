@@ -12,8 +12,10 @@ import {
     findUserByEmail,
     findUserById,
     insertUser,
+    updateUserPassword,
 } from '../repository/usersRepository.js';
 import {
+    ChangePasswordSchema,
     LoginSchema,
     LogoutSchema,
     RefreshTokenSchema,
@@ -274,5 +276,55 @@ authRoutes.get(
                     name: user.name,
                 })
             );
+    })
+);
+
+/**
+ * POST /api/auth/changePassword - パスワード変更
+ */
+authRoutes.post(
+    '/changePassword',
+    authenticate,
+    asyncHandler((req, res) => {
+        if (!req.user) {
+            return err(new UnauthorizedError('User not authenticated'));
+        }
+
+        const userId = req.user.userId;
+
+        return parseSchema(ChangePasswordSchema, req.body).asyncAndThen(
+            (input) =>
+                findUserById(userId)
+                    .andThen((user) =>
+                        user == null
+                            ? err(new UnauthorizedError('User not found'))
+                            : ok(user)
+                    )
+                    .andThen((user) =>
+                        verifyPassword(
+                            input.currentPassword,
+                            user.password_hash
+                        ).andThen((isValid) =>
+                            isValid
+                                ? ok(user)
+                                : err(
+                                      new UnauthorizedError(
+                                          'Current password is incorrect'
+                                      )
+                                  )
+                        )
+                    )
+                    .andThen(() =>
+                        hashPassword(input.newPassword).andThen(
+                            (passwordHash) =>
+                                updateUserPassword(userId, passwordHash)
+                        )
+                    )
+                    .map(() =>
+                        res.status(200).json({
+                            message: 'Password changed successfully',
+                        })
+                    )
+        );
     })
 );
