@@ -21,7 +21,6 @@ import {
     launchBrowser,
     scrapePortfolio,
 } from './scraper.js';
-import { VERSION } from './version.js';
 
 const printHelp = (): void => {
     console.log(`
@@ -63,10 +62,6 @@ APIサーバーに送信するバッチアプリケーション
   rm -rf ~/.cache/ms-playwright
   mf-scraper
 `);
-};
-
-const printVersion = (): void => {
-    console.log(`mf-scraper ${VERSION}`);
 };
 
 const scrape = async (): Promise<void> => {
@@ -157,10 +152,6 @@ const main = async (): Promise<void> => {
         case '-h':
         case 'help':
             printHelp();
-            break;
-        case '--version':
-        case '-v':
-            printVersion();
             break;
         case undefined:
             // デフォルト: スクレイピング実行
