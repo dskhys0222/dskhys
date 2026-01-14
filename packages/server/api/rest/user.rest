@@ -1,8 +1,0 @@
-POST https://dskhys.com/api/auth/register HTTP/1.1
-content-type: application/json
-
-{
-    "email": "dskhys@outlook.com",
-    "name": "Daisuke Hayashi",
-    "password": "tmn8Y6xO0SsmtBuXEJfS69B8IQfNiLnK"
-}
