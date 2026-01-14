@@ -1,6 +1,6 @@
 {
     "name": "@dskhys/mf-scraper",
-    "version": "0.0.1+git.a241474",
+    "version": "0.0.1",
     "description": "MoneyForward portfolio scraper",
     "license": "ISC",
     "author": "",
@@ -10,7 +10,6 @@
         "mf-scraper": "dist/index.js"
     },
     "scripts": {
-        "prebuild": "node scripts/generate-version.js",
         "build": "tsc",
         "login": "tsx src/login.ts",
         "start": "tsx src/index.ts",

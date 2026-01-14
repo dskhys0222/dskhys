@@ -1,4 +1,4 @@
-name: Publish npm Packages
+name: Release
 
 on:
   push:
@@ -14,11 +14,13 @@ permissions:
   contents: read
 
 jobs:
-  publish:
-    name: Publish to npm
+  release:
+    name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      issues: write
+      pull-requests: write
       id-token: write
 
     steps:
@@ -49,13 +51,11 @@ jobs:
       - name: Test
         run: pnpm mf-scraper test
 
-      - name: Build mf-scraper
+      - name: Build
         run: pnpm mf-scraper build
 
-      - name: Check version.ts
-        run: cat packages/client/mf-scraper/src/version.ts
-
-      - name: Publish to npm
-        run: |
-          cd packages/client/mf-scraper
-          npm publish --access public
+      - name: Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: packages/client/mf-scraper

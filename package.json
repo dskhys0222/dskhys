@@ -20,6 +20,10 @@
         "mf-scraper": "pnpm --filter @dskhys/mf-scraper"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.3.10"
+        "@biomejs/biome": "^2.3.10",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/github": "^12.0.2",
+        "@semantic-release/npm": "^13.1.3",
+        "semantic-release": "^25.0.2"
     }
 }
