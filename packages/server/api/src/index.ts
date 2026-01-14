@@ -24,8 +24,8 @@ const corsOptions = {
 
         // localhost と 127.0.0.1 を許可（開発環境用）
         if (
-            origin === 'http://localhost:5173' ||
-            origin === 'http://127.0.0.1:5173'
+            origin.startsWith('https://localhost:') ||
+            origin.startsWith('https://127.0.0.1:')
         ) {
             return callback(null, true);
         }
