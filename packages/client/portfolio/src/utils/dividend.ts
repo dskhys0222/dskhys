@@ -33,15 +33,17 @@ export function calculateDividendStocksTotalAmount(stocks: Stock[]): number {
  * 配当金情報を集計
  */
 export function aggregateDividendInfo(stocks: Stock[]): DividendInfo {
-    const dividendStocks = filterDividendStocks(stocks);
+    const taxRate = 20.315 / 100;
 
-    const totalDividendAmount = calculateTotalDividendAmount(stocks);
+    const dividendStocks = filterDividendStocks(stocks);
+    const totalDividendAmount =
+        calculateTotalDividendAmount(stocks) * (1 - taxRate);
 
     const stockDetails = dividendStocks
         .map((stock) => {
             const dividendPerUnit = stock.dividendAmount || 0;
             const units = stock.units || 0;
-            const totalAmount = dividendPerUnit * units;
+            const totalAmount = dividendPerUnit * units * (1 - taxRate);
             return {
                 stockId: stock.id,
                 name: stock.name,
