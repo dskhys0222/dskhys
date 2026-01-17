@@ -181,7 +181,7 @@ export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
         const cells = await row.locator('td').all();
         if (cells.length >= 7) {
             stocks.push({
-                name: (await cells[0]?.textContent())?.trim() || '',
+                name: (await cells[1]?.textContent())?.trim() || '',
                 units: parseNumber((await cells[2]?.textContent()) || '0'),
                 averageCost: parseNumber(
                     (await cells[3]?.textContent()) || '0'
