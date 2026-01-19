@@ -44,6 +44,9 @@ importers:
       react-dom:
         specifier: ^19.2.0
         version: 19.2.3(react@19.2.3)
+      zustand:
+        specifier: ^5.0.9
+        version: 5.0.9(@types/react@19.2.7)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@pandacss/dev':
         specifier: ^1.7.2

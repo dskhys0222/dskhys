@@ -1,16 +1,164 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { BudgetItem } from '@/components/BudgetItem';
+import type { BudgetStore } from '@/store/budgetStore';
+import { useBudgetStore } from '@/store/budgetStore';
 import { styles } from './styles';
 
 export const Route = createFileRoute('/')({
     component: App,
 });
 
+interface TouchState {
+    startX: number;
+    startTime: number;
+}
+
 function App() {
+    const items = useBudgetStore((state: BudgetStore) => state.items);
+    const addItem = useBudgetStore((state: BudgetStore) => state.addItem);
+    const removeItem = useBudgetStore((state: BudgetStore) => state.removeItem);
+    const [inputValue, setInputValue] = useState('');
+    const [touchState, setTouchState] = useState<TouchState | null>(null);
+    const [swipingId, setSwipingId] = useState<string | null>(null);
+    const [swipeOffset, setSwipeOffset] = useState<number>(0);
+    const [isTouch, setIsTouch] = useState(false);
+
+    // デバイスタイプ判定
+    useEffect(() => {
+        setIsTouch('ontouchstart' in window);
+    }, []);
+
+    const handleAdd = () => {
+        if (inputValue.trim()) {
+            addItem(inputValue);
+            setInputValue('');
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleAdd();
+        }
+    };
+
+    const handleDelete = (id: string, name: string) => {
+        if (window.confirm(`「${name}」を削除しますか？`)) {
+            removeItem(id);
+        }
+        setSwipingId(null);
+        setSwipeOffset(0);
+    };
+
+    const handleTouchStart = (id: string, e: React.TouchEvent) => {
+        setTouchState({
+            startX: e.touches[0].clientX,
+            startTime: Date.now(),
+        });
+        setSwipingId(id);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (touchState && swipingId) {
+            const currentX = e.touches[0].clientX;
+            const offset = currentX - touchState.startX;
+            // 左方向のみ許可（負の値）
+            if (offset < 0) {
+                setSwipeOffset(offset);
+            }
+        }
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent, id: string, name: string) => {
+        if (!touchState) return;
+
+        const endX = e.changedTouches[0].clientX;
+        const distance = touchState.startX - endX;
+        const duration = Date.now() - touchState.startTime;
+
+        // 左スワイプ: 50px以上、400ms以内
+        if (distance > 50 && duration < 400) {
+            handleDelete(id, name);
+        } else {
+            // スワイプ解除
+            setSwipingId(null);
+            setSwipeOffset(0);
+        }
+
+        setTouchState(null);
+    };
+
     return (
         <div className={styles.pageStack}>
-            <BudgetItem name="モノ" />
-            <BudgetItem name="コト" />
+            <div className={styles.addItemForm}>
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="管理対象を入力"
+                />
+                <button type="button" onClick={handleAdd}>
+                    追加
+                </button>
+            </div>
+            {items.map((item: { id: string; name: string }) => (
+                <div
+                    key={item.id}
+                    className={
+                        isTouch
+                            ? styles.itemWrapperContainer
+                            : styles.itemWrapperDesktop
+                    }
+                >
+                    {isTouch && (
+                        <>
+                            {/* 削除背景（スマホのみ） */}
+                            <div className={styles.deleteBackground}>🗑️</div>
+                            {/* アイテム本体（スマホのみ） */}
+                            <div
+                                className={styles.itemWrapper}
+                                onTouchStart={(e) =>
+                                    handleTouchStart(item.id, e)
+                                }
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={(e) =>
+                                    handleTouchEnd(e, item.id, item.name)
+                                }
+                                style={{
+                                    transform:
+                                        swipingId === item.id
+                                            ? `translateX(${swipeOffset}px)`
+                                            : 'translateX(0)',
+                                    transition:
+                                        swipingId === item.id
+                                            ? 'none'
+                                            : 'transform 0.3s ease',
+                                }}
+                            >
+                                <BudgetItem name={item.name} />
+                            </div>
+                        </>
+                    )}
+                    {!isTouch && (
+                        <>
+                            {/* PC版レイアウト */}
+                            <div className={styles.itemWrapperPcContainer}>
+                                <BudgetItem name={item.name} />
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleDelete(item.id, item.name)
+                                    }
+                                    className={styles.deleteButton}
+                                >
+                                    削除
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            ))}
         </div>
     );
 }
