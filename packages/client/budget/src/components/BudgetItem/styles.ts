@@ -105,8 +105,9 @@ export const styles = {
         display: 'grid',
         placeItems: 'center',
         p: '4',
-        bg: 'blackAlpha.500',
+        bg: 'rgba(0, 0, 0, 0.5)',
         zIndex: 50,
+        overflow: 'auto',
     }),
 
     dialog: css({
@@ -118,6 +119,7 @@ export const styles = {
         borderColor: 'gray.200',
         bg: 'white',
         p: '4',
+        my: 'auto',
     }),
 
     dialogTitle: css({
