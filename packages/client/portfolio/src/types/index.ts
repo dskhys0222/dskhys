@@ -49,6 +49,8 @@ export interface AggregatedData {
     name: string;
     value: number;
     percentage: number;
+    targetRatio?: number; // 理想比率（比で入力される値）
+    difference?: number; // 差額：現在の金額 - 理想金額（円）
 }
 
 // 配当金情報
@@ -69,6 +71,7 @@ export interface DividendInfo {
 export interface CustomAggregationAttribute {
     name: string; // 属性名（例: "サテライト", "コア"）
     color: string; // グラフの色
+    targetRatio?: number; // 理想比率（%）、0-100の値
 }
 
 // カスタム集計での銘柄への属性割り当て

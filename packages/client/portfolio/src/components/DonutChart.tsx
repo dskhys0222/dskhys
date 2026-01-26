@@ -8,6 +8,9 @@ interface DonutChartProps {
     colors?: Record<string, string>;
     showLegendTable?: boolean;
     showTotal?: boolean;
+    showDifference?: boolean; // 差額を表示するか
+    displayMode?: 'percentage' | 'difference'; // スマホでの表示モード
+    isMobileMode?: boolean; // スマホ表示か（true=スマホ、false=PC）
 }
 
 const DEFAULT_COLORS = [
@@ -58,6 +61,9 @@ export function DonutChart({
     colors,
     showLegendTable = false,
     showTotal = false,
+    showDifference = false,
+    displayMode = 'percentage',
+    isMobileMode = false,
 }: DonutChartProps) {
     const getColor = (name: string, index: number): string => {
         if (colors?.[name]) return colors[name];
@@ -122,34 +128,65 @@ export function DonutChart({
             {showLegendTable && (
                 <table className={donutChartStyles.legendTable}>
                     <tbody>
-                        {data.map((item, index) => (
-                            <tr key={item.name}>
-                                <td className={donutChartStyles.legendTd}>
-                                    <span
-                                        className={
-                                            donutChartStyles.colorIndicator
-                                        }
-                                        style={{
-                                            backgroundColor: getColor(
-                                                item.name,
-                                                index
-                                            ),
-                                        }}
-                                    />
-                                    {item.name}
-                                </td>
-                                <td
-                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                >
-                                    {formatCurrency(item.value)}
-                                </td>
-                                <td
-                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                >
-                                    {item.percentage.toFixed(1)}%
-                                </td>
-                            </tr>
-                        ))}
+                        {data.map((item, index) => {
+                            const showDiff =
+                                showDifference && item.difference !== undefined;
+                            const isMobileDisplayDifference =
+                                isMobileMode &&
+                                displayMode === 'difference' &&
+                                showDiff;
+
+                            return (
+                                <tr key={item.name}>
+                                    <td className={donutChartStyles.legendTd}>
+                                        <span
+                                            className={
+                                                donutChartStyles.colorIndicator
+                                            }
+                                            style={{
+                                                backgroundColor: getColor(
+                                                    item.name,
+                                                    index
+                                                ),
+                                            }}
+                                        />
+                                        {item.name}
+                                    </td>
+                                    <td
+                                        className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                    >
+                                        {formatCurrency(item.value)}
+                                    </td>
+                                    {showDiff && !isMobileMode && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                        >
+                                            {item.difference >= 0 ? '+' : ''}
+                                            {Math.round(
+                                                item.difference
+                                            ).toLocaleString('ja-JP')}
+                                        </td>
+                                    )}
+                                    {!isMobileDisplayDifference && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                        >
+                                            {item.percentage.toFixed(1)}%
+                                        </td>
+                                    )}
+                                    {isMobileDisplayDifference && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                        >
+                                            {item.difference >= 0 ? '+' : ''}
+                                            {Math.round(
+                                                item.difference
+                                            ).toLocaleString('ja-JP')}
+                                        </td>
+                                    )}
+                                </tr>
+                            );
+                        })}
                         {showTotal && (
                             <tr
                                 style={{
@@ -171,11 +208,22 @@ export function DonutChart({
                                         )
                                     )}
                                 </td>
-                                <td
-                                    className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                >
-                                    100.0%
-                                </td>
+                                {showDifference && !isMobileMode && (
+                                    <td
+                                        className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                    >
+                                        -
+                                    </td>
+                                )}
+                                {!(
+                                    isMobileMode && displayMode === 'difference'
+                                ) && (
+                                    <td
+                                        className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                    >
+                                        100.0%
+                                    </td>
+                                )}
                             </tr>
                         )}
                     </tbody>

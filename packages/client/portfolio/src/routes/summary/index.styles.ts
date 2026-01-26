@@ -53,10 +53,16 @@ export const summaryStyles = {
     customChartContainer: css({
         position: 'relative',
     }),
-    deleteButton: css({
+    buttonContainer: css({
         position: 'absolute',
         top: '0.5rem',
         right: '0.5rem',
+        zIndex: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.25rem',
+    }),
+    deleteButton: css({
         padding: '0.25rem 0.5rem',
         backgroundColor: 'red.100',
         color: 'red.700',
@@ -64,15 +70,11 @@ export const summaryStyles = {
         borderRadius: 'sm',
         fontSize: 'xs',
         cursor: 'pointer',
-        zIndex: 10,
         _hover: {
             backgroundColor: 'red.200',
         },
     }),
     editButton: css({
-        position: 'absolute',
-        top: '0.5rem',
-        right: '3rem',
         padding: '0.25rem 0.5rem',
         backgroundColor: 'blue.100',
         color: 'blue.700',
@@ -80,9 +82,20 @@ export const summaryStyles = {
         borderRadius: 'sm',
         fontSize: 'xs',
         cursor: 'pointer',
-        zIndex: 10,
         _hover: {
             backgroundColor: 'blue.200',
+        },
+    }),
+    toggleButton: css({
+        padding: '0.25rem 0.5rem',
+        backgroundColor: 'purple.100',
+        color: 'purple.700',
+        border: 'none',
+        borderRadius: 'sm',
+        fontSize: 'xs',
+        cursor: 'pointer',
+        _hover: {
+            backgroundColor: 'purple.200',
         },
     }),
     emptyState: css({

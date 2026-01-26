@@ -226,6 +226,25 @@ function NewCustomAggregationPage() {
                                     placeholder="属性名（例: コア）"
                                     style={{ flex: 1 }}
                                 />
+                                <input
+                                    type="number"
+                                    value={attr.targetRatio ?? ''}
+                                    onChange={(e) => {
+                                        const newAttributes = [...attributes];
+                                        newAttributes[index] = {
+                                            ...newAttributes[index],
+                                            targetRatio: e.target.value
+                                                ? Number(e.target.value)
+                                                : undefined,
+                                        };
+                                        setAttributes(newAttributes);
+                                    }}
+                                    className={newAggregationStyles.input}
+                                    placeholder="理想比"
+                                    min="0"
+                                    step="0.1"
+                                    style={{ width: '80px' }}
+                                />
                                 {attributes.length > 1 && (
                                     <button
                                         type="button"

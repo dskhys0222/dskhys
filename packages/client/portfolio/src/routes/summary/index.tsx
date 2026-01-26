@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { DonutChart } from '../../components/DonutChart';
 import { useCustomAggregationsStore, useStocksStore } from '../../stores';
 import type { AggregatedData, CustomAggregation, Stock } from '../../types';
@@ -28,10 +29,12 @@ function aggregateCustom(
     aggregation: CustomAggregation
 ): AggregatedData[] {
     const totals: Record<string, number> = {};
+    const targetRatios: Record<string, number | undefined> = {};
 
     // 各属性の初期化
     for (const attr of aggregation.attributes) {
         totals[attr.name] = 0;
+        targetRatios[attr.name] = attr.targetRatio;
     }
 
     // 銘柄の評価額を属性ごとに集計
@@ -46,13 +49,34 @@ function aggregateCustom(
     // 合計を計算
     const total = Object.values(totals).reduce((sum, val) => sum + val, 0);
 
-    // AggregatedData形式に変換
+    // AggregatedData形式に変換（差額を計算）
     return aggregation.attributes
-        .map((attr) => ({
-            name: attr.name,
-            value: totals[attr.name] || 0,
-            percentage: total > 0 ? (totals[attr.name] / total) * 100 : 0,
-        }))
+        .map((attr) => {
+            const value = totals[attr.name] || 0;
+            const percentage = total > 0 ? (value / total) * 100 : 0;
+            const targetRatio = attr.targetRatio;
+            // 理想比率から理想金額を計算し、差額を求める
+            let difference: number | undefined;
+            if (targetRatio !== undefined && targetRatio > 0) {
+                // 全属性の比の合計を計算
+                const totalRatio = aggregation.attributes.reduce(
+                    (sum, a) => sum + (a.targetRatio || 0),
+                    0
+                );
+                if (totalRatio > 0) {
+                    const targetValue = (total * targetRatio) / totalRatio;
+                    difference = value - targetValue;
+                }
+            }
+
+            return {
+                name: attr.name,
+                value,
+                percentage,
+                targetRatio,
+                difference,
+            };
+        })
         .filter((item) => item.value > 0);
 }
 
@@ -76,6 +100,28 @@ function SummaryLayout() {
         (state) => state.deleteCustomAggregation
     );
 
+    // スマホでの表示モード（差額 or 比率）
+    const [displayModes, setDisplayModes] = useState<
+        Record<string, 'percentage' | 'difference'>
+    >({});
+
+    // スマホかどうかの判定
+    const [isMobileMode, setIsMobileMode] = useState(false);
+
+    useEffect(() => {
+        // 初期判定
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        setIsMobileMode(mediaQuery.matches);
+
+        // メディアクエリの変更を監視
+        const handleChange = (e: MediaQueryListEvent) => {
+            setIsMobileMode(e.matches);
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
     const totalValue = calculateTotalValue(stocks);
     const totalProfitLoss = calculateTotalProfitLoss(stocks);
     const dividendInfo = aggregateDividendInfo(stocks);
@@ -90,6 +136,13 @@ function SummaryLayout() {
         if (confirm(`「${name}」を削除しますか？`)) {
             deleteCustomAggregation(id);
         }
+    };
+
+    const toggleDisplayMode = (id: string) => {
+        setDisplayModes((prev) => ({
+            ...prev,
+            [id]: prev[id] === 'percentage' ? 'difference' : 'percentage',
+        }));
     };
 
     if (stocks.length === 0) {
@@ -173,6 +226,12 @@ function SummaryLayout() {
                         {customAggregations.map((aggregation) => {
                             const data = aggregateCustom(stocks, aggregation);
                             const colors = getCustomColors(aggregation);
+                            const hasTargetRatios = data.some(
+                                (item) => item.targetRatio !== undefined
+                            );
+                            const currentMode =
+                                displayModes[aggregation.id] ?? 'percentage';
+
                             return (
                                 <div
                                     key={aggregation.id}
@@ -180,31 +239,57 @@ function SummaryLayout() {
                                         summaryStyles.customChartContainer
                                     }
                                 >
-                                    <Link
-                                        to="/summary/$id/edit"
-                                        params={{ id: aggregation.id }}
-                                        className={summaryStyles.editButton}
-                                    >
-                                        編集
-                                    </Link>
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleDeleteCustomAggregation(
-                                                aggregation.id,
-                                                aggregation.name
-                                            )
+                                    <div
+                                        className={
+                                            summaryStyles.buttonContainer
                                         }
-                                        className={summaryStyles.deleteButton}
                                     >
-                                        削除
-                                    </button>
+                                        <Link
+                                            to="/summary/$id/edit"
+                                            params={{ id: aggregation.id }}
+                                            className={summaryStyles.editButton}
+                                        >
+                                            編集
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                handleDeleteCustomAggregation(
+                                                    aggregation.id,
+                                                    aggregation.name
+                                                )
+                                            }
+                                            className={
+                                                summaryStyles.deleteButton
+                                            }
+                                        >
+                                            削除
+                                        </button>
+                                        {hasTargetRatios && isMobileMode && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleDisplayMode(
+                                                        aggregation.id
+                                                    )
+                                                }
+                                                className={
+                                                    summaryStyles.toggleButton
+                                                }
+                                            >
+                                                切替
+                                            </button>
+                                        )}
+                                    </div>
                                     <DonutChart
                                         title={aggregation.name}
                                         data={data}
                                         colors={colors}
                                         showLegendTable
                                         showTotal
+                                        showDifference={hasTargetRatios}
+                                        displayMode={currentMode}
+                                        isMobileMode={isMobileMode}
                                     />
                                 </div>
                             );
