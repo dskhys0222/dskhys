@@ -157,16 +157,20 @@ export function DonutChart({
                                     >
                                         {formatCurrency(item.value)}
                                     </td>
-                                    {showDiff && !isMobileMode && (
-                                        <td
-                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                        >
-                                            {item.difference >= 0 ? '+' : ''}
-                                            {Math.round(
-                                                item.difference
-                                            ).toLocaleString('ja-JP')}
-                                        </td>
-                                    )}
+                                    {showDiff &&
+                                        !isMobileMode &&
+                                        item.difference !== undefined && (
+                                            <td
+                                                className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                            >
+                                                {item.difference >= 0
+                                                    ? '+'
+                                                    : ''}
+                                                {Math.round(
+                                                    item.difference
+                                                ).toLocaleString('ja-JP')}
+                                            </td>
+                                        )}
                                     {!isMobileDisplayDifference && (
                                         <td
                                             className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
@@ -174,16 +178,19 @@ export function DonutChart({
                                             {item.percentage.toFixed(1)}%
                                         </td>
                                     )}
-                                    {isMobileDisplayDifference && (
-                                        <td
-                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                        >
-                                            {item.difference >= 0 ? '+' : ''}
-                                            {Math.round(
-                                                item.difference
-                                            ).toLocaleString('ja-JP')}
-                                        </td>
-                                    )}
+                                    {isMobileDisplayDifference &&
+                                        item.difference !== undefined && (
+                                            <td
+                                                className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                            >
+                                                {item.difference >= 0
+                                                    ? '+'
+                                                    : ''}
+                                                {Math.round(
+                                                    item.difference
+                                                ).toLocaleString('ja-JP')}
+                                            </td>
+                                        )}
                                 </tr>
                             );
                         })}
