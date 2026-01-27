@@ -25,4 +25,20 @@ export const styles = {
         color: 'gray.900',
         letterSpacing: 'tight',
     }),
+    tab: css({
+        color: 'gray.700',
+        textDecoration: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: 'md',
+        fontSize: 'sm',
+        fontWeight: 'bold',
+        transition: 'background 0.2s',
+        _hover: {
+            background: 'gray.100',
+        },
+    }),
+    activeTab: css({
+        background: 'blue.100',
+        color: 'blue.700',
+    }),
 } as const;

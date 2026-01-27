@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubscriptionRouteImport } from './routes/subscription'
+import { Route as IncomeExpenseRouteImport } from './routes/income-expense'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HistoryNameRouteImport } from './routes/history/$name'
 
+const SubscriptionRoute = SubscriptionRouteImport.update({
+  id: '/subscription',
+  path: '/subscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncomeExpenseRoute = IncomeExpenseRouteImport.update({
+  id: '/income-expense',
+  path: '/income-expense',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -25,32 +37,54 @@ const HistoryNameRoute = HistoryNameRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/income-expense': typeof IncomeExpenseRoute
+  '/subscription': typeof SubscriptionRoute
   '/history/$name': typeof HistoryNameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/income-expense': typeof IncomeExpenseRoute
+  '/subscription': typeof SubscriptionRoute
   '/history/$name': typeof HistoryNameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/income-expense': typeof IncomeExpenseRoute
+  '/subscription': typeof SubscriptionRoute
   '/history/$name': typeof HistoryNameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/history/$name'
+  fullPaths: '/' | '/income-expense' | '/subscription' | '/history/$name'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history/$name'
-  id: '__root__' | '/' | '/history/$name'
+  to: '/' | '/income-expense' | '/subscription' | '/history/$name'
+  id: '__root__' | '/' | '/income-expense' | '/subscription' | '/history/$name'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  IncomeExpenseRoute: typeof IncomeExpenseRoute
+  SubscriptionRoute: typeof SubscriptionRoute
   HistoryNameRoute: typeof HistoryNameRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/subscription': {
+      id: '/subscription'
+      path: '/subscription'
+      fullPath: '/subscription'
+      preLoaderRoute: typeof SubscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/income-expense': {
+      id: '/income-expense'
+      path: '/income-expense'
+      fullPath: '/income-expense'
+      preLoaderRoute: typeof IncomeExpenseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  IncomeExpenseRoute: IncomeExpenseRoute,
+  SubscriptionRoute: SubscriptionRoute,
   HistoryNameRoute: HistoryNameRoute,
 }
 export const routeTree = rootRouteImport
