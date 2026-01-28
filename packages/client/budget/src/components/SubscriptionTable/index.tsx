@@ -355,6 +355,7 @@ export function SubscriptionTable({
                                             >
                                                 {onMove && (
                                                     <button
+                                                        type="button"
                                                         style={
                                                             tableStyles.moveButton
                                                         }
@@ -366,6 +367,7 @@ export function SubscriptionTable({
                                                     </button>
                                                 )}
                                                 <button
+                                                    type="button"
                                                     style={
                                                         tableStyles.deleteButton
                                                     }
@@ -401,8 +403,11 @@ export function SubscriptionTable({
             <form onSubmit={handleAdd} style={tableStyles.addForm}>
                 <div style={tableStyles.formRow}>
                     <div style={tableStyles.formGroup}>
-                        <label style={tableStyles.label}>カテゴリー</label>
+                        <label htmlFor="category" style={tableStyles.label}>
+                            カテゴリー
+                        </label>
                         <select
+                            id="category"
                             style={tableStyles.select}
                             value={formData.category}
                             onChange={(e) =>
@@ -420,8 +425,11 @@ export function SubscriptionTable({
                         </select>
                     </div>
                     <div style={tableStyles.formGroup}>
-                        <label style={tableStyles.label}>名前</label>
+                        <label htmlFor="name" style={tableStyles.label}>
+                            名前
+                        </label>
                         <input
+                            id="name"
                             type="text"
                             style={tableStyles.input}
                             value={formData.name}
@@ -435,8 +443,14 @@ export function SubscriptionTable({
                         />
                     </div>
                     <div style={tableStyles.formGroup}>
-                        <label style={tableStyles.label}>月額（¥）</label>
+                        <label
+                            htmlFor="pricePerMonth"
+                            style={tableStyles.label}
+                        >
+                            月額（¥）
+                        </label>
                         <input
+                            id="pricePerMonth"
                             type="number"
                             style={tableStyles.input}
                             value={formData.pricePerMonth}
@@ -451,8 +465,11 @@ export function SubscriptionTable({
                         />
                     </div>
                     <div style={tableStyles.formGroup}>
-                        <label style={tableStyles.label}>年額（¥）</label>
+                        <label htmlFor="pricePerYear" style={tableStyles.label}>
+                            年額（¥）
+                        </label>
                         <input
+                            id="pricePerYear"
                             type="number"
                             style={tableStyles.input}
                             value={formData.pricePerYear}
@@ -467,8 +484,11 @@ export function SubscriptionTable({
                         />
                     </div>
                     <div style={tableStyles.formGroup}>
-                        <label style={tableStyles.label}>備考</label>
+                        <label htmlFor="remark" style={tableStyles.label}>
+                            備考
+                        </label>
                         <input
+                            id="remark"
                             type="text"
                             style={tableStyles.input}
                             value={formData.remark}
@@ -483,10 +503,14 @@ export function SubscriptionTable({
                     </div>
                     {title.includes('契約中') && (
                         <div style={tableStyles.formGroup}>
-                            <label style={tableStyles.label}>
+                            <label
+                                htmlFor="expiration"
+                                style={tableStyles.label}
+                            >
                                 更新月（任意）
                             </label>
                             <input
+                                id="expiration"
                                 type="text"
                                 style={tableStyles.input}
                                 value={formData.renewalMonth}
