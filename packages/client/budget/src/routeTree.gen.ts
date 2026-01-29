@@ -20,6 +20,8 @@ import { Route as CashFlowIncomeAddRouteImport } from './routes/cash-flow/income
 import { Route as CashFlowExpenseAddRouteImport } from './routes/cash-flow/expense/add'
 import { Route as CashFlowIncomeIdIndexRouteImport } from './routes/cash-flow/income/$id/index'
 import { Route as CashFlowExpenseIdIndexRouteImport } from './routes/cash-flow/expense/$id/index'
+import { Route as CashFlowIncomeIdEditRouteImport } from './routes/cash-flow/income/$id/edit'
+import { Route as CashFlowExpenseIdEditRouteImport } from './routes/cash-flow/expense/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +78,16 @@ const CashFlowExpenseIdIndexRoute = CashFlowExpenseIdIndexRouteImport.update({
   path: '/cash-flow/expense/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CashFlowIncomeIdEditRoute = CashFlowIncomeIdEditRouteImport.update({
+  id: '/cash-flow/income/$id/edit',
+  path: '/cash-flow/income/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashFlowExpenseIdEditRoute = CashFlowExpenseIdEditRouteImport.update({
+  id: '/cash-flow/expense/$id/edit',
+  path: '/cash-flow/expense/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,6 +99,8 @@ export interface FileRoutesByFullPath {
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
   '/subscription/$id/edit': typeof SubscriptionIdEditRoute
   '/subscription/$id': typeof SubscriptionIdIndexRoute
+  '/cash-flow/expense/$id/edit': typeof CashFlowExpenseIdEditRoute
+  '/cash-flow/income/$id/edit': typeof CashFlowIncomeIdEditRoute
   '/cash-flow/expense/$id': typeof CashFlowExpenseIdIndexRoute
   '/cash-flow/income/$id': typeof CashFlowIncomeIdIndexRoute
 }
@@ -100,6 +114,8 @@ export interface FileRoutesByTo {
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
   '/subscription/$id/edit': typeof SubscriptionIdEditRoute
   '/subscription/$id': typeof SubscriptionIdIndexRoute
+  '/cash-flow/expense/$id/edit': typeof CashFlowExpenseIdEditRoute
+  '/cash-flow/income/$id/edit': typeof CashFlowIncomeIdEditRoute
   '/cash-flow/expense/$id': typeof CashFlowExpenseIdIndexRoute
   '/cash-flow/income/$id': typeof CashFlowIncomeIdIndexRoute
 }
@@ -114,6 +130,8 @@ export interface FileRoutesById {
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
   '/subscription/$id/edit': typeof SubscriptionIdEditRoute
   '/subscription/$id/': typeof SubscriptionIdIndexRoute
+  '/cash-flow/expense/$id/edit': typeof CashFlowExpenseIdEditRoute
+  '/cash-flow/income/$id/edit': typeof CashFlowIncomeIdEditRoute
   '/cash-flow/expense/$id/': typeof CashFlowExpenseIdIndexRoute
   '/cash-flow/income/$id/': typeof CashFlowIncomeIdIndexRoute
 }
@@ -129,6 +147,8 @@ export interface FileRouteTypes {
     | '/cash-flow/income/add'
     | '/subscription/$id/edit'
     | '/subscription/$id'
+    | '/cash-flow/expense/$id/edit'
+    | '/cash-flow/income/$id/edit'
     | '/cash-flow/expense/$id'
     | '/cash-flow/income/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/cash-flow/income/add'
     | '/subscription/$id/edit'
     | '/subscription/$id'
+    | '/cash-flow/expense/$id/edit'
+    | '/cash-flow/income/$id/edit'
     | '/cash-flow/expense/$id'
     | '/cash-flow/income/$id'
   id:
@@ -155,6 +177,8 @@ export interface FileRouteTypes {
     | '/cash-flow/income/add'
     | '/subscription/$id/edit'
     | '/subscription/$id/'
+    | '/cash-flow/expense/$id/edit'
+    | '/cash-flow/income/$id/edit'
     | '/cash-flow/expense/$id/'
     | '/cash-flow/income/$id/'
   fileRoutesById: FileRoutesById
@@ -169,6 +193,8 @@ export interface RootRouteChildren {
   CashFlowIncomeAddRoute: typeof CashFlowIncomeAddRoute
   SubscriptionIdEditRoute: typeof SubscriptionIdEditRoute
   SubscriptionIdIndexRoute: typeof SubscriptionIdIndexRoute
+  CashFlowExpenseIdEditRoute: typeof CashFlowExpenseIdEditRoute
+  CashFlowIncomeIdEditRoute: typeof CashFlowIncomeIdEditRoute
   CashFlowExpenseIdIndexRoute: typeof CashFlowExpenseIdIndexRoute
   CashFlowIncomeIdIndexRoute: typeof CashFlowIncomeIdIndexRoute
 }
@@ -252,6 +278,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CashFlowExpenseIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cash-flow/income/$id/edit': {
+      id: '/cash-flow/income/$id/edit'
+      path: '/cash-flow/income/$id/edit'
+      fullPath: '/cash-flow/income/$id/edit'
+      preLoaderRoute: typeof CashFlowIncomeIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cash-flow/expense/$id/edit': {
+      id: '/cash-flow/expense/$id/edit'
+      path: '/cash-flow/expense/$id/edit'
+      fullPath: '/cash-flow/expense/$id/edit'
+      preLoaderRoute: typeof CashFlowExpenseIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -265,6 +305,8 @@ const rootRouteChildren: RootRouteChildren = {
   CashFlowIncomeAddRoute: CashFlowIncomeAddRoute,
   SubscriptionIdEditRoute: SubscriptionIdEditRoute,
   SubscriptionIdIndexRoute: SubscriptionIdIndexRoute,
+  CashFlowExpenseIdEditRoute: CashFlowExpenseIdEditRoute,
+  CashFlowIncomeIdEditRoute: CashFlowIncomeIdEditRoute,
   CashFlowExpenseIdIndexRoute: CashFlowExpenseIdIndexRoute,
   CashFlowIncomeIdIndexRoute: CashFlowIncomeIdIndexRoute,
 }
