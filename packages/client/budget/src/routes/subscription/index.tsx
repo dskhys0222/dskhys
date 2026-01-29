@@ -1,33 +1,34 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { SubscriptionTable } from '@/components/SubscriptionTable';
 import { SUBSCRIPTION_CATEGORIES } from '@/constants/categories';
 import {
     useActiveSubscriptionStore,
     useSubscriptionCandidateStore,
 } from '@/store/subscriptionStore';
-import { styles } from './styles';
+import { styles } from '../styles';
 
-export const Route = createFileRoute('/subscription')({
+export const Route = createFileRoute('/subscription/')({
     component: SubscriptionPage,
 });
 
 export default function SubscriptionPage() {
+    const navigate = useNavigate();
     const activeSubItems = useActiveSubscriptionStore((state) => state.items);
-    const addActiveSubItem = useActiveSubscriptionStore(
-        (state) => state.addItem
-    );
     const removeActiveSubItem = useActiveSubscriptionStore(
         (state) => state.removeItem
+    );
+    const addActiveSubItem = useActiveSubscriptionStore(
+        (state) => state.addItem
     );
 
     const candidateSubItems = useSubscriptionCandidateStore(
         (state) => state.items
     );
-    const addCandidateSubItem = useSubscriptionCandidateStore(
-        (state) => state.addItem
-    );
     const removeCandidateSubItem = useSubscriptionCandidateStore(
         (state) => state.removeItem
+    );
+    const addCandidateSubItem = useSubscriptionCandidateStore(
+        (state) => state.addItem
     );
 
     const handleMoveToCandidate = (id: string) => {
@@ -54,7 +55,6 @@ export default function SubscriptionPage() {
                 style={{
                     fontSize: '1.5rem',
                     fontWeight: 'bold',
-                    marginBottom: '1rem',
                 }}
             >
                 サブスクリプション管理
@@ -63,7 +63,8 @@ export default function SubscriptionPage() {
                 title="契約中のサブスク"
                 items={activeSubItems}
                 categories={SUBSCRIPTION_CATEGORIES}
-                onAdd={addActiveSubItem}
+                onAdd={() => navigate({ to: '/subscription/add' })}
+                onCardClick={(id) => navigate({ to: `/subscription/${id}` })}
                 onRemove={removeActiveSubItem}
                 onMove={handleMoveToCandidate}
                 moveButtonLabel="候補へ"
@@ -72,7 +73,8 @@ export default function SubscriptionPage() {
                 title="サブスク追加候補"
                 items={candidateSubItems}
                 categories={SUBSCRIPTION_CATEGORIES}
-                onAdd={addCandidateSubItem}
+                onAdd={() => navigate({ to: '/subscription/add' })}
+                onCardClick={(id) => navigate({ to: `/subscription/${id}` })}
                 onRemove={removeCandidateSubItem}
                 onMove={handleMoveToActive}
                 moveButtonLabel="契約へ"

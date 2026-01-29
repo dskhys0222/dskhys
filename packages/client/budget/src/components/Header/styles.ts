@@ -1,4 +1,4 @@
-import { css } from '../../styled-system/css';
+import { css } from '../../../styled-system/css';
 
 export const styles = {
     header: css({
@@ -40,5 +40,11 @@ export const styles = {
     activeTab: css({
         background: 'blue.100',
         color: 'blue.700',
+        textDecoration: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: 'md',
+        fontSize: 'sm',
+        fontWeight: 'bold',
+        transition: 'background 0.2s',
     }),
 } as const;

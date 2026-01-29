@@ -1,7 +1,7 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import { styles } from './styles';
 
-export default function Header() {
+export function Header() {
     const location = useLocation();
     const isActive = (path: string) => {
         if (path === '/') return location.pathname === '/';
@@ -21,14 +21,14 @@ export default function Header() {
                         ホーム
                     </Link>
                     <Link
-                        to="/income-expense"
+                        to="/cash-flow"
                         className={
-                            isActive('/income-expense')
+                            isActive('/cash-flow')
                                 ? styles.activeTab
                                 : styles.tab
                         }
                     >
-                        収入・支出
+                        収支
                     </Link>
                     <Link
                         to="/subscription"
