@@ -60,7 +60,7 @@ export default function SubscriptionPage() {
                 サブスクリプション管理
             </h1>
             <SubscriptionTable
-                title="契約中のサブスク"
+                title="契約中"
                 items={activeSubItems}
                 categories={SUBSCRIPTION_CATEGORIES}
                 onAdd={() => navigate({ to: '/subscription/add' })}
@@ -70,7 +70,7 @@ export default function SubscriptionPage() {
                 moveButtonLabel="候補へ"
             />
             <SubscriptionTable
-                title="サブスク追加候補"
+                title="追加候補"
                 items={candidateSubItems}
                 categories={SUBSCRIPTION_CATEGORIES}
                 onAdd={() => navigate({ to: '/subscription/add' })}
