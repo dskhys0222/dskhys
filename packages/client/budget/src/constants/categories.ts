@@ -19,10 +19,10 @@ export const INCOME_CATEGORIES: Record<string, Category> = {
         borderColor: '#42A5F5',
     },
     tax_social: {
-        name: '税金・社会保障',
+        name: '税金',
         color: '#fff',
-        bgColor: '#FFB74D',
-        borderColor: '#FFA726',
+        bgColor: '#7E57C2',
+        borderColor: '#7C4DFF',
     },
     investment: {
         name: '投資',
@@ -39,6 +39,18 @@ export const INCOME_CATEGORIES: Record<string, Category> = {
 };
 
 export const EXPENSE_CATEGORIES: Record<string, Category> = {
+    life: {
+        name: '消費',
+        color: '#fff',
+        bgColor: '#66BB6A',
+        borderColor: '#4CAF50',
+    },
+    hobby: {
+        name: '浪費',
+        color: '#fff',
+        bgColor: '#EC407A',
+        borderColor: '#E91E63',
+    },
     tax: {
         name: '税金',
         color: '#fff',
@@ -50,24 +62,6 @@ export const EXPENSE_CATEGORIES: Record<string, Category> = {
         color: '#fff',
         bgColor: '#FFD54F',
         borderColor: '#FFCA28',
-    },
-    life_fixed: {
-        name: '生活（固定）',
-        color: '#fff',
-        bgColor: '#66BB6A',
-        borderColor: '#4CAF50',
-    },
-    life_variable: {
-        name: '生活（変動）',
-        color: '#fff',
-        bgColor: '#AB47BC',
-        borderColor: '#8E24AA',
-    },
-    hobby: {
-        name: '趣味',
-        color: '#fff',
-        bgColor: '#EC407A',
-        borderColor: '#E91E63',
     },
     other: {
         name: 'その他',
