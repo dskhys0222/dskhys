@@ -56,7 +56,7 @@ function ExpenseDetailPage() {
             <div
                 style={{
                     padding: '1rem',
-                    backgroundColor: category?.bgColor || '#f3f4f6',
+                    backgroundColor: '#f3f4f6',
                     borderRadius: '0.5rem',
                     marginBottom: '1rem',
                 }}
