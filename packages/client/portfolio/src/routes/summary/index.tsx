@@ -4,7 +4,6 @@ import { DonutChart } from '../../components/DonutChart';
 import { useCustomAggregationsStore, useStocksStore } from '../../stores';
 import type { AggregatedData, CustomAggregation, Stock } from '../../types';
 import {
-    aggregateByField,
     calculateTotalProfitLoss,
     calculateTotalValue,
 } from '../../utils/aggregation';
@@ -126,12 +125,6 @@ function SummaryLayout() {
     const totalProfitLoss = calculateTotalProfitLoss(stocks);
     const dividendInfo = aggregateDividendInfo(stocks);
 
-    // 各カテゴリ別の集計データ
-    const assetClassData = aggregateByField(stocks, 'assetClass');
-    const regionData = aggregateByField(stocks, 'region');
-    const attributeData = aggregateByField(stocks, 'attribute');
-    const accountData = aggregateByField(stocks, 'account');
-
     const handleDeleteCustomAggregation = (id: string, name: string) => {
         if (confirm(`「${name}」を削除しますか？`)) {
             deleteCustomAggregation(id);
@@ -198,29 +191,6 @@ function SummaryLayout() {
                 </div>
 
                 {/* ドーナツグラフ + 凡例テーブル */}
-                <div className={summaryStyles.chartsGrid}>
-                    <DonutChart
-                        title="クラス別"
-                        data={assetClassData}
-                        showLegendTable
-                    />
-                    <DonutChart
-                        title="地域別"
-                        data={regionData}
-                        showLegendTable
-                    />
-                    <DonutChart
-                        title="属性別"
-                        data={attributeData}
-                        showLegendTable
-                    />
-                    <DonutChart
-                        title="口座別"
-                        data={accountData}
-                        showLegendTable
-                    />
-                </div>
-
                 {customAggregations.length > 0 && (
                     <div className={summaryStyles.chartsGrid}>
                         {customAggregations.map((aggregation) => {

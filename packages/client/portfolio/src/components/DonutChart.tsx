@@ -25,28 +25,6 @@ const DEFAULT_COLORS = [
     '#FFD700', // 金
 ];
 
-const CATEGORY_COLORS: Record<string, string> = {
-    // クラス
-    現金: '#757575',
-    株式: '#C62828',
-    コモディティ: '#ffd9009c',
-    // 地域
-    日本: '#C62828',
-    米国: '#1976D2',
-    全世界: '#2E7D32',
-    // 属性
-    インデックス: '#1976D2',
-    増配: '#C62828',
-    ゴールド: '#ffd900ce',
-    暗号通貨: '#7B1FA2',
-    // 口座
-    預金: '#757575',
-    特定: '#C62828',
-    NISA: '#F57C00',
-    DC: '#2E7D32',
-    暗号資産: '#7B1FA2',
-};
-
 function formatCurrency(value: number): string {
     return new Intl.NumberFormat('ja-JP', {
         style: 'currency',
@@ -67,7 +45,6 @@ export function DonutChart({
 }: DonutChartProps) {
     const getColor = (name: string, index: number): string => {
         if (colors?.[name]) return colors[name];
-        if (CATEGORY_COLORS[name]) return CATEGORY_COLORS[name];
         return DEFAULT_COLORS[index % DEFAULT_COLORS.length];
     };
 
