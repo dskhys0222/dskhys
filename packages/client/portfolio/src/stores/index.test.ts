@@ -58,10 +58,6 @@ describe('stores', () => {
                     value: 25000,
                     units: 100,
                     averageCost: 200,
-                    assetClass: '株式' as const,
-                    region: '米国' as const,
-                    attribute: 'インデックス' as const,
-                    account: '特定' as const,
                     source: 'manual' as const,
                 };
 
@@ -82,10 +78,6 @@ describe('stores', () => {
                     value: 18000,
                     units: 50,
                     averageCost: 300,
-                    assetClass: '株式' as const,
-                    region: '米国' as const,
-                    attribute: 'インデックス' as const,
-                    account: 'NISA' as const,
                     source: 'manual' as const,
                 };
 
@@ -108,10 +100,6 @@ describe('stores', () => {
                     value: 25000,
                     units: 100,
                     averageCost: 200,
-                    assetClass: '株式',
-                    region: '米国',
-                    attribute: 'インデックス',
-                    account: '特定',
                     source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
@@ -137,10 +125,6 @@ describe('stores', () => {
                     value: 25000,
                     units: 100,
                     averageCost: 200,
-                    assetClass: '株式',
-                    region: '米国',
-                    attribute: 'インデックス',
-                    account: '特定',
                     source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
@@ -163,10 +147,6 @@ describe('stores', () => {
                     value: 25000,
                     units: 100,
                     averageCost: 200,
-                    assetClass: '株式',
-                    region: '米国',
-                    attribute: 'インデックス',
-                    account: '特定',
                     source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
@@ -185,10 +165,6 @@ describe('stores', () => {
                     value: 25000,
                     units: 100,
                     averageCost: 200,
-                    assetClass: '株式',
-                    region: '米国',
-                    attribute: 'インデックス',
-                    account: '特定',
                     source: 'manual',
                 };
                 useStocksStore.getState().addStock(stock);
@@ -209,10 +185,6 @@ describe('stores', () => {
                         value: 25000,
                         units: 100,
                         averageCost: 200,
-                        assetClass: '株式',
-                        region: '米国',
-                        attribute: 'インデックス',
-                        account: '特定',
                         source: 'manual',
                         createdAt: '2024-01-01T00:00:00Z',
                         updatedAt: '2024-01-01T00:00:00Z',

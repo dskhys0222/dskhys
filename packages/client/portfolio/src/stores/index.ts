@@ -531,7 +531,7 @@ export const useMFDataStore = create<MFDataStore>((set, get) => ({
                     units: mfStock.units,
                     currentPrice: mfStock.currentPrice,
                     averageCost: mfStock.averageCost,
-                    // ティッカー、属性（assetClass, region, attribute, account）は上書きしない
+                    // ティッカーは上書きしない
                 });
                 updatedCount++;
             } else {
@@ -546,10 +546,6 @@ export const useMFDataStore = create<MFDataStore>((set, get) => ({
                     units: mfStock.units,
                     currentPrice: mfStock.currentPrice,
                     averageCost: mfStock.averageCost,
-                    assetClass: '現金', // デフォルト値
-                    region: '全世界', // デフォルト値
-                    attribute: '現金', // デフォルト値
-                    account: '預金', // デフォルト値
                     note: 'MoneyForwardから自動取得',
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),

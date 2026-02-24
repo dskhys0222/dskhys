@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { ACCOUNTS, ASSET_CLASSES, ATTRIBUTES, REGIONS } from '@/types';
 
 // 空文字やNaNをundefinedに変換するpreprocessor
 const optionalNumber = z.preprocess((val) => {
@@ -23,18 +22,6 @@ export const stockSchema = z.object({
     currentPrice: optionalNumber,
     units: optionalNumber,
     averageCost: optionalNumber,
-    assetClass: z.enum(ASSET_CLASSES, {
-        errorMap: () => ({ message: 'クラスを選択してください' }),
-    }),
-    region: z.enum(REGIONS, {
-        errorMap: () => ({ message: '地域を選択してください' }),
-    }),
-    attribute: z.enum(ATTRIBUTES, {
-        errorMap: () => ({ message: '属性を選択してください' }),
-    }),
-    account: z.enum(ACCOUNTS, {
-        errorMap: () => ({ message: '口座を選択してください' }),
-    }),
     note: z.string().max(500, '備考は500文字以内で入力してください').optional(),
     // 配当金関連
     includeDividend: z.boolean().optional().default(false),

@@ -32,7 +32,7 @@ function HomePage() {
     const loadSyncConfig = useMFDataStore((state) => state.loadSyncConfig);
     const loadTokens = useMFDataStore((state) => state.loadTokens);
 
-    const [sortBy, setSortBy] = useState<string>('account');
+    const [sortBy, setSortBy] = useState<string>('value');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [touchStartX, setTouchStartX] = useState<number>(0);
     const [swipingId, setSwipingId] = useState<string | null>(null);
@@ -69,15 +69,6 @@ function HomePage() {
     const sortedStocks = useMemo(() => {
         const result = [...stocks];
 
-        // 口座の順序定義
-        const accountOrder: Record<string, number> = {
-            預金: 1,
-            暗号資産: 2,
-            特定: 3,
-            NISA: 4,
-            DC: 5,
-        };
-
         result.sort((a, b) => {
             let comparison = 0;
             switch (sortBy) {
@@ -89,20 +80,6 @@ function HomePage() {
                     break;
                 case 'value':
                     comparison = a.value - b.value;
-                    break;
-                case 'assetClass':
-                    comparison = a.assetClass.localeCompare(b.assetClass);
-                    break;
-                case 'region':
-                    comparison = a.region.localeCompare(b.region);
-                    break;
-                case 'attribute':
-                    comparison = a.attribute.localeCompare(b.attribute);
-                    break;
-                case 'account':
-                    comparison =
-                        (accountOrder[a.account] || 999) -
-                        (accountOrder[b.account] || 999);
                     break;
                 default:
                     comparison = 0;
@@ -251,10 +228,6 @@ function HomePage() {
                     <option value="ticker">ティッカー順</option>
                     <option value="name">銘柄名順</option>
                     <option value="value">評価額順</option>
-                    <option value="assetClass">クラス順</option>
-                    <option value="region">地域順</option>
-                    <option value="attribute">属性順</option>
-                    <option value="account">口座順</option>
                 </select>
                 <select
                     className={indexStyles.filterSelect}
@@ -324,12 +297,7 @@ function HomePage() {
                                 <div className={indexStyles.cardName}>
                                     {stock.name}
                                 </div>
-                                <div className={indexStyles.cardBody}>
-                                    <span>{stock.assetClass}</span>
-                                    <span>{stock.region}</span>
-                                    <span>{stock.attribute}</span>
-                                    <span>{stock.account}</span>
-                                </div>
+                                <div className={indexStyles.cardBody}></div>
                             </div>
                         </div>
                     ))}
@@ -369,42 +337,6 @@ function HomePage() {
                                     {sortBy === 'value' &&
                                         (sortOrder === 'asc' ? '▲' : '▼')}
                                 </th>
-                                <th
-                                    className={indexStyles.th}
-                                    onClick={() => handleSort('assetClass')}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    クラス{' '}
-                                    {sortBy === 'assetClass' &&
-                                        (sortOrder === 'asc' ? '▲' : '▼')}
-                                </th>
-                                <th
-                                    className={indexStyles.th}
-                                    onClick={() => handleSort('region')}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    地域{' '}
-                                    {sortBy === 'region' &&
-                                        (sortOrder === 'asc' ? '▲' : '▼')}
-                                </th>
-                                <th
-                                    className={indexStyles.th}
-                                    onClick={() => handleSort('attribute')}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    属性{' '}
-                                    {sortBy === 'attribute' &&
-                                        (sortOrder === 'asc' ? '▲' : '▼')}
-                                </th>
-                                <th
-                                    className={indexStyles.th}
-                                    onClick={() => handleSort('account')}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    口座{' '}
-                                    {sortBy === 'account' &&
-                                        (sortOrder === 'asc' ? '▲' : '▼')}
-                                </th>
                                 <th className={indexStyles.th}>操作</th>
                             </tr>
                         </thead>
@@ -421,18 +353,6 @@ function HomePage() {
                                     </td>
                                     <td className={indexStyles.td}>
                                         {formatCurrency(stock.value)}
-                                    </td>
-                                    <td className={indexStyles.td}>
-                                        {stock.assetClass}
-                                    </td>
-                                    <td className={indexStyles.td}>
-                                        {stock.region}
-                                    </td>
-                                    <td className={indexStyles.td}>
-                                        {stock.attribute}
-                                    </td>
-                                    <td className={indexStyles.td}>
-                                        {stock.account}
                                     </td>
                                     <td className={indexStyles.td}>
                                         <button

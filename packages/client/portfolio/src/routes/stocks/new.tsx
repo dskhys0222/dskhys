@@ -3,7 +3,6 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { type StockFormData, stockSchema } from '../../schemas/stock';
 import { useStocksStore } from '../../stores';
-import { ACCOUNTS, ASSET_CLASSES, ATTRIBUTES, REGIONS } from '../../types';
 import { formStyles } from './form.styles';
 
 export const Route = createFileRoute('/stocks/new')({
@@ -28,10 +27,6 @@ function NewStockPage() {
             currentPrice: undefined,
             units: undefined,
             averageCost: undefined,
-            assetClass: undefined,
-            region: undefined,
-            attribute: undefined,
-            account: undefined,
             note: '',
             includeDividend: false,
             dividendAmount: undefined,
@@ -165,101 +160,6 @@ function NewStockPage() {
                             {errors.averageCost && (
                                 <span className={formStyles.error}>
                                     {errors.averageCost.message}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* カテゴリ情報 */}
-                <div className={formStyles.section}>
-                    <h3 className={formStyles.sectionTitle}>カテゴリ情報</h3>
-                    <div className={formStyles.fieldGroup}>
-                        <div className={formStyles.field}>
-                            <label className={formStyles.label}>
-                                クラス
-                                <span className={formStyles.required}>*</span>
-                                <select
-                                    {...register('assetClass')}
-                                    className={`${formStyles.select} ${errors.assetClass ? formStyles.inputError : ''}`}
-                                >
-                                    <option value="">選択してください</option>
-                                    {ASSET_CLASSES.map((cls) => (
-                                        <option key={cls} value={cls}>
-                                            {cls}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            {errors.assetClass && (
-                                <span className={formStyles.error}>
-                                    {errors.assetClass.message}
-                                </span>
-                            )}
-                        </div>
-                        <div className={formStyles.field}>
-                            <label className={formStyles.label}>
-                                地域
-                                <span className={formStyles.required}>*</span>
-                                <select
-                                    {...register('region')}
-                                    className={`${formStyles.select} ${errors.region ? formStyles.inputError : ''}`}
-                                >
-                                    <option value="">選択してください</option>
-                                    {REGIONS.map((region) => (
-                                        <option key={region} value={region}>
-                                            {region}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            {errors.region && (
-                                <span className={formStyles.error}>
-                                    {errors.region.message}
-                                </span>
-                            )}
-                        </div>
-                        <div className={formStyles.field}>
-                            <label className={formStyles.label}>
-                                属性
-                                <span className={formStyles.required}>*</span>
-                                <select
-                                    {...register('attribute')}
-                                    className={`${formStyles.select} ${errors.attribute ? formStyles.inputError : ''}`}
-                                >
-                                    <option value="">選択してください</option>
-                                    {ATTRIBUTES.map((attr) => (
-                                        <option key={attr} value={attr}>
-                                            {attr}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            {errors.attribute && (
-                                <span className={formStyles.error}>
-                                    {errors.attribute.message}
-                                </span>
-                            )}
-                        </div>
-                        <div className={formStyles.field}>
-                            <label className={formStyles.label}>
-                                口座
-                                <span className={formStyles.required}>*</span>
-                                <select
-                                    {...register('account')}
-                                    className={`${formStyles.select} ${errors.account ? formStyles.inputError : ''}`}
-                                >
-                                    <option value="">選択してください</option>
-                                    {ACCOUNTS.map((account) => (
-                                        <option key={account} value={account}>
-                                            {account}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            {errors.account && (
-                                <span className={formStyles.error}>
-                                    {errors.account.message}
                                 </span>
                             )}
                         </div>

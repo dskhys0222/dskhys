@@ -13,10 +13,6 @@ describe('Dividend Aggregation', () => {
             ticker: 'TEST-A',
             value: 1000000,
             units: 100,
-            assetClass: '株式',
-            region: '日本',
-            attribute: '増配',
-            account: '特定',
             includeDividend: true,
             dividendAmount: 500, // 1口あたり500円
             createdAt: '2024-01-01T00:00:00Z',
@@ -29,10 +25,6 @@ describe('Dividend Aggregation', () => {
             ticker: 'TEST-B',
             value: 2000000,
             units: 200,
-            assetClass: '株式',
-            region: '米国',
-            attribute: '増配',
-            account: 'NISA',
             includeDividend: true,
             dividendAmount: 300, // 1口あたり300円
             createdAt: '2024-01-01T00:00:00Z',
@@ -45,10 +37,6 @@ describe('Dividend Aggregation', () => {
             ticker: 'TEST-C',
             value: 500000,
             units: 50,
-            assetClass: '株式',
-            region: '日本',
-            attribute: 'インデックス',
-            account: '預金',
             includeDividend: false, // 集計対象外
             dividendAmount: 100,
             createdAt: '2024-01-01T00:00:00Z',
