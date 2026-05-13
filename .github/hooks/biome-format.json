@@ -1,0 +1,14 @@
+{
+    "hooks": {
+        "PostToolUse": [
+            {
+                "type": "command",
+                "windows": "pnpm format 2>&1 | Out-Null; exit 0",
+                "linux": "pnpm format > /dev/null 2>&1 || true",
+                "osx": "pnpm format > /dev/null 2>&1 || true",
+                "cwd": "${workspaceRoot}",
+                "timeout": 30
+            }
+        ]
+    }
+}
