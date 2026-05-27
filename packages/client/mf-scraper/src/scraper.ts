@@ -121,7 +121,7 @@ export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
                 cashRow1Text = (await cells[1].textContent()) || '0';
             }
         }
-        if (text?.includes('現金残高(ハイブリッド預金除く)')) {
+        if (text?.includes('現金残高')) {
             const cells = await row.locator('td').all();
             if (cells[1]) {
                 cashRow2Text = (await cells[1].textContent()) || '0';
