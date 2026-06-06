@@ -4,9 +4,9 @@
     "engines": {
         "node": "24",
         "npm": "npmではなくpnpmを使用してください",
-        "pnpm": "10"
+        "pnpm": "11"
     },
-    "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
+    "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916",
     "scripts": {
         "lint": "biome check .",
         "format": "biome check --write .",
