@@ -3,6 +3,24 @@
 このプロジェクトは、システムのバックエンド、フロントエンド、インフラのドキュメントやソースコードなど、関連するものを一括で管理するためのものです。
 このシステムは、私が個人的に使用するものであり、商用利用や第三者への提供は予定していません。
 
+## 環境構築
+
+1. Node.jsをインストールする
+    ```ps1
+    winget install -e --source winget --id OpenJS.NodeJS.LTS
+    node -v
+    ```
+2. pnpmを有効化する
+   ```ps1
+   corepack enable
+   corepack install
+   pnpm -v
+   ```
+3. パッケージのインストール
+   ```ps1
+   pnpm install
+   ```
+
 ## ディレクトリ構成
 
 pnpm workspace を利用したモノレポとする。
