@@ -16,11 +16,14 @@ userRoutes.get(
         const { id } = req.params;
 
         // 検証関数を作成
-        const validateId = (idParam: string): Result<number, Error> => {
-            if (!idParam || Number.isNaN(Number(idParam))) {
+        const validateId = (
+            idParam: string | string[]
+        ): Result<number, Error> => {
+            const idStr = Array.isArray(idParam) ? idParam[0] : idParam;
+            if (!idStr || Number.isNaN(Number(idStr))) {
                 return err(new ValidationError('Invalid user ID'));
             }
-            const numId = Number(idParam);
+            const numId = Number(idStr);
 
             if (numId > 100) {
                 return err(new NotFoundError('User'));
