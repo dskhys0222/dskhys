@@ -5,9 +5,9 @@ packages:
   - packages/client/portfolio
   - packages/client/mf-scraper
 
-minimumReleaseAge: 2880
+allowBuilds:
+  bcrypt: true
+  esbuild: true
+  sqlite3: true
 
-onlyBuiltDependencies:
-  - bcrypt
-  - esbuild
-  - sqlite3
+minimumReleaseAge: 2880
