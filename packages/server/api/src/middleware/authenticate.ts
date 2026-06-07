@@ -25,7 +25,7 @@ export const authenticate = (
 ): void => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader?.startsWith('Bearer ')) {
         next(new UnauthorizedError('No token provided'));
         return;
     }
