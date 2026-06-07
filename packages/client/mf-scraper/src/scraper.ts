@@ -37,6 +37,7 @@ export const launchBrowser = async (
 ): Promise<Browser> => {
     return chromium.launch({
         headless,
+        channel: 'chrome',
         // bot検出対策
         args: ['--disable-blink-features=AutomationControlled'],
     });
