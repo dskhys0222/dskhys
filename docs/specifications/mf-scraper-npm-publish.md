@@ -33,21 +33,21 @@ on:
 
 ```yaml
 - name: Checkout code
-  uses: actions/checkout@v4
+  uses: actions/checkout@v6.0.3
 ```
 
 #### 2. pnpm セットアップ
 
 ```yaml
 - name: Setup pnpm
-  uses: pnpm/action-setup@v4
+  uses: pnpm/action-setup@v6.0.8
 ```
 
 #### 3. Node.js セットアップ
 
 ```yaml
 - name: Setup Node.js
-  uses: actions/setup-node@v4
+  uses: actions/setup-node@v6.4.0
   with:
     node-version-file: "package.json"
     cache: "pnpm"
