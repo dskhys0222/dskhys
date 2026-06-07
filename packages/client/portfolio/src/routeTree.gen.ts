@@ -58,7 +58,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/stocks/new': typeof StocksNewRoute
   '/summary/new': typeof SummaryNewRoute
-  '/summary': typeof SummaryIndexRoute
+  '/summary/': typeof SummaryIndexRoute
   '/stocks/$id/edit': typeof StocksIdEditRoute
   '/summary/$id/edit': typeof SummaryIdEditRoute
 }
@@ -88,7 +88,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/stocks/new'
     | '/summary/new'
-    | '/summary'
+    | '/summary/'
     | '/stocks/$id/edit'
     | '/summary/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -140,7 +140,7 @@ declare module '@tanstack/react-router' {
     '/summary/': {
       id: '/summary/'
       path: '/summary'
-      fullPath: '/summary'
+      fullPath: '/summary/'
       preLoaderRoute: typeof SummaryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

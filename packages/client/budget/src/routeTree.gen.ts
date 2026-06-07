@@ -93,16 +93,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/history/$name': typeof HistoryNameRoute
   '/subscription/add': typeof SubscriptionAddRoute
-  '/cash-flow': typeof CashFlowIndexRoute
-  '/subscription': typeof SubscriptionIndexRoute
+  '/cash-flow/': typeof CashFlowIndexRoute
+  '/subscription/': typeof SubscriptionIndexRoute
   '/cash-flow/expense/add': typeof CashFlowExpenseAddRoute
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
   '/subscription/$id/edit': typeof SubscriptionIdEditRoute
-  '/subscription/$id': typeof SubscriptionIdIndexRoute
+  '/subscription/$id/': typeof SubscriptionIdIndexRoute
   '/cash-flow/expense/$id/edit': typeof CashFlowExpenseIdEditRoute
   '/cash-flow/income/$id/edit': typeof CashFlowIncomeIdEditRoute
-  '/cash-flow/expense/$id': typeof CashFlowExpenseIdIndexRoute
-  '/cash-flow/income/$id': typeof CashFlowIncomeIdIndexRoute
+  '/cash-flow/expense/$id/': typeof CashFlowExpenseIdIndexRoute
+  '/cash-flow/income/$id/': typeof CashFlowIncomeIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,16 +141,16 @@ export interface FileRouteTypes {
     | '/'
     | '/history/$name'
     | '/subscription/add'
-    | '/cash-flow'
-    | '/subscription'
+    | '/cash-flow/'
+    | '/subscription/'
     | '/cash-flow/expense/add'
     | '/cash-flow/income/add'
     | '/subscription/$id/edit'
-    | '/subscription/$id'
+    | '/subscription/$id/'
     | '/cash-flow/expense/$id/edit'
     | '/cash-flow/income/$id/edit'
-    | '/cash-flow/expense/$id'
-    | '/cash-flow/income/$id'
+    | '/cash-flow/expense/$id/'
+    | '/cash-flow/income/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -211,14 +211,14 @@ declare module '@tanstack/react-router' {
     '/subscription/': {
       id: '/subscription/'
       path: '/subscription'
-      fullPath: '/subscription'
+      fullPath: '/subscription/'
       preLoaderRoute: typeof SubscriptionIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cash-flow/': {
       id: '/cash-flow/'
       path: '/cash-flow'
-      fullPath: '/cash-flow'
+      fullPath: '/cash-flow/'
       preLoaderRoute: typeof CashFlowIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -239,7 +239,7 @@ declare module '@tanstack/react-router' {
     '/subscription/$id/': {
       id: '/subscription/$id/'
       path: '/subscription/$id'
-      fullPath: '/subscription/$id'
+      fullPath: '/subscription/$id/'
       preLoaderRoute: typeof SubscriptionIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -267,14 +267,14 @@ declare module '@tanstack/react-router' {
     '/cash-flow/income/$id/': {
       id: '/cash-flow/income/$id/'
       path: '/cash-flow/income/$id'
-      fullPath: '/cash-flow/income/$id'
+      fullPath: '/cash-flow/income/$id/'
       preLoaderRoute: typeof CashFlowIncomeIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cash-flow/expense/$id/': {
       id: '/cash-flow/expense/$id/'
       path: '/cash-flow/expense/$id'
-      fullPath: '/cash-flow/expense/$id'
+      fullPath: '/cash-flow/expense/$id/'
       preLoaderRoute: typeof CashFlowExpenseIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
