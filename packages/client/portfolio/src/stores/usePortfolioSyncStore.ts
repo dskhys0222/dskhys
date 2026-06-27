@@ -11,6 +11,49 @@ import {
 
 const LAST_SYNCED_STORAGE_KEY = 'portfolio-sync-last-synced';
 
+const requestWithAuthRetry = async (
+    apiUrl: string,
+    path: string,
+    init: RequestInit = {}
+): Promise<Response> => {
+    const { accessToken, refreshAccessToken } = useMFDataStore.getState();
+    const headers = new Headers(init.headers ?? {});
+
+    if (accessToken) {
+        headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    let response = await fetch(`${apiUrl}${path}`, {
+        ...init,
+        headers,
+    });
+
+    if (response.status !== 401) {
+        return response;
+    }
+
+    const refreshed = await refreshAccessToken(apiUrl);
+    if (!refreshed) {
+        throw new Error(
+            'トークンのリフレッシュに失敗しました。再度ログインしてください。'
+        );
+    }
+
+    const newAccessToken = useMFDataStore.getState().accessToken;
+    const retryHeaders = new Headers(init.headers ?? {});
+
+    if (newAccessToken) {
+        retryHeaders.set('Authorization', `Bearer ${newAccessToken}`);
+    }
+
+    response = await fetch(`${apiUrl}${path}`, {
+        ...init,
+        headers: retryHeaders,
+    });
+
+    return response;
+};
+
 interface PortfolioSyncStore {
     isSyncing: boolean;
     lastSyncedAt: string | null;
@@ -70,14 +113,17 @@ export const usePortfolioSyncStore = create<PortfolioSyncStore>((set, get) => ({
                 encryptionKey
             );
 
-            const response = await fetch(`${apiUrl}/api/portfolio/snapshot`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify(encrypted),
-            });
+            const response = await requestWithAuthRetry(
+                apiUrl,
+                '/api/portfolio/snapshot',
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(encrypted),
+                }
+            );
 
             if (response.status === 409) {
                 const conflictData = await response.json().catch(() => null);
@@ -140,11 +186,10 @@ export const usePortfolioSyncStore = create<PortfolioSyncStore>((set, get) => ({
         set({ isSyncing: true, syncError: null });
 
         try {
-            const response = await fetch(`${apiUrl}/api/portfolio/snapshot`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
+            const response = await requestWithAuthRetry(
+                apiUrl,
+                '/api/portfolio/snapshot'
+            );
 
             if (!response.ok) {
                 if (response.status === 404) {
