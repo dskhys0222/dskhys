@@ -7,6 +7,7 @@ WORKDIR /app
 COPY package.json ./
 
 # packageManagerフィールドからpnpmをインストール
+RUN npm install -g corepack@latest
 RUN corepack enable && corepack install
 
 # ワークスペース設定とパッケージファイルをコピー
@@ -32,6 +33,7 @@ WORKDIR /app
 COPY package.json ./
 
 # packageManagerフィールドからpnpmをインストール
+RUN npm install -g corepack@latest
 RUN corepack enable && corepack install
 
 # ワークスペース設定とパッケージファイルをコピー

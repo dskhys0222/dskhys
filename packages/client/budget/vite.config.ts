@@ -1,8 +1,9 @@
 import { fileURLToPath, URL } from 'node:url';
+import babel from '@rolldown/plugin-babel';
 import { devtools } from '@tanstack/devtools-vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
-import viteReact from '@vitejs/plugin-react';
+import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -15,11 +16,8 @@ export default defineConfig({
             autoCodeSplitting: true,
             routeFileIgnorePattern: 'styles\\.ts$',
         }),
-        viteReact({
-            babel: {
-                plugins: ['babel-plugin-react-compiler'],
-            },
-        }),
+        viteReact(),
+        babel({ presets: [reactCompilerPreset()] }),
         VitePWA({
             registerType: 'autoUpdate',
             devOptions: {
