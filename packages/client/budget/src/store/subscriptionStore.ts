@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useAutoSyncTriggerStore } from './autoSyncTriggerStore';
 
 export interface SubscriptionItem {
     id: string;
@@ -45,6 +46,7 @@ export const useActiveSubscriptionStore = create<ActiveSubscriptionStore>()(
                         },
                     ],
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             updateItem: (id: string, item: Partial<SubscriptionItem>) => {
                 set((state: ActiveSubscriptionStore) => ({
@@ -52,11 +54,13 @@ export const useActiveSubscriptionStore = create<ActiveSubscriptionStore>()(
                         i.id === id ? { ...i, ...item } : i
                     ),
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             removeItem: (id: string) => {
                 set((state: ActiveSubscriptionStore) => ({
                     items: state.items.filter((i) => i.id !== id),
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             getTotalMonthly: () => {
                 return get().items.reduce(
@@ -99,6 +103,7 @@ export const useSubscriptionCandidateStore =
                             },
                         ],
                     }));
+                    useAutoSyncTriggerStore.getState().markChanged();
                 },
                 updateItem: (id: string, item: Partial<SubscriptionItem>) => {
                     set((state: SubscriptionCandidateStore) => ({
@@ -106,11 +111,13 @@ export const useSubscriptionCandidateStore =
                             i.id === id ? { ...i, ...item } : i
                         ),
                     }));
+                    useAutoSyncTriggerStore.getState().markChanged();
                 },
                 removeItem: (id: string) => {
                     set((state: SubscriptionCandidateStore) => ({
                         items: state.items.filter((i) => i.id !== id),
                     }));
+                    useAutoSyncTriggerStore.getState().markChanged();
                 },
                 getTotalMonthly: () => {
                     return get().items.reduce(

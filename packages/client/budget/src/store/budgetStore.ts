@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useAutoSyncTriggerStore } from './autoSyncTriggerStore';
 
-interface BudgetItem {
+export interface BudgetItem {
     id: string;
     name: string;
 }
@@ -26,6 +27,7 @@ export const useBudgetStore = create<BudgetStore>()(
                         },
                     ],
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             removeItem: (id: string) => {
                 set((state: BudgetStore) => ({
@@ -33,6 +35,7 @@ export const useBudgetStore = create<BudgetStore>()(
                         (item: BudgetItem) => item.id !== id
                     ),
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
         }),
         {

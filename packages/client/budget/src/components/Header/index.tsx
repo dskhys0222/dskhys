@@ -40,6 +40,16 @@ export function Header() {
                     >
                         サブスク
                     </Link>
+                    <Link
+                        to="/settings"
+                        className={
+                            isActive('/settings')
+                                ? styles.activeTab
+                                : styles.tab
+                        }
+                    >
+                        設定
+                    </Link>
                 </nav>
             </div>
         </header>

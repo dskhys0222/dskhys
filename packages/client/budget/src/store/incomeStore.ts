@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useAutoSyncTriggerStore } from './autoSyncTriggerStore';
 
 export interface IncomeItem {
     id: string;
@@ -33,6 +34,7 @@ export const useIncomeStore = create<IncomeStore>()(
                         },
                     ],
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             updateItem: (id: string, item: Partial<IncomeItem>) => {
                 set((state: IncomeStore) => ({
@@ -40,11 +42,13 @@ export const useIncomeStore = create<IncomeStore>()(
                         i.id === id ? { ...i, ...item } : i
                     ),
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             removeItem: (id: string) => {
                 set((state: IncomeStore) => ({
                     items: state.items.filter((i) => i.id !== id),
                 }));
+                useAutoSyncTriggerStore.getState().markChanged();
             },
             getTotalMonthly: () => {
                 return get().items.reduce(

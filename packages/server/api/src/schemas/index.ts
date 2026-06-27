@@ -153,3 +153,23 @@ export type PortfolioSnapshot = z.infer<typeof PortfolioSnapshotSchema>;
 export type UpsertPortfolioSnapshot = z.infer<
     typeof UpsertPortfolioSnapshotSchema
 >;
+
+// バジェットスナップショット関連のスキーマ
+export const BudgetSnapshotSchema = z.object({
+    auth_tag: z.string().min(1),
+    created_at: z.string().datetime().optional(),
+    encrypted_data: z.string().min(1),
+    id: z.number().int().positive().optional(),
+    iv: z.string().min(1),
+    updated_at: z.string().optional(),
+    user_id: z.number().int().positive(),
+});
+
+export const UpsertBudgetSnapshotSchema = z.object({
+    data: z.string().min(1),
+    iv: z.string().min(1),
+    tag: z.string().min(1),
+});
+
+export type BudgetSnapshot = z.infer<typeof BudgetSnapshotSchema>;
+export type UpsertBudgetSnapshot = z.infer<typeof UpsertBudgetSnapshotSchema>;

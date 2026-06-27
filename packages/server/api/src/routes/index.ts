@@ -1,6 +1,7 @@
 import type { Router as ExpressRouter } from 'express';
 import { Router } from 'express';
 import { authRoutes } from './auth.js';
+import { budgetRoutes } from './budget.js';
 import { itemRoutes } from './item.js';
 import { portfolioRoutes } from './portfolio.js';
 import { userRoutes } from './users.js';
@@ -27,6 +28,9 @@ router.use('/item', itemRoutes);
 
 // ポートフォリオルート
 router.use('/portfolio', portfolioRoutes);
+
+// バジェットルート
+router.use('/budget', budgetRoutes);
 
 // TODO: 他のルートを追加
 // router.use('/posts', postRoutes)

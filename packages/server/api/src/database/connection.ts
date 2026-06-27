@@ -65,11 +65,25 @@ const initializeDatabase = (): void => {
     )
   `;
 
+    const createBudgetSnapshotsTable = `
+    CREATE TABLE IF NOT EXISTS budget_snapshots (
+      id               INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id          INTEGER NOT NULL UNIQUE,
+      iv               TEXT NOT NULL,
+      encrypted_data   TEXT NOT NULL,
+      auth_tag         TEXT NOT NULL,
+      created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    )
+  `;
+
     runQuery(createUsersTable)
         .andThen(() => runQuery(createRefreshTokensTable))
         .andThen(() => runQuery(createListItemsTable))
         .andThen(() => runQuery(createEncryptedPortfoliosTable))
         .andThen(() => runQuery(createPortfolioSnapshotsTable))
+        .andThen(() => runQuery(createBudgetSnapshotsTable))
         .match(
             () => console.log('データベースの初期化が完了しました'),
             (error) => console.error('データベース初期化エラー:', error.message)

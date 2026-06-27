@@ -3,10 +3,12 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
 import { Header } from '@/components/Header';
+import { useAutoSync } from '@/hooks/useAutoSync';
 import { styles } from './styles';
 
-export const Route = createRootRoute({
-    component: () => (
+function RootComponent() {
+    useAutoSync();
+    return (
         <div className={styles.app}>
             <Header />
             <main className={styles.main}>
@@ -24,5 +26,9 @@ export const Route = createRootRoute({
                 ]}
             />
         </div>
-    ),
+    );
+}
+
+export const Route = createRootRoute({
+    component: RootComponent,
 });

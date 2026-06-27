@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SubscriptionIndexRouteImport } from './routes/subscription/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as CashFlowIndexRouteImport } from './routes/cash-flow/index'
 import { Route as SubscriptionAddRouteImport } from './routes/subscription/add'
 import { Route as HistoryNameRouteImport } from './routes/history/$name'
@@ -31,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
 const SubscriptionIndexRoute = SubscriptionIndexRouteImport.update({
   id: '/subscription/',
   path: '/subscription/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CashFlowIndexRoute = CashFlowIndexRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/history/$name': typeof HistoryNameRoute
   '/subscription/add': typeof SubscriptionAddRoute
   '/cash-flow/': typeof CashFlowIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/subscription/': typeof SubscriptionIndexRoute
   '/cash-flow/expense/add': typeof CashFlowExpenseAddRoute
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/history/$name': typeof HistoryNameRoute
   '/subscription/add': typeof SubscriptionAddRoute
   '/cash-flow': typeof CashFlowIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/subscription': typeof SubscriptionIndexRoute
   '/cash-flow/expense/add': typeof CashFlowExpenseAddRoute
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/history/$name': typeof HistoryNameRoute
   '/subscription/add': typeof SubscriptionAddRoute
   '/cash-flow/': typeof CashFlowIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/subscription/': typeof SubscriptionIndexRoute
   '/cash-flow/expense/add': typeof CashFlowExpenseAddRoute
   '/cash-flow/income/add': typeof CashFlowIncomeAddRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/history/$name'
     | '/subscription/add'
     | '/cash-flow/'
+    | '/settings/'
     | '/subscription/'
     | '/cash-flow/expense/add'
     | '/cash-flow/income/add'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/history/$name'
     | '/subscription/add'
     | '/cash-flow'
+    | '/settings'
     | '/subscription'
     | '/cash-flow/expense/add'
     | '/cash-flow/income/add'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/history/$name'
     | '/subscription/add'
     | '/cash-flow/'
+    | '/settings/'
     | '/subscription/'
     | '/cash-flow/expense/add'
     | '/cash-flow/income/add'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   HistoryNameRoute: typeof HistoryNameRoute
   SubscriptionAddRoute: typeof SubscriptionAddRoute
   CashFlowIndexRoute: typeof CashFlowIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
   SubscriptionIndexRoute: typeof SubscriptionIndexRoute
   CashFlowExpenseAddRoute: typeof CashFlowExpenseAddRoute
   CashFlowIncomeAddRoute: typeof CashFlowIncomeAddRoute
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/subscription/'
       preLoaderRoute: typeof SubscriptionIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cash-flow/': {
@@ -300,6 +320,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryNameRoute: HistoryNameRoute,
   SubscriptionAddRoute: SubscriptionAddRoute,
   CashFlowIndexRoute: CashFlowIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
   SubscriptionIndexRoute: SubscriptionIndexRoute,
   CashFlowExpenseAddRoute: CashFlowExpenseAddRoute,
   CashFlowIncomeAddRoute: CashFlowIncomeAddRoute,
