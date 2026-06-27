@@ -1,23 +1,19 @@
 import { useEffect, useRef } from 'react';
-import {
-    useCustomAggregationsStore,
-    useMFDataStore,
-    useStocksStore,
-} from '@/stores/index';
+import { useMFDataStore } from '@/stores/index';
+import { useAutoSyncTriggerStore } from '@/stores/useAutoSyncTriggerStore';
 import { usePortfolioSyncStore } from '@/stores/usePortfolioSyncStore';
 
 const DEBOUNCE_MS = 2000;
 
+let autoSyncTimer: ReturnType<typeof setTimeout> | null = null;
+let autoSyncScheduledVersion: string | null = null;
+
 /**
- * stocksまたはcustomAggregationsが更新されたとき、
- * デバウンス後に自動プッシュを実行するフック。
- * 認証済みかつencryptionKeyが設定済みの場合のみ発火。
+ * データ変更時に自動同期するフック。
+ * 変更トリガーが増えたときだけ debounce 後に push を実行する。
  */
 export function useAutoSync(): void {
-    const stocks = useStocksStore((s) => s.stocks);
-    const customAggregations = useCustomAggregationsStore(
-        (s) => s.customAggregations
-    );
+    const dataVersion = useAutoSyncTriggerStore((s) => s.dataVersion);
     const accessToken = useMFDataStore((s) => s.accessToken);
     const encryptionKey = useMFDataStore((s) => s.encryptionKey);
     const push = usePortfolioSyncStore((s) => s.push);
@@ -26,30 +22,49 @@ export function useAutoSync(): void {
     const isAuthenticated = accessToken !== '';
     const hasKey = encryptionKey !== '';
 
-    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const hasMountedRef = useRef(false);
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: stocks と customAggregations は変更検知のためのトリガー
     useEffect(() => {
         if (!hasMountedRef.current) {
             hasMountedRef.current = true;
+            autoSyncScheduledVersion = String(dataVersion);
             return;
         }
 
-        if (!isAuthenticated || !hasKey || isSyncing) return;
-
-        if (timerRef.current !== null) {
-            clearTimeout(timerRef.current);
+        if (!isAuthenticated || !hasKey || isSyncing) {
+            if (autoSyncTimer !== null) {
+                clearTimeout(autoSyncTimer);
+                autoSyncTimer = null;
+            }
+            autoSyncScheduledVersion = null;
+            return;
         }
 
-        timerRef.current = setTimeout(() => {
+        const triggerKey = String(dataVersion);
+        if (autoSyncScheduledVersion === triggerKey) {
+            return;
+        }
+
+        if (autoSyncTimer !== null) {
+            clearTimeout(autoSyncTimer);
+            autoSyncTimer = null;
+        }
+
+        autoSyncScheduledVersion = triggerKey;
+        autoSyncTimer = setTimeout(() => {
+            autoSyncTimer = null;
+            autoSyncScheduledVersion = null;
             push();
         }, DEBOUNCE_MS);
+    }, [dataVersion, isAuthenticated, hasKey, isSyncing, push]);
 
+    useEffect(() => {
         return () => {
-            if (timerRef.current !== null) {
-                clearTimeout(timerRef.current);
+            if (autoSyncTimer !== null) {
+                clearTimeout(autoSyncTimer);
+                autoSyncTimer = null;
             }
+            autoSyncScheduledVersion = null;
         };
-    }, [stocks, customAggregations, isAuthenticated, hasKey, isSyncing, push]);
+    }, []);
 }

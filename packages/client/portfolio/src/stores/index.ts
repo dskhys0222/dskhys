@@ -10,6 +10,7 @@ import type {
 import { decryptPortfolioData } from '@/utils/crypto';
 import { createInitialMappings } from '@/utils/mf-mapping';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/storage';
+import { useAutoSyncTriggerStore } from './useAutoSyncTriggerStore';
 
 const STORAGE_KEY = 'portfolio-stocks';
 
@@ -37,6 +38,7 @@ export const useStocksStore = create<StocksStore>((set, get) => ({
             stocks: [...state.stocks, newStock],
         }));
 
+        useAutoSyncTriggerStore.getState().markChanged();
         get().saveStocks();
     },
 
@@ -53,6 +55,7 @@ export const useStocksStore = create<StocksStore>((set, get) => ({
 
         set({ stocks: updatedStocks });
 
+        useAutoSyncTriggerStore.getState().markChanged();
         saveToLocalStorage(STORAGE_KEY, updatedStocks);
     },
 
@@ -61,6 +64,7 @@ export const useStocksStore = create<StocksStore>((set, get) => ({
             stocks: state.stocks.filter((stock) => stock.id !== id),
         }));
 
+        useAutoSyncTriggerStore.getState().markChanged();
         get().saveStocks();
     },
 
@@ -139,6 +143,7 @@ export const useCustomAggregationsStore = create<CustomAggregationsStore>(
                 ],
             }));
 
+            useAutoSyncTriggerStore.getState().markChanged();
             get().saveCustomAggregations();
         },
 
@@ -155,6 +160,7 @@ export const useCustomAggregationsStore = create<CustomAggregationsStore>(
             );
 
             set({ customAggregations: updatedAggregations });
+            useAutoSyncTriggerStore.getState().markChanged();
             get().saveCustomAggregations();
         },
 
@@ -165,6 +171,7 @@ export const useCustomAggregationsStore = create<CustomAggregationsStore>(
                 ),
             }));
 
+            useAutoSyncTriggerStore.getState().markChanged();
             get().saveCustomAggregations();
         },
 
@@ -555,6 +562,7 @@ export const useMFDataStore = create<MFDataStore>((set, get) => ({
                 useStocksStore.setState({
                     stocks: [...currentStocks, newStock],
                 });
+                useAutoSyncTriggerStore.getState().markChanged();
                 useStocksStore.getState().saveStocks();
                 addedCount++;
             }

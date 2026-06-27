@@ -5,6 +5,7 @@ import {
     useMFDataStore,
     useStocksStore,
 } from '@/stores/index';
+import { useAutoSyncTriggerStore } from '@/stores/useAutoSyncTriggerStore';
 import { usePortfolioSyncStore } from '@/stores/usePortfolioSyncStore';
 import { useAutoSync } from './useAutoSync';
 
@@ -12,6 +13,7 @@ describe('useAutoSync', () => {
     beforeEach(() => {
         vi.useFakeTimers();
         vi.clearAllMocks();
+        vi.clearAllTimers();
 
         useMFDataStore.setState({
             accessToken: 'token',
@@ -19,6 +21,7 @@ describe('useAutoSync', () => {
         });
         useStocksStore.setState({ stocks: [] });
         useCustomAggregationsStore.setState({ customAggregations: [] });
+        useAutoSyncTriggerStore.setState({ dataVersion: 0 });
         usePortfolioSyncStore.setState({
             isSyncing: false,
             push: vi.fn(),
@@ -42,25 +45,51 @@ describe('useAutoSync', () => {
         expect(push).not.toHaveBeenCalled();
 
         act(() => {
-            useStocksStore.setState({
-                stocks: [
-                    {
-                        id: '1',
-                        name: 'Test',
-                        ticker: 'TEST',
-                        value: 100,
-                        units: 1,
-                        averageCost: 100,
-                        source: 'manual',
-                        createdAt: '2024-01-01T00:00:00.000Z',
-                        updatedAt: '2024-01-01T00:00:00.000Z',
-                    },
-                ],
+            useStocksStore.getState().addStock({
+                name: 'Test',
+                ticker: 'TEST',
+                value: 100,
+                units: 1,
+                averageCost: 100,
+                source: 'manual',
             });
         });
 
         act(() => {
             vi.advanceTimersByTime(2000);
+        });
+
+        expect(push).toHaveBeenCalledTimes(1);
+    });
+
+    it('同期状態の変化で追加の自動同期が走らない', () => {
+        const push = vi.fn();
+        usePortfolioSyncStore.setState({ push } as never);
+
+        renderHook(() => useAutoSync());
+
+        act(() => {
+            useStocksStore.getState().addStock({
+                name: 'Test',
+                ticker: 'TEST',
+                value: 100,
+                units: 1,
+                averageCost: 100,
+                source: 'manual',
+            });
+        });
+
+        act(() => {
+            vi.advanceTimersByTime(2000);
+        });
+
+        expect(push).toHaveBeenCalledTimes(1);
+
+        act(() => {
+            usePortfolioSyncStore.setState({ isSyncing: true } as never);
+        });
+        act(() => {
+            usePortfolioSyncStore.setState({ isSyncing: false } as never);
         });
 
         expect(push).toHaveBeenCalledTimes(1);
