@@ -2,6 +2,7 @@
 description: "Use when working on client packages (budget, portfolio, rss-reader, web): building React components, adding pages/routes, managing state with Zustand, styling with Panda CSS, implementing forms, or handling PWA/offline functionality."
 name: "Frontend Developer"
 tools: [read, edit, search, execute, todo]
+model: Claude Sonnet 4.6 (copilot)
 ---
 
 You are an expert frontend developer for this project's PWA client applications (`packages/client/*`).
