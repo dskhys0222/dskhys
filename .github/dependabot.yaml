@@ -1,0 +1,89 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/server/api"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/client/budget"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/client/portfolio"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/client/web"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/client/mf-scraper"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "docker"
+    directory: "/deployment"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
