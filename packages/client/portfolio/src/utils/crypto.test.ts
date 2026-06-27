@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { decrypt, decryptPortfolioData } from './crypto';
+import {
+    decrypt,
+    decryptData,
+    decryptPortfolioData,
+    encryptData,
+} from './crypto';
 
 // テスト用の暗号化データを生成するヘルパー関数
 // Node.js crypto APIで暗号化したデータを使用
@@ -73,5 +78,67 @@ describe('crypto integration', () => {
         // 注: このテストは実際にNode.jsで生成したテストデータが必要
         // E2Eテストで検証済み
         expect(true).toBe(true);
+    });
+});
+
+describe('encryptData / decryptData', () => {
+    const testKey = 'my-secret-key';
+
+    it('暗号化→復号のラウンドトリップ', async () => {
+        const plaintext = 'Hello, Portfolio!';
+        const encrypted = await encryptData(plaintext, testKey);
+        const decrypted = await decryptData(
+            encrypted.iv,
+            encrypted.data,
+            encrypted.tag,
+            testKey
+        );
+        expect(decrypted).toBe(plaintext);
+    });
+
+    it('JSONオブジェクトのラウンドトリップ', async () => {
+        const obj = { stocks: [{ id: '1', name: 'AAPL' }], version: '1.0' };
+        const plaintext = JSON.stringify(obj);
+        const encrypted = await encryptData(plaintext, testKey);
+        const decrypted = await decryptData(
+            encrypted.iv,
+            encrypted.data,
+            encrypted.tag,
+            testKey
+        );
+        expect(JSON.parse(decrypted)).toEqual(obj);
+    });
+
+    it('異なるIVで毎回異なる暗号文が生成される', async () => {
+        const plaintext = 'same plaintext';
+        const enc1 = await encryptData(plaintext, testKey);
+        const enc2 = await encryptData(plaintext, testKey);
+        // IVはランダムなので毎回異なる
+        expect(enc1.iv).not.toBe(enc2.iv);
+        // 暗号文も異なる
+        expect(enc1.data).not.toBe(enc2.data);
+    });
+
+    it('不正なキーでの復号は失敗する', async () => {
+        const plaintext = 'secret data';
+        const encrypted = await encryptData(plaintext, testKey);
+        await expect(
+            decryptData(
+                encrypted.iv,
+                encrypted.data,
+                encrypted.tag,
+                'wrong-key'
+            )
+        ).rejects.toThrow();
+    });
+
+    it('改ざんされたtagでの復号は失敗する', async () => {
+        const plaintext = 'secret data';
+        const encrypted = await encryptData(plaintext, testKey);
+        // tagを破損させる
+        const tamperedTag = btoa('tampered-tag-1234');
+        await expect(
+            decryptData(encrypted.iv, encrypted.data, tamperedTag, testKey)
+        ).rejects.toThrow();
     });
 });

@@ -6,6 +6,7 @@ import {
     useSettingsStore,
     useStocksStore,
 } from '../stores';
+import { usePortfolioSyncStore } from '../stores/usePortfolioSyncStore';
 import { exportToJSON, importFromJSON } from '../utils/storage';
 import { settingsStyles } from './settings.styles';
 
@@ -40,6 +41,15 @@ function SettingsPage() {
     const loadTokens = useMFDataStore((state) => state.loadTokens);
     const login = useMFDataStore((state) => state.login);
     const logout = useMFDataStore((state) => state.logout);
+
+    const isSyncing = usePortfolioSyncStore((state) => state.isSyncing);
+    const lastSyncedAt = usePortfolioSyncStore((state) => state.lastSyncedAt);
+    const syncError = usePortfolioSyncStore((state) => state.syncError);
+    const hasConflict = usePortfolioSyncStore((state) => state.hasConflict);
+    const push = usePortfolioSyncStore((state) => state.push);
+    const resolveConflict = usePortfolioSyncStore(
+        (state) => state.resolveConflict
+    );
 
     const [mfApiUrl, setMfApiUrl] = useState('');
     const [mfEncryptionKey, setMfEncryptionKey] = useState('');
@@ -399,6 +409,78 @@ function SettingsPage() {
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* ポートフォリオ同期 */}
+            <div className={settingsStyles.section}>
+                <h3 className={settingsStyles.sectionTitle}>
+                    ポートフォリオ同期
+                </h3>
+                <p className={settingsStyles.sectionDescription}>
+                    サーバーとポートフォリオデータを同期します。
+                </p>
+
+                <div className={settingsStyles.info}>
+                    <p>
+                        <span className={settingsStyles.infoLabel}>
+                            最終同期:
+                        </span>{' '}
+                        {lastSyncedAt
+                            ? new Date(lastSyncedAt).toLocaleString()
+                            : 'なし'}
+                    </p>
+                    <p>
+                        <span className={settingsStyles.infoLabel}>状態:</span>{' '}
+                        {isSyncing
+                            ? '同期中...'
+                            : syncError
+                              ? 'エラー'
+                              : lastSyncedAt
+                                ? '同期済み'
+                                : '未同期'}
+                    </p>
+                </div>
+
+                <div className={settingsStyles.buttonGroup}>
+                    <button
+                        type="button"
+                        onClick={push}
+                        disabled={isSyncing || !accessToken || !encryptionKey}
+                        className={`${settingsStyles.button} ${settingsStyles.exportButton}`}
+                    >
+                        {isSyncing ? '同期中...' : '🔄 今すぐ同期'}
+                    </button>
+                </div>
+
+                {syncError && (
+                    <div className={settingsStyles.errorMessage}>
+                        {syncError}
+                    </div>
+                )}
+
+                {hasConflict && (
+                    <div className={settingsStyles.conflictBox}>
+                        <p className={settingsStyles.conflictMessage}>
+                            サーバーとローカルのデータが競合しています
+                        </p>
+                        <div className={settingsStyles.conflictButtonGroup}>
+                            <button
+                                type="button"
+                                onClick={() => resolveConflict('local')}
+                                className={settingsStyles.conflictLocalButton}
+                            >
+                                ローカルを使用
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => resolveConflict('server')}
+                                className={settingsStyles.conflictServerButton}
+                            >
+                                サーバーを使用
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* 危険な操作 */}

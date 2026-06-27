@@ -106,3 +106,116 @@ export const decryptPortfolioData = async <T>(
     );
     return JSON.parse(decrypted) as T;
 };
+
+/**
+ * ArrayBufferをBase64文字列に変換
+ */
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+};
+
+/**
+ * 文字列キーからAES-256-GCMキーを導出（PBKDF2）
+ * saltは固定値 "portfolio-sync-v1"（共通キー前提）
+ */
+const deriveKey = async (keyString: string): Promise<CryptoKey> => {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(keyString),
+        'PBKDF2',
+        false,
+        ['deriveKey']
+    );
+    const salt = encoder.encode('portfolio-sync-v1');
+    return crypto.subtle.deriveKey(
+        {
+            name: 'PBKDF2',
+            salt,
+            iterations: 100000,
+            hash: 'SHA-256',
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+};
+
+/**
+ * AES-256-GCMでデータを暗号化（PBKDF2キー導出）
+ *
+ * AES-GCMのencrypt()戻り値: 先頭(length-16)バイトが暗号文、末尾16バイトがauthTag。
+ *
+ * @param plaintext - 暗号化するプレーンテキスト
+ * @param keyString - キー文字列（PBKDF2で導出）
+ * @returns { iv, data, tag } すべてBase64エンコード済み
+ */
+export const encryptData = async (
+    plaintext: string,
+    keyString: string
+): Promise<{ iv: string; data: string; tag: string }> => {
+    const key = await deriveKey(keyString);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoder = new TextEncoder();
+
+    const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv, tagLength: 128 },
+        key,
+        encoder.encode(plaintext)
+    );
+
+    const encryptedBytes = new Uint8Array(encryptedBuffer);
+    const tagLength = 16;
+    const ciphertext = encryptedBytes.slice(
+        0,
+        encryptedBytes.length - tagLength
+    );
+    const tag = encryptedBytes.slice(encryptedBytes.length - tagLength);
+
+    return {
+        iv: arrayBufferToBase64(iv.buffer as ArrayBuffer),
+        data: arrayBufferToBase64(ciphertext.buffer as ArrayBuffer),
+        tag: arrayBufferToBase64(tag.buffer as ArrayBuffer),
+    };
+};
+
+/**
+ * AES-256-GCMでデータを復号（PBKDF2キー導出）
+ *
+ * @param iv - 初期化ベクトル（Base64）
+ * @param data - 暗号文（Base64）
+ * @param tag - 認証タグ（Base64）
+ * @param keyString - キー文字列（PBKDF2で導出）
+ * @returns 復号された文字列
+ */
+export const decryptData = async (
+    iv: string,
+    data: string,
+    tag: string,
+    keyString: string
+): Promise<string> => {
+    const key = await deriveKey(keyString);
+    const ivBytes = base64ToArrayBuffer(iv);
+    const ciphertext = base64ToArrayBuffer(data);
+    const tagBytes = base64ToArrayBuffer(tag);
+
+    const ciphertextWithTag = new Uint8Array(
+        ciphertext.length + tagBytes.length
+    );
+    ciphertextWithTag.set(ciphertext);
+    ciphertextWithTag.set(tagBytes, ciphertext.length);
+
+    const decryptedBuffer = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: ivBytes.buffer as ArrayBuffer, tagLength: 128 },
+        key,
+        ciphertextWithTag.buffer as ArrayBuffer
+    );
+
+    return new TextDecoder().decode(decryptedBuffer);
+};

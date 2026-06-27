@@ -130,3 +130,26 @@ export type EncryptedPortfolio = z.infer<typeof EncryptedPortfolioSchema>;
 export type CreateEncryptedPortfolio = z.infer<
     typeof CreateEncryptedPortfolioSchema
 >;
+
+// ポートフォリオスナップショット関連のスキーマ
+export const PortfolioSnapshotSchema = z.object({
+    auth_tag: z.string().min(1),
+    created_at: z.string().datetime().optional(),
+    encrypted_data: z.string().min(1),
+    id: z.number().int().positive().optional(),
+    iv: z.string().min(1),
+    updated_at: z.string().optional(),
+    user_id: z.number().int().positive(),
+});
+
+export const UpsertPortfolioSnapshotSchema = z.object({
+    clientUpdatedAt: z.string().optional(),
+    data: z.string().min(1),
+    iv: z.string().min(1),
+    tag: z.string().min(1),
+});
+
+export type PortfolioSnapshot = z.infer<typeof PortfolioSnapshotSchema>;
+export type UpsertPortfolioSnapshot = z.infer<
+    typeof UpsertPortfolioSnapshotSchema
+>;

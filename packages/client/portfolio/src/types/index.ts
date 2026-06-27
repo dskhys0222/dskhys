@@ -113,3 +113,13 @@ export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
+
+/** バックエンド同期用スナップショット */
+export interface PortfolioSnapshot {
+    version: '1.0';
+    stocks: Stock[];
+    customAggregations: CustomAggregation[];
+    settings: AppSettings;
+    mfMappings: StockMapping[];
+    exportedAt: string;
+}

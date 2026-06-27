@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { routeTree } from './routeTree.gen';
 import {
     useCustomAggregationsStore,
+    useMFDataStore,
     useSettingsStore,
     useStocksStore,
 } from './stores';
@@ -12,6 +13,9 @@ import {
 useStocksStore.getState().loadStocks();
 useSettingsStore.getState().loadSettings();
 useCustomAggregationsStore.getState().loadCustomAggregations();
+useMFDataStore.getState().loadTokens();
+useMFDataStore.getState().loadEncryptionKey();
+useMFDataStore.getState().loadSyncConfig();
 
 // Create a new router instance
 const router = createRouter({
