@@ -61,15 +61,6 @@ export default defineConfig({
         }),
         basicSsl(),
     ],
-    test: {
-        environment: 'jsdom',
-        include: [
-            'src/**/test.tsx',
-            'src/**/test.ts',
-            'src/**/*.test.tsx',
-            'src/**/*.test.ts',
-        ],
-    },
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),

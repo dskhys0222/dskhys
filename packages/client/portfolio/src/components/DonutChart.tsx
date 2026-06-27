@@ -83,9 +83,9 @@ export function DonutChart({
                             ))}
                         </Pie>
                         <Tooltip
-                            formatter={(value: number, name: string) => [
-                                `${formatCurrency(value)} (${(data.find((d) => d.name === name)?.percentage ?? 0).toFixed(1)}%)`,
-                                name,
+                            formatter={(value, name) => [
+                                `${formatCurrency(Number(value))} (${(data.find((d) => d.name === name)?.percentage ?? 0).toFixed(1)}%)`,
+                                String(name ?? ''),
                             ]}
                         />
                         <text
