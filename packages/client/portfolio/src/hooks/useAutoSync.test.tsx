@@ -1,6 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useCustomAggregationsStore, useMFDataStore, useStocksStore } from '@/stores/index';
+import {
+    useCustomAggregationsStore,
+    useMFDataStore,
+    useStocksStore,
+} from '@/stores/index';
 import { usePortfolioSyncStore } from '@/stores/usePortfolioSyncStore';
 import { useAutoSync } from './useAutoSync';
 

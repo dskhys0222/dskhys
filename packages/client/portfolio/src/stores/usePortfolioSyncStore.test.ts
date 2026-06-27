@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useCustomAggregationsStore, useMFDataStore, useSettingsStore, useStocksStore } from './index';
+import {
+    useCustomAggregationsStore,
+    useMFDataStore,
+    useSettingsStore,
+    useStocksStore,
+} from './index';
 import { usePortfolioSyncStore } from './usePortfolioSyncStore';
 
 const localStorageMock = (() => {
