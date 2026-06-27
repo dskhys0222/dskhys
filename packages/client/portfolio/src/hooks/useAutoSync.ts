@@ -27,9 +27,15 @@ export function useAutoSync(): void {
     const hasKey = encryptionKey !== '';
 
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const hasMountedRef = useRef(false);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: stocks と customAggregations は変更検知のためのトリガー
     useEffect(() => {
+        if (!hasMountedRef.current) {
+            hasMountedRef.current = true;
+            return;
+        }
+
         if (!isAuthenticated || !hasKey || isSyncing) return;
 
         if (timerRef.current !== null) {
