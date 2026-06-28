@@ -61,8 +61,16 @@ export function BudgetItem({ name }: BudgetItemProps) {
             return nextAmount;
         });
         closeDialog();
-    }, [canConfirm, closeDialog, deltaAmount, dialogMode, historyStorageKey, markChanged]);
+    }, [
+        canConfirm,
+        closeDialog,
+        deltaAmount,
+        dialogMode,
+        historyStorageKey,
+        markChanged,
+    ]);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: lastPullAt is an intentional re-read trigger after server pull
     useEffect(() => {
         setHasHydratedFromStorage(false);
         const storedAmount = readAmountFromLocalStorage(storageKey);

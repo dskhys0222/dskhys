@@ -22,6 +22,7 @@ function HistoryPage() {
 
     const lastPullAt = useBudgetSyncStore((s) => s.lastPullAt);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: lastPullAt is an intentional re-read trigger after server pull
     const entries = useMemo(
         () => readHistoryFromLocalStorage(createHistoryStorageKey(name)),
         [name, lastPullAt]
