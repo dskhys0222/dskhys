@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
 
+import { useBudgetSyncStore } from '@/store/budgetSyncStore';
 import { styles } from './styles';
 
 export const Route = createFileRoute('/history/$name')({
@@ -19,9 +20,11 @@ function HistoryPage() {
     const navigate = useNavigate();
     const { name } = Route.useParams();
 
+    const lastPullAt = useBudgetSyncStore((s) => s.lastPullAt);
+
     const entries = useMemo(
         () => readHistoryFromLocalStorage(createHistoryStorageKey(name)),
-        [name]
+        [name, lastPullAt]
     );
 
     useEffect(() => {

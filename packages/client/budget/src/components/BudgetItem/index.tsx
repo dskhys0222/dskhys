@@ -2,6 +2,8 @@ import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useAutoSyncTriggerStore } from '@/store/autoSyncTriggerStore';
+import { useBudgetSyncStore } from '@/store/budgetSyncStore';
 import { styles } from './styles';
 
 export interface BudgetItemProps {
@@ -20,6 +22,9 @@ export function BudgetItem({ name }: BudgetItemProps) {
 
     const storageKey = name;
     const historyStorageKey = `budget:history:${name}`;
+
+    const lastPullAt = useBudgetSyncStore((s) => s.lastPullAt);
+    const markChanged = useAutoSyncTriggerStore((s) => s.markChanged);
 
     const deltaAmount = useMemo(() => {
         if (!/^\d+$/.test(deltaAmountInput)) return null;
@@ -51,22 +56,25 @@ export function BudgetItem({ name }: BudgetItemProps) {
                 after: nextAmount,
             });
 
+            markChanged();
+
             return nextAmount;
         });
         closeDialog();
-    }, [canConfirm, closeDialog, deltaAmount, dialogMode, historyStorageKey]);
+    }, [canConfirm, closeDialog, deltaAmount, dialogMode, historyStorageKey, markChanged]);
 
     useEffect(() => {
         setHasHydratedFromStorage(false);
         const storedAmount = readAmountFromLocalStorage(storageKey);
         setAmount(storedAmount ?? 0);
         setHasHydratedFromStorage(true);
-    }, [storageKey]);
+    }, [storageKey, lastPullAt]);
 
     useEffect(() => {
         if (!hasHydratedFromStorage) return;
         writeAmountToLocalStorage(storageKey, amount);
-    }, [amount, hasHydratedFromStorage, storageKey]);
+        markChanged();
+    }, [amount, hasHydratedFromStorage, markChanged, storageKey]);
 
     useEffect(() => {
         if (!dialogMode) return;

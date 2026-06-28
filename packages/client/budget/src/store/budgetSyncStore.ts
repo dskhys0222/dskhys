@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { BudgetSnapshot } from '@/types/sync';
+import type { BudgetSnapshot, HistoryEntry } from '@/types/sync';
 import { apiFetch } from '@/utils/api';
 import { decryptBudgetData, encryptData } from '@/utils/crypto';
 import { useAuthStore } from './authStore';
@@ -16,6 +16,7 @@ interface BudgetSyncState {
     encryptionKey: string;
     isSyncing: boolean;
     lastSyncedAt: string | null;
+    lastPullAt: string | null;
     syncError: string | null;
     push: () => Promise<void>;
     pull: () => Promise<void>;
@@ -29,6 +30,7 @@ export const useBudgetSyncStore = create<BudgetSyncState>()(
             encryptionKey: '',
             isSyncing: false,
             lastSyncedAt: null,
+            lastPullAt: null,
             syncError: null,
 
             push: async () => {
@@ -56,6 +58,38 @@ export const useBudgetSyncStore = create<BudgetSyncState>()(
                 set({ isSyncing: true, syncError: null });
 
                 try {
+                    const budgetItemNames = useBudgetStore
+                        .getState()
+                        .items.map((item) => item.name);
+
+                    const budgetAmounts: Record<string, number> = {};
+                    for (const name of budgetItemNames) {
+                        const raw = localStorage.getItem(name);
+                        const parsed = raw !== null ? Number(raw) : 0;
+                        budgetAmounts[name] = Number.isSafeInteger(parsed)
+                            ? parsed
+                            : 0;
+                    }
+
+                    const budgetHistories: Record<string, HistoryEntry[]> = {};
+                    for (const name of budgetItemNames) {
+                        const raw = localStorage.getItem(
+                            `budget:history:${name}`
+                        );
+                        if (raw !== null) {
+                            try {
+                                const parsed = JSON.parse(raw) as unknown;
+                                budgetHistories[name] = Array.isArray(parsed)
+                                    ? parsed.filter(isHistoryEntry)
+                                    : [];
+                            } catch {
+                                budgetHistories[name] = [];
+                            }
+                        } else {
+                            budgetHistories[name] = [];
+                        }
+                    }
+
                     const snapshot: BudgetSnapshot = {
                         version: 1,
                         budgetItems: useBudgetStore.getState().items,
@@ -65,6 +99,8 @@ export const useBudgetSyncStore = create<BudgetSyncState>()(
                             useActiveSubscriptionStore.getState().items,
                         subscriptionCandidates:
                             useSubscriptionCandidateStore.getState().items,
+                        budgetAmounts,
+                        budgetHistories,
                         exportedAt: new Date().toISOString(),
                     };
 
@@ -163,7 +199,28 @@ export const useBudgetSyncStore = create<BudgetSyncState>()(
                         items: snapshot.subscriptionCandidates,
                     });
 
-                    set({ lastSyncedAt: new Date().toISOString() });
+                    if (snapshot.budgetAmounts) {
+                        for (const [name, amount] of Object.entries(
+                            snapshot.budgetAmounts
+                        )) {
+                            localStorage.setItem(name, String(amount));
+                        }
+                    }
+                    if (snapshot.budgetHistories) {
+                        for (const [name, history] of Object.entries(
+                            snapshot.budgetHistories
+                        )) {
+                            localStorage.setItem(
+                                `budget:history:${name}`,
+                                JSON.stringify(history)
+                            );
+                        }
+                    }
+
+                    set({
+                        lastSyncedAt: new Date().toISOString(),
+                        lastPullAt: new Date().toISOString(),
+                    });
                 } catch (e) {
                     const msg =
                         e instanceof Error ? e.message : 'プルに失敗しました';
@@ -190,3 +247,18 @@ export const useBudgetSyncStore = create<BudgetSyncState>()(
         }
     )
 );
+
+function isHistoryEntry(value: unknown): value is HistoryEntry {
+    if (!value || typeof value !== 'object') return false;
+    const record = value as Record<string, unknown>;
+    return (
+        typeof record.id === 'string' &&
+        typeof record.at === 'string' &&
+        (record.kind === 'increase' || record.kind === 'decrease') &&
+        typeof record.delta === 'number' &&
+        Number.isSafeInteger(record.delta) &&
+        record.delta > 0 &&
+        typeof record.after === 'number' &&
+        Number.isSafeInteger(record.after)
+    );
+}
