@@ -23,7 +23,7 @@
     },
     "devDependencies": {
         "@babel/core": "^8.0.1",
-        "@pandacss/dev": "^1.11.3",
+        "@pandacss/dev": "^1.11.4",
         "@rolldown/plugin-babel": "^0.2.3",
         "@tanstack/devtools-vite": "^0.8.1",
         "@testing-library/dom": "^10.4.0",
