@@ -327,7 +327,7 @@ jobs:
 
       - name: Download dist artifact
         if: needs.lint.outputs.budget_changed == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: budget-dist
           path: budget-dist
@@ -396,7 +396,7 @@ jobs:
 
       - name: Download dist artifact
         if: needs.lint.outputs.portfolio_changed == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: portfolio-dist
           path: portfolio-dist
