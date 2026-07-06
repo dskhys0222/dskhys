@@ -110,35 +110,29 @@ export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
     const stocks: Omit<MFStock, 'id'>[] = [];
 
     // 現金
-    const cashRows = await page.locator('table tbody tr').all();
+    const cashRows = await page
+        .locator('#portfolio_det_depo table tbody tr')
+        .all();
     let cashRow1Text = '';
     let cashRow2Text = '';
-    let cashRow3Text = '';
     for (const row of cashRows) {
         const text = await row.textContent();
-        if (text?.includes('SBIハイブリッド預金')) {
+        if (text?.includes('現金残高')) {
+            // SBI証券
             const cells = await row.locator('td').all();
             if (cells[1]) {
                 cashRow1Text = (await cells[1].textContent()) || '0';
             }
         }
-        if (text?.includes('現金残高')) {
+        if (text?.includes('JPY残高')) {
+            // GMOコイン
             const cells = await row.locator('td').all();
             if (cells[1]) {
                 cashRow2Text = (await cells[1].textContent()) || '0';
             }
         }
-        if (text?.includes('預り金')) {
-            const cells = await row.locator('td').all();
-            if (cells[1]) {
-                cashRow3Text = (await cells[1].textContent()) || '0';
-            }
-        }
     }
-    const cashAmount =
-        parseNumber(cashRow1Text) +
-        parseNumber(cashRow2Text) +
-        parseNumber(cashRow3Text);
+    const cashAmount = parseNumber(cashRow1Text) + parseNumber(cashRow2Text);
     stocks.push({
         name: '現金',
         units: cashAmount,
@@ -146,32 +140,29 @@ export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
         currentPrice: 1,
         value: cashAmount,
         profitLoss: 0,
-        account: 'SBIハイブリッド預金',
+        account: 'SBI証券',
     });
 
     // 暗号資産
-    let cryptoAmount = 0;
-    for (const row of cashRows) {
-        const text = await row.textContent();
-        if (text?.includes('GMOコイン')) {
-            const cells = await row.locator('td').all();
-            if (cells[1]) {
-                cryptoAmount += parseNumber(
-                    (await cells[1].textContent()) || '0'
-                );
-            }
+    const cryptoRows = await page
+        .locator('#portfolio_det_crpt table tbody tr')
+        .all();
+    for (const row of cryptoRows) {
+        const cells = await row.locator('td').all();
+        const cryptoAmount = parseNumber(
+            (await cells[1]?.textContent()) || '0'
+        );
+        if (cryptoAmount > 0) {
+            stocks.push({
+                name: (await cells[0]?.textContent())?.trim() || '',
+                units: cryptoAmount,
+                averageCost: 1,
+                currentPrice: 1,
+                value: cryptoAmount,
+                profitLoss: 0,
+                account: (await cells[2]?.textContent())?.trim() || '',
+            });
         }
-    }
-    if (cryptoAmount > 0) {
-        stocks.push({
-            name: 'ビットコイン',
-            units: cryptoAmount,
-            averageCost: 1,
-            currentPrice: 1,
-            value: cryptoAmount,
-            profitLoss: 0,
-            account: 'GMOコイン',
-        });
     }
 
     // 株式
