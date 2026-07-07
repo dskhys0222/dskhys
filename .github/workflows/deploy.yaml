@@ -23,7 +23,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
 
@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
@@ -155,7 +155,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -173,7 +173,7 @@ jobs:
         run: pnpm --filter @dskhys/budget run build
 
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: budget-dist
           path: packages/client/budget/dist
@@ -187,7 +187,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -205,7 +205,7 @@ jobs:
         run: pnpm --filter @dskhys/portfolio run build
 
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: portfolio-dist
           path: packages/client/portfolio/dist
@@ -221,7 +221,7 @@ jobs:
     
     steps:
       - name: Checkout files
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Deploy to server
         if: needs.lint.outputs.api_changed == 'true'
@@ -319,7 +319,7 @@ jobs:
     steps:
       - name: Checkout files
         if: needs.lint.outputs.budget_changed == 'true'
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           sparse-checkout: |
             deployment/compose.yaml
@@ -327,7 +327,7 @@ jobs:
 
       - name: Download dist artifact
         if: needs.lint.outputs.budget_changed == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: budget-dist
           path: budget-dist
@@ -388,7 +388,7 @@ jobs:
     steps:
       - name: Checkout files
         if: needs.lint.outputs.portfolio_changed == 'true'
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           sparse-checkout: |
             deployment/compose.yaml
@@ -396,7 +396,7 @@ jobs:
 
       - name: Download dist artifact
         if: needs.lint.outputs.portfolio_changed == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: portfolio-dist
           path: portfolio-dist
@@ -462,7 +462,7 @@ jobs:
 
     steps:
       - name: Checkout files
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           sparse-checkout: |
             deployment/compose.yaml
