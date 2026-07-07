@@ -9,8 +9,13 @@ interface DonutChartProps {
     showLegendTable?: boolean;
     showTotal?: boolean;
     showDifference?: boolean; // 差額を表示するか
-    displayMode?: 'percentage' | 'difference'; // スマホでの表示モード
-    isMobileMode?: boolean; // スマホ表示か（true=スマホ、false=PC）
+    displayMode?:
+        | 'percentage'
+        | 'difference'
+        | 'profitLossAmount'
+        | 'profitLossRate'; // スマホでの表示モード
+    isMobileMode?: boolean; // タブレット以下の表示か
+    isSmallScreen?: boolean; // スマホのみ true
 }
 
 const DEFAULT_COLORS = [
@@ -42,11 +47,25 @@ export function DonutChart({
     showDifference = false,
     displayMode = 'percentage',
     isMobileMode = false,
+    isSmallScreen = false,
 }: DonutChartProps) {
     const getColor = (name: string, index: number): string => {
         if (colors?.[name]) return colors[name];
         return DEFAULT_COLORS[index % DEFAULT_COLORS.length];
     };
+
+    const isProfitLossMode =
+        displayMode === 'profitLossAmount' || displayMode === 'profitLossRate';
+
+    // PC/タブレット (isSmallScreen=false): 両方同時表示
+    // スマホ (isSmallScreen=true): 1列ずつ（amount/rate モードに対応）
+    const showProfitLossAmount =
+        isProfitLossMode &&
+        (displayMode === 'profitLossAmount' || !isSmallScreen);
+
+    const showProfitLossRate =
+        isProfitLossMode &&
+        (displayMode === 'profitLossRate' || !isSmallScreen);
 
     if (data.length === 0) {
         return (
@@ -136,6 +155,7 @@ export function DonutChart({
                                     </td>
                                     {showDiff &&
                                         !isMobileMode &&
+                                        !isProfitLossMode &&
                                         item.difference !== undefined && (
                                             <td
                                                 className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
@@ -148,13 +168,15 @@ export function DonutChart({
                                                 ).toLocaleString('ja-JP')}
                                             </td>
                                         )}
-                                    {!isMobileDisplayDifference && (
-                                        <td
-                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
-                                        >
-                                            {item.percentage.toFixed(1)}%
-                                        </td>
-                                    )}
+                                    {!isProfitLossMode &&
+                                        (!isMobileMode ||
+                                            displayMode === 'percentage') && (
+                                            <td
+                                                className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                            >
+                                                {item.percentage.toFixed(1)}%
+                                            </td>
+                                        )}
                                     {isMobileDisplayDifference &&
                                         item.difference !== undefined && (
                                             <td
@@ -168,6 +190,43 @@ export function DonutChart({
                                                 ).toLocaleString('ja-JP')}
                                             </td>
                                         )}
+                                    {showProfitLossAmount && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                            style={{
+                                                color:
+                                                    item.profitLoss ===
+                                                    undefined
+                                                        ? undefined
+                                                        : item.profitLoss >= 0
+                                                          ? '#16a34a'
+                                                          : '#dc2626',
+                                            }}
+                                        >
+                                            {item.profitLoss === undefined
+                                                ? '-'
+                                                : `${item.profitLoss >= 0 ? '+' : ''}${Math.round(item.profitLoss).toLocaleString('ja-JP')}`}
+                                        </td>
+                                    )}
+                                    {showProfitLossRate && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                            style={{
+                                                color:
+                                                    item.profitLossRate ===
+                                                    undefined
+                                                        ? undefined
+                                                        : item.profitLossRate >=
+                                                            0
+                                                          ? '#16a34a'
+                                                          : '#dc2626',
+                                            }}
+                                        >
+                                            {item.profitLossRate === undefined
+                                                ? '-'
+                                                : `${item.profitLossRate >= 0 ? '+' : ''}${item.profitLossRate.toFixed(2)}%`}
+                                        </td>
+                                    )}
                                 </tr>
                             );
                         })}
@@ -192,20 +251,36 @@ export function DonutChart({
                                         )
                                     )}
                                 </td>
-                                {showDifference && !isMobileMode && (
+                                {showDifference &&
+                                    !isMobileMode &&
+                                    !isProfitLossMode && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                        >
+                                            -
+                                        </td>
+                                    )}
+                                {!isProfitLossMode &&
+                                    (!isMobileMode ||
+                                        displayMode === 'percentage') && (
+                                        <td
+                                            className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
+                                        >
+                                            100.0%
+                                        </td>
+                                    )}
+                                {showProfitLossAmount && (
                                     <td
                                         className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                     >
                                         -
                                     </td>
                                 )}
-                                {!(
-                                    isMobileMode && displayMode === 'difference'
-                                ) && (
+                                {showProfitLossRate && (
                                     <td
                                         className={`${donutChartStyles.legendTd} ${donutChartStyles.legendTdRight}`}
                                     >
-                                        100.0%
+                                        -
                                     </td>
                                 )}
                             </tr>

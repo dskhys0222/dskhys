@@ -25,6 +25,8 @@ export interface AggregatedData {
     percentage: number;
     targetRatio?: number; // 理想比率（比で入力される値）
     difference?: number; // 差額：現在の金額 - 理想金額（円）
+    profitLoss?: number; // 損益額（取得原価がある銘柄のみ計算）
+    profitLossRate?: number; // 損益率（%）
 }
 
 // 配当金情報

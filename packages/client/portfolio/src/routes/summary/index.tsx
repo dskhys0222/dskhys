@@ -2,8 +2,9 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { DonutChart } from '../../components/DonutChart';
 import { useCustomAggregationsStore, useStocksStore } from '../../stores';
-import type { AggregatedData, CustomAggregation, Stock } from '../../types';
+import type { CustomAggregation } from '../../types';
 import {
+    aggregateCustom,
     calculateTotalProfitLoss,
     calculateTotalValue,
 } from '../../utils/aggregation';
@@ -20,63 +21,6 @@ function formatCurrency(value: number): string {
         currency: 'JPY',
         maximumFractionDigits: 0,
     }).format(value);
-}
-
-// カスタム集計のデータを計算
-function aggregateCustom(
-    stocks: Stock[],
-    aggregation: CustomAggregation
-): AggregatedData[] {
-    const totals: Record<string, number> = {};
-    const targetRatios: Record<string, number | undefined> = {};
-
-    // 各属性の初期化
-    for (const attr of aggregation.attributes) {
-        totals[attr.name] = 0;
-        targetRatios[attr.name] = attr.targetRatio;
-    }
-
-    // 銘柄の評価額を属性ごとに集計
-    for (const assignment of aggregation.stockAssignments) {
-        const stock = stocks.find((s) => s.id === assignment.stockId);
-        if (stock) {
-            totals[assignment.attributeName] =
-                (totals[assignment.attributeName] || 0) + stock.value;
-        }
-    }
-
-    // 合計を計算
-    const total = Object.values(totals).reduce((sum, val) => sum + val, 0);
-
-    // AggregatedData形式に変換（差額を計算）
-    return aggregation.attributes
-        .map((attr) => {
-            const value = totals[attr.name] || 0;
-            const percentage = total > 0 ? (value / total) * 100 : 0;
-            const targetRatio = attr.targetRatio;
-            // 理想比率から理想金額を計算し、差額を求める
-            let difference: number | undefined;
-            if (targetRatio !== undefined && targetRatio > 0) {
-                // 全属性の比の合計を計算
-                const totalRatio = aggregation.attributes.reduce(
-                    (sum, a) => sum + (a.targetRatio || 0),
-                    0
-                );
-                if (totalRatio > 0) {
-                    const targetValue = (total * targetRatio) / totalRatio;
-                    difference = value - targetValue;
-                }
-            }
-
-            return {
-                name: attr.name,
-                value,
-                percentage,
-                targetRatio,
-                difference,
-            };
-        })
-        .filter((item) => item.value > 0);
 }
 
 // カスタム集計の色マップを取得
@@ -101,24 +45,35 @@ function SummaryLayout() {
 
     // スマホでの表示モード（差額 or 比率）
     const [displayModes, setDisplayModes] = useState<
-        Record<string, 'percentage' | 'difference'>
+        Record<
+            string,
+            'percentage' | 'difference' | 'profitLossAmount' | 'profitLossRate'
+        >
     >({});
 
-    // スマホかどうかの判定
+    // タブレット以下かどうかの判定（コンパクトモード）
     const [isMobileMode, setIsMobileMode] = useState(false);
+    // スマホのみかどうかの判定
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     useEffect(() => {
-        // 初期判定
-        const mediaQuery = window.matchMedia('(max-width: 768px)');
-        setIsMobileMode(mediaQuery.matches);
+        const tabletQuery = window.matchMedia('(max-width: 1024px)');
+        const phoneQuery = window.matchMedia('(max-width: 640px)');
 
-        // メディアクエリの変更を監視
-        const handleChange = (e: MediaQueryListEvent) => {
+        setIsMobileMode(tabletQuery.matches);
+        setIsSmallScreen(phoneQuery.matches);
+
+        const handleTablet = (e: MediaQueryListEvent) =>
             setIsMobileMode(e.matches);
-        };
+        const handlePhone = (e: MediaQueryListEvent) =>
+            setIsSmallScreen(e.matches);
 
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
+        tabletQuery.addEventListener('change', handleTablet);
+        phoneQuery.addEventListener('change', handlePhone);
+        return () => {
+            tabletQuery.removeEventListener('change', handleTablet);
+            phoneQuery.removeEventListener('change', handlePhone);
+        };
     }, []);
 
     const totalValue = calculateTotalValue(stocks);
@@ -131,11 +86,43 @@ function SummaryLayout() {
         }
     };
 
-    const toggleDisplayMode = (id: string) => {
-        setDisplayModes((prev) => ({
-            ...prev,
-            [id]: prev[id] === 'percentage' ? 'difference' : 'percentage',
-        }));
+    const toggleDisplayMode = (
+        id: string,
+        hasTargetRatios: boolean,
+        hasProfitLoss: boolean
+    ) => {
+        setDisplayModes((prev) => {
+            const current = prev[id] ?? 'percentage';
+            type Mode =
+                | 'percentage'
+                | 'difference'
+                | 'profitLossAmount'
+                | 'profitLossRate';
+
+            const profitLossModes: Mode[] = isSmallScreen
+                ? ['profitLossAmount', 'profitLossRate']
+                : ['profitLossAmount'];
+
+            const allModes: Mode[] = isMobileMode
+                ? [
+                      'percentage',
+                      ...(hasTargetRatios ? (['difference'] as Mode[]) : []),
+                      ...(hasProfitLoss ? profitLossModes : []),
+                  ]
+                : [
+                      // PC: 差額+割合 ⇔ 損益額+損益率 の2択
+                      'percentage',
+                      ...(hasProfitLoss
+                          ? (['profitLossAmount'] as Mode[])
+                          : []),
+                  ];
+
+            const currentIndex = allModes.indexOf(current as Mode);
+            const nextIndex = (currentIndex + 1) % allModes.length;
+            const next: Mode = allModes[nextIndex] ?? 'percentage';
+
+            return { ...prev, [id]: next };
+        });
     };
 
     if (stocks.length === 0) {
@@ -201,6 +188,9 @@ function SummaryLayout() {
                             );
                             const currentMode =
                                 displayModes[aggregation.id] ?? 'percentage';
+                            const hasProfitLoss = data.some(
+                                (item) => item.profitLoss !== undefined
+                            );
 
                             return (
                                 <div
@@ -235,12 +225,16 @@ function SummaryLayout() {
                                         >
                                             削除
                                         </button>
-                                        {hasTargetRatios && isMobileMode && (
+                                        {(hasProfitLoss ||
+                                            (hasTargetRatios &&
+                                                isMobileMode)) && (
                                             <button
                                                 type="button"
                                                 onClick={() =>
                                                     toggleDisplayMode(
-                                                        aggregation.id
+                                                        aggregation.id,
+                                                        hasTargetRatios,
+                                                        hasProfitLoss
                                                     )
                                                 }
                                                 className={
@@ -260,6 +254,7 @@ function SummaryLayout() {
                                         showDifference={hasTargetRatios}
                                         displayMode={currentMode}
                                         isMobileMode={isMobileMode}
+                                        isSmallScreen={isSmallScreen}
                                     />
                                 </div>
                             );
