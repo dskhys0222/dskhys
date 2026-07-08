@@ -42,7 +42,7 @@ describe('schemas', () => {
             const result = stockSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.errors[0].path).toContain('name');
+                expect(result.error.issues[0].path).toContain('name');
             }
         });
 
@@ -56,7 +56,7 @@ describe('schemas', () => {
             const result = stockSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.errors[0].message).toBe(
+                expect(result.error.issues[0].message).toBe(
                     'ティッカーは必須です'
                 );
             }
@@ -72,7 +72,7 @@ describe('schemas', () => {
             const result = stockSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.errors[0].message).toBe(
+                expect(result.error.issues[0].message).toBe(
                     'ティッカーは20文字以内で入力してください'
                 );
             }
@@ -88,7 +88,7 @@ describe('schemas', () => {
             const result = stockSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.errors[0].message).toBe(
+                expect(result.error.issues[0].message).toBe(
                     '評価額は0以上で入力してください'
                 );
             }
@@ -105,7 +105,7 @@ describe('schemas', () => {
             const result = stockSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.errors[0].message).toBe(
+                expect(result.error.issues[0].message).toBe(
                     '備考は500文字以内で入力してください'
                 );
             }

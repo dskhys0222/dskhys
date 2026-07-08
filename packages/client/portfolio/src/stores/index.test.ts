@@ -26,7 +26,7 @@ Object.defineProperty(window, 'localStorage', {
 
 // crypto.randomUUIDのモック
 const mockUUID = 'test-uuid-123';
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(globalThis, 'crypto', {
     value: {
         randomUUID: () => mockUUID,
     },

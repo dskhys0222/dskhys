@@ -17,7 +17,7 @@ export const stockSchema = z.object({
         .min(1, 'ティッカーは必須です')
         .max(20, 'ティッカーは20文字以内で入力してください'),
     value: z
-        .number({ invalid_type_error: '評価額は数値で入力してください' })
+        .number({ message: '評価額は数値で入力してください' })
         .nonnegative('評価額は0以上で入力してください'),
     currentPrice: optionalNumber,
     units: optionalNumber,
