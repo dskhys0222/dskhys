@@ -10,6 +10,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -25,6 +27,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -40,6 +44,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -55,6 +61,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -70,6 +78,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -85,6 +95,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       all-dependencies:
         patterns:
@@ -100,6 +112,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       docker:
         patterns:
@@ -115,6 +129,8 @@ updates:
     labels:
       - "dependencies"
       - "automated"
+    assignees:
+      - "dskhys0222"
     groups:
       github-actions:
         patterns:
