@@ -1,110 +1,18 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"
+    directories:
+      - "/"
+      - "/packages/server/api"
+      - "/packages/client/budget"
+      - "/packages/client/mf-scraper"
+      - "/packages/client/portfolio"
+      - "/packages/client/web"
     schedule:
       interval: "daily"
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "automated"
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/server/api"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/client/budget"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/client/portfolio"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/client/web"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/client/mf-scraper"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
     assignees:
       - "dskhys0222"
     cooldown:
@@ -121,9 +29,6 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
     assignees:
       - "dskhys0222"
     cooldown:
@@ -140,9 +45,6 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "automated"
     assignees:
       - "dskhys0222"
     cooldown:
