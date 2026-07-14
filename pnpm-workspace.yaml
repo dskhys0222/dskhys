@@ -10,4 +10,4 @@ allowBuilds:
   esbuild: true
   sqlite3: true
 
-minimumReleaseAge: 2880
+minimumReleaseAge: 10080

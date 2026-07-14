@@ -12,6 +12,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -29,6 +31,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -46,6 +50,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -63,6 +69,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -80,6 +88,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -97,6 +107,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       all-dependencies:
         patterns:
@@ -114,6 +126,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       docker:
         patterns:
@@ -131,6 +145,8 @@ updates:
       - "automated"
     assignees:
       - "dskhys0222"
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:
