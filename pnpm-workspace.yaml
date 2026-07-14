@@ -11,3 +11,9 @@ allowBuilds:
   sqlite3: true
 
 minimumReleaseAge: 10080
+
+minimumReleaseAgeExclude:
+  - esbuild@0.28.1
+  - form-data@4.0.6
+  - hono@4.12.25
+  - undici@6.27.0 || 7.28.0
