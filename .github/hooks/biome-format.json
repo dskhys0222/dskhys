@@ -1,13 +1,3 @@
 {
-    "hooks": {
-//         "PostToolUse": [
-//             {
-//                 "type": "command",
-//                 "powershell": "pnpm format 2>&1 | Out-Null; exit 0",
-//                 "bash": "pnpm format > /dev/null 2>&1 || true",
-//                 "cwd": "${workspaceRoot}",
-//                 "timeout": 30
-//             }
-//         ]
-    }
+    "hooks": {}
 }
