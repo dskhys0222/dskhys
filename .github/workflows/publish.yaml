@@ -1,13 +1,13 @@
-name: Release
+name: Publish
 
 on:
-  push:
-    branches:
-      - 'main'
-    paths:
-      - 'packages/client/mf-scraper/package.json'
-      - 'packages/client/mf-scraper/src/**'
-      - '.github/workflows/publish.yaml'
+  # push:
+  #   branches:
+  #     - 'main'
+  #   paths:
+  #     - 'packages/client/mf-scraper/package.json'
+  #     - 'packages/client/mf-scraper/src/**'
+  #     - '.github/workflows/publish.yaml'
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   release:
-    name: Release
+    name: Publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -54,7 +54,7 @@ jobs:
       - name: Build
         run: pnpm mf-scraper build
 
-      - name: Release
+      - name: Publish
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
