@@ -20,6 +20,9 @@ jobs:
       api_changed: ${{ steps.changes.outputs.api }}
       budget_changed: ${{ steps.changes.outputs.budget }}
       portfolio_changed: ${{ steps.changes.outputs.portfolio }}
+      api_test_changed: ${{ steps.changes.outputs.api_test }}
+      budget_test_changed: ${{ steps.changes.outputs.budget_test }}
+      portfolio_test_changed: ${{ steps.changes.outputs.portfolio_test }}
     
     steps:
       - name: Checkout code
@@ -68,6 +71,21 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - 'package.json'
+            api_test:
+              - 'packages/server/api/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
+            budget_test:
+              - 'packages/client/budget/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
+            portfolio_test:
+              - 'packages/client/portfolio/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
 
   test:
     name: Test
@@ -94,19 +112,19 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ "${{ needs.lint.outputs.api_changed }}" = "true" ]; then
+          if [ "${{ needs.lint.outputs.api_test_changed }}" = "true" ]; then
             pnpm --filter @dskhys/api run test
           else
             echo "Skip api tests (no changes)"
           fi
 
-          if [ "${{ needs.lint.outputs.budget_changed }}" = "true" ]; then
+          if [ "${{ needs.lint.outputs.budget_test_changed }}" = "true" ]; then
             pnpm --filter @dskhys/budget run test
           else
             echo "Skip budget tests (no changes)"
           fi
 
-          if [ "${{ needs.lint.outputs.portfolio_changed }}" = "true" ]; then
+          if [ "${{ needs.lint.outputs.portfolio_test_changed }}" = "true" ]; then
             pnpm --filter @dskhys/portfolio run test
           else
             echo "Skip portfolio tests (no changes)"
