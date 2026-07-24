@@ -80,4 +80,16 @@ export const styles = {
             bg: 'red.600',
         },
     }),
+    totalSummary: css({
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        px: '4',
+        py: '3',
+        bg: 'white',
+        borderRadius: 'md',
+        boxShadow: 'sm',
+        fontWeight: 'bold',
+        fontSize: 'lg',
+    }),
 } as const;

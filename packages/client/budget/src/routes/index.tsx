@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { BudgetItem } from '@/components/BudgetItem';
+import {
+    BudgetItem,
+    readAmountFromLocalStorage,
+} from '@/components/BudgetItem';
+import { useAutoSyncTriggerStore } from '@/store/autoSyncTriggerStore';
 import type { BudgetStore } from '@/store/budgetStore';
 import { useBudgetStore } from '@/store/budgetStore';
 import { styles } from './styles';
@@ -18,6 +22,12 @@ function App() {
     // Budget Store (既存の「モノ」「コト」管理)
     const budgetItems = useBudgetStore((state: BudgetStore) => state.items);
     const addBudgetItem = useBudgetStore((state: BudgetStore) => state.addItem);
+    // 金額変更時に再レンダリングするためにsubscribe
+    useAutoSyncTriggerStore((state) => state.dataVersion);
+    const totalAmount = budgetItems.reduce((sum, item) => {
+        const amount = readAmountFromLocalStorage(item.name);
+        return sum + (amount ?? 0);
+    }, 0);
     const removeBudgetItem = useBudgetStore(
         (state: BudgetStore) => state.removeItem
     );
@@ -92,8 +102,17 @@ function App() {
         setTouchState(null);
     };
 
+    const formattedTotal = new Intl.NumberFormat('ja-JP', {
+        style: 'currency',
+        currency: 'JPY',
+    }).format(totalAmount);
+
     return (
         <div className={styles.pageStack}>
+            <div className={styles.totalSummary}>
+                <span>合計</span>
+                <span>{formattedTotal}</span>
+            </div>
             <div className={styles.addItemForm}>
                 <input
                     type="text"

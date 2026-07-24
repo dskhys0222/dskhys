@@ -291,7 +291,7 @@ function formatCurrency(value: number) {
     return `￥${value.toLocaleString()}`;
 }
 
-function readAmountFromLocalStorage(key: string): number | null {
+export function readAmountFromLocalStorage(key: string): number | null {
     if (typeof window === 'undefined') return null;
     if (!('localStorage' in window)) return null;
 
