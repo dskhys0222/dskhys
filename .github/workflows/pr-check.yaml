@@ -61,11 +61,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: |
-          pnpm --filter @dskhys/api run test
-          pnpm --filter @dskhys/budget run test
-          pnpm --filter @dskhys/portfolio run test
+      - name: Test API
+        run: pnpm --filter @dskhys/api run test
+
+      - name: Test Budget
+        run: pnpm --filter @dskhys/budget run test
+
+      - name: Test Portfolio
+        run: pnpm --filter @dskhys/portfolio run test
 
   build:
     name: Build
@@ -90,8 +93,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: |
-          pnpm --filter @dskhys/api run build
-          pnpm --filter @dskhys/budget run build
-          pnpm --filter @dskhys/portfolio run build
+      - name: Build API
+        run: pnpm --filter @dskhys/api run build
+
+      - name: Build Budget
+        run: pnpm --filter @dskhys/budget run build
+
+      - name: Build Portfolio
+        run: pnpm --filter @dskhys/portfolio run build
