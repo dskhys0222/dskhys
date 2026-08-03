@@ -10,14 +10,14 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@hookform/resolvers": "^5.4.0",
+        "@hookform/resolvers": "^5.5.7",
         "@tanstack/react-devtools": "^0.10.9",
         "@tanstack/react-router": "^1.170.18",
         "@tanstack/react-router-devtools": "^1.167.0",
         "@tanstack/router-plugin": "^1.168.23",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
-        "react-hook-form": "^7.82.0",
+        "react-hook-form": "^7.83.0",
         "zod": "^4.4.3",
         "zustand": "^5.0.14"
     },
