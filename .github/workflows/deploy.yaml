@@ -505,5 +505,4 @@ jobs:
             cd ${DEPLOY_PATH}
             docker compose up -d --no-deps --force-recreate nginx
             docker compose exec nginx nginx -t
-            docker compose exec nginx nginx -s reload
           "
