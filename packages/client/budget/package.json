@@ -10,7 +10,7 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@hookform/resolvers": "^5.9.0",
+        "@hookform/resolvers": "^5.9.1",
         "@tanstack/react-devtools": "^0.10.10",
         "@tanstack/react-router": "^1.170.29",
         "@tanstack/react-router-devtools": "^1.167.1",
