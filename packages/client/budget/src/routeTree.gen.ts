@@ -10,33 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SubscriptionIndexRouteImport } from './routes/subscription/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as CashFlowIndexRouteImport } from './routes/cash-flow/index'
-import { Route as SubscriptionAddRouteImport } from './routes/subscription/add'
 import { Route as HistoryNameRouteImport } from './routes/history/$name'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SubscriptionIndexRouteImport } from './routes/subscription/index'
+import { Route as SubscriptionAddRouteImport } from './routes/subscription/add'
+import { Route as CashFlowExpenseAddRouteImport } from './routes/cash-flow/expense/add'
+import { Route as CashFlowIncomeAddRouteImport } from './routes/cash-flow/income/add'
 import { Route as SubscriptionIdIndexRouteImport } from './routes/subscription/$id/index'
 import { Route as SubscriptionIdEditRouteImport } from './routes/subscription/$id/edit'
-import { Route as CashFlowIncomeAddRouteImport } from './routes/cash-flow/income/add'
-import { Route as CashFlowExpenseAddRouteImport } from './routes/cash-flow/expense/add'
-import { Route as CashFlowIncomeIdIndexRouteImport } from './routes/cash-flow/income/$id/index'
 import { Route as CashFlowExpenseIdIndexRouteImport } from './routes/cash-flow/expense/$id/index'
-import { Route as CashFlowIncomeIdEditRouteImport } from './routes/cash-flow/income/$id/edit'
 import { Route as CashFlowExpenseIdEditRouteImport } from './routes/cash-flow/expense/$id/edit'
+import { Route as CashFlowIncomeIdIndexRouteImport } from './routes/cash-flow/income/$id/index'
+import { Route as CashFlowIncomeIdEditRouteImport } from './routes/cash-flow/income/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SubscriptionIndexRoute = SubscriptionIndexRouteImport.update({
-  id: '/subscription/',
-  path: '/subscription/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CashFlowIndexRoute = CashFlowIndexRouteImport.update({
@@ -44,14 +34,34 @@ const CashFlowIndexRoute = CashFlowIndexRouteImport.update({
   path: '/cash-flow/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoryNameRoute = HistoryNameRouteImport.update({
+  id: '/history/$name',
+  path: '/history/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubscriptionIndexRoute = SubscriptionIndexRouteImport.update({
+  id: '/subscription/',
+  path: '/subscription/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscriptionAddRoute = SubscriptionAddRouteImport.update({
   id: '/subscription/add',
   path: '/subscription/add',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HistoryNameRoute = HistoryNameRouteImport.update({
-  id: '/history/$name',
-  path: '/history/$name',
+const CashFlowExpenseAddRoute = CashFlowExpenseAddRouteImport.update({
+  id: '/cash-flow/expense/add',
+  path: '/cash-flow/expense/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashFlowIncomeAddRoute = CashFlowIncomeAddRouteImport.update({
+  id: '/cash-flow/income/add',
+  path: '/cash-flow/income/add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubscriptionIdIndexRoute = SubscriptionIdIndexRouteImport.update({
@@ -64,14 +74,14 @@ const SubscriptionIdEditRoute = SubscriptionIdEditRouteImport.update({
   path: '/subscription/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CashFlowIncomeAddRoute = CashFlowIncomeAddRouteImport.update({
-  id: '/cash-flow/income/add',
-  path: '/cash-flow/income/add',
+const CashFlowExpenseIdIndexRoute = CashFlowExpenseIdIndexRouteImport.update({
+  id: '/cash-flow/expense/$id/',
+  path: '/cash-flow/expense/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CashFlowExpenseAddRoute = CashFlowExpenseAddRouteImport.update({
-  id: '/cash-flow/expense/add',
-  path: '/cash-flow/expense/add',
+const CashFlowExpenseIdEditRoute = CashFlowExpenseIdEditRouteImport.update({
+  id: '/cash-flow/expense/$id/edit',
+  path: '/cash-flow/expense/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CashFlowIncomeIdIndexRoute = CashFlowIncomeIdIndexRouteImport.update({
@@ -79,19 +89,9 @@ const CashFlowIncomeIdIndexRoute = CashFlowIncomeIdIndexRouteImport.update({
   path: '/cash-flow/income/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CashFlowExpenseIdIndexRoute = CashFlowExpenseIdIndexRouteImport.update({
-  id: '/cash-flow/expense/$id/',
-  path: '/cash-flow/expense/$id/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CashFlowIncomeIdEditRoute = CashFlowIncomeIdEditRouteImport.update({
   id: '/cash-flow/income/$id/edit',
   path: '/cash-flow/income/$id/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CashFlowExpenseIdEditRoute = CashFlowExpenseIdEditRouteImport.update({
-  id: '/cash-flow/expense/$id/edit',
-  path: '/cash-flow/expense/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -221,11 +221,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/subscription/': {
-      id: '/subscription/'
-      path: '/subscription'
-      fullPath: '/subscription/'
-      preLoaderRoute: typeof SubscriptionIndexRouteImport
+    '/cash-flow/': {
+      id: '/cash-flow/'
+      path: '/cash-flow'
+      fullPath: '/cash-flow/'
+      preLoaderRoute: typeof CashFlowIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history/$name': {
+      id: '/history/$name'
+      path: '/history/$name'
+      fullPath: '/history/$name'
+      preLoaderRoute: typeof HistoryNameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -235,11 +242,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cash-flow/': {
-      id: '/cash-flow/'
-      path: '/cash-flow'
-      fullPath: '/cash-flow/'
-      preLoaderRoute: typeof CashFlowIndexRouteImport
+    '/subscription/': {
+      id: '/subscription/'
+      path: '/subscription'
+      fullPath: '/subscription/'
+      preLoaderRoute: typeof SubscriptionIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subscription/add': {
@@ -249,11 +256,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscriptionAddRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/history/$name': {
-      id: '/history/$name'
-      path: '/history/$name'
-      fullPath: '/history/$name'
-      preLoaderRoute: typeof HistoryNameRouteImport
+    '/cash-flow/expense/add': {
+      id: '/cash-flow/expense/add'
+      path: '/cash-flow/expense/add'
+      fullPath: '/cash-flow/expense/add'
+      preLoaderRoute: typeof CashFlowExpenseAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cash-flow/income/add': {
+      id: '/cash-flow/income/add'
+      path: '/cash-flow/income/add'
+      fullPath: '/cash-flow/income/add'
+      preLoaderRoute: typeof CashFlowIncomeAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subscription/$id/': {
@@ -270,18 +284,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscriptionIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cash-flow/income/add': {
-      id: '/cash-flow/income/add'
-      path: '/cash-flow/income/add'
-      fullPath: '/cash-flow/income/add'
-      preLoaderRoute: typeof CashFlowIncomeAddRouteImport
+    '/cash-flow/expense/$id/': {
+      id: '/cash-flow/expense/$id/'
+      path: '/cash-flow/expense/$id'
+      fullPath: '/cash-flow/expense/$id/'
+      preLoaderRoute: typeof CashFlowExpenseIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cash-flow/expense/add': {
-      id: '/cash-flow/expense/add'
-      path: '/cash-flow/expense/add'
-      fullPath: '/cash-flow/expense/add'
-      preLoaderRoute: typeof CashFlowExpenseAddRouteImport
+    '/cash-flow/expense/$id/edit': {
+      id: '/cash-flow/expense/$id/edit'
+      path: '/cash-flow/expense/$id/edit'
+      fullPath: '/cash-flow/expense/$id/edit'
+      preLoaderRoute: typeof CashFlowExpenseIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cash-flow/income/$id/': {
@@ -291,25 +305,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CashFlowIncomeIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cash-flow/expense/$id/': {
-      id: '/cash-flow/expense/$id/'
-      path: '/cash-flow/expense/$id'
-      fullPath: '/cash-flow/expense/$id/'
-      preLoaderRoute: typeof CashFlowExpenseIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cash-flow/income/$id/edit': {
       id: '/cash-flow/income/$id/edit'
       path: '/cash-flow/income/$id/edit'
       fullPath: '/cash-flow/income/$id/edit'
       preLoaderRoute: typeof CashFlowIncomeIdEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cash-flow/expense/$id/edit': {
-      id: '/cash-flow/expense/$id/edit'
-      path: '/cash-flow/expense/$id/edit'
-      fullPath: '/cash-flow/expense/$id/edit'
-      preLoaderRoute: typeof CashFlowExpenseIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
