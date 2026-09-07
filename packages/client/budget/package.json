@@ -17,8 +17,8 @@
         "@tanstack/router-plugin": "^1.168.35",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
-        "react-hook-form": "^7.86.0",
-        "zod": "^4.4.3",
+        "react-hook-form": "^7.87.0",
+        "zod": "^4.5.4",
         "zustand": "^5.0.15"
     },
     "devDependencies": {
@@ -32,7 +32,7 @@
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.5",
         "@vitejs/plugin-basic-ssl": "^2.3.0",
-        "@vitejs/plugin-react": "^6.1.0",
+        "@vitejs/plugin-react": "^6.1.1",
         "babel-plugin-react-compiler": "^1.0.0",
         "jsdom": "^30.0.1",
         "typescript": "^7.0.2",
