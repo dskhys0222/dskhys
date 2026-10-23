@@ -6,6 +6,7 @@ packages:
   - packages/client/mf-scraper
 
 allowBuilds:
+  '@parcel/watcher': false
   bcrypt: true
   esbuild: true
   sqlite3: true
