@@ -221,6 +221,12 @@ importers:
       '@pandacss/dev':
         specifier: ^2.2.0
         version: 2.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(postcss@8.5.30)
+      '@pandacss/preset-base':
+        specifier: 2.2.0
+        version: 2.2.0
+      '@pandacss/preset-panda':
+        specifier: 2.2.0
+        version: 2.2.0
       '@rolldown/plugin-babel':
         specifier: ^0.2.4
         version: 0.2.4(@babel/core@8.0.7)(@babel/runtime@7.29.7)(rolldown@1.2.14)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15))
@@ -325,6 +331,12 @@ importers:
       '@pandacss/dev':
         specifier: ^2.2.0
         version: 2.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(postcss@8.5.30)
+      '@pandacss/preset-base':
+        specifier: 2.2.0
+        version: 2.2.0
+      '@pandacss/preset-panda':
+        specifier: 2.2.0
+        version: 2.2.0
       '@rolldown/plugin-babel':
         specifier: ^0.2.4
         version: 0.2.4(@babel/core@8.0.7)(@babel/runtime@7.29.7)(rolldown@1.2.14)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15))
@@ -1762,6 +1774,14 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       postcss: '>=8'
+
+  '@pandacss/preset-base@2.2.0':
+    resolution: {integrity: sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ==}
+    engines: {node: '>=22'}
+
+  '@pandacss/preset-panda@2.2.0':
+    resolution: {integrity: sha512-gk0hVKGATcoJ5eCNxTSUBF5bDqkjF7XdnJSXFWPHICgDF20VO0z3iO3E3AijynEXyx/5JM7dQly/fM3z7QYu0g==}
+    engines: {node: '>=22'}
 
   '@pandacss/types@2.2.0':
     resolution: {integrity: sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ==}
@@ -7095,6 +7115,14 @@ snapshots:
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
+
+  '@pandacss/preset-base@2.2.0':
+    dependencies:
+      '@pandacss/types': 2.2.0
+
+  '@pandacss/preset-panda@2.2.0':
+    dependencies:
+      '@pandacss/types': 2.2.0
 
   '@pandacss/types@2.2.0': {}
 

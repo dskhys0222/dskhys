@@ -24,6 +24,8 @@
     "devDependencies": {
         "@babel/core": "^8.0.7",
         "@pandacss/dev": "^2.2.0",
+        "@pandacss/preset-base": "2.2.0",
+        "@pandacss/preset-panda": "2.2.0",
         "@rolldown/plugin-babel": "^0.2.4",
         "@tanstack/devtools-vite": "^0.8.5",
         "@testing-library/dom": "^10.4.2",

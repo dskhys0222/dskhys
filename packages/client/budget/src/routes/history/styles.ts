@@ -6,12 +6,12 @@ export const styles = {
         flexDirection: 'column',
         gap: '4',
         minWidth: 0,
-        p: '4',
+        padding: '4',
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: 'gray.200',
         borderRadius: 'md',
-        bg: 'white',
+        backgroundColor: 'white',
     }),
 
     header: css({
@@ -44,7 +44,7 @@ export const styles = {
             alignItems: 'center',
             justifyContent: 'center',
             height: '9',
-            px: '4',
+            paddingInline: '4',
             borderRadius: 'md',
             borderWidth: '1px',
             borderStyle: 'solid',
@@ -62,11 +62,11 @@ export const styles = {
         variants: {
             intent: {
                 default: {
-                    bg: 'white',
+                    backgroundColor: 'white',
                     borderColor: 'gray.200',
                     color: 'gray.800',
-                    _hover: { bg: 'gray.50' },
-                    _active: { bg: 'gray.100' },
+                    _hover: { backgroundColor: 'gray.50' },
+                    _active: { backgroundColor: 'gray.100' },
                 },
             },
         },
@@ -90,12 +90,12 @@ export const styles = {
         display: 'flex',
         flexDirection: 'column',
         gap: '1',
-        p: '3',
+        padding: '3',
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: 'gray.200',
         borderRadius: 'md',
-        bg: 'gray.50',
+        backgroundColor: 'gray.50',
     }),
 
     entryTopRow: css({
