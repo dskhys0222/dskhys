@@ -10,7 +10,7 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@hookform/resolvers": "^5.9.2",
+        "@hookform/resolvers": "^6.0.0",
         "@tanstack/react-devtools": "^0.10.13",
         "@tanstack/react-router": "^1.170.45",
         "@tanstack/react-router-devtools": "^1.167.2",
@@ -23,9 +23,9 @@
     },
     "devDependencies": {
         "@babel/core": "^8.0.7",
-        "@pandacss/dev": "^2.2.0",
-        "@pandacss/preset-base": "2.2.0",
-        "@pandacss/preset-panda": "2.2.0",
+        "@pandacss/dev": "^2.3.0",
+        "@pandacss/preset-base": "2.3.0",
+        "@pandacss/preset-panda": "2.3.0",
         "@rolldown/plugin-babel": "^0.2.4",
         "@tanstack/devtools-vite": "^0.8.5",
         "@testing-library/dom": "^10.4.2",
