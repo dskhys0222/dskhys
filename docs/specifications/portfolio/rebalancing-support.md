@@ -9,7 +9,6 @@
 ### 1. 理想比の設定
 
 **編集画面での入力**:
-
 - カスタム集計の編集・新規作成画面で、各属性に「理想比」を入力できる
 - 入力欄の仕様：
   - 数値入力フィールド（0以上、上限なし）
@@ -18,7 +17,6 @@
   - 例：5項目に対して各1を入力 → 各20%が理想割合（1÷(1+1+1+1+1)=20%）
 
 **データ構造**:
-
 - `CustomAggregationAttribute` に `targetRatio?: number` フィールド（比の値）
 - `AggregatedData` に以下フィールドを追加：
   - `targetRatio?: number` - 理想比（パーセント以外の比の値）
@@ -35,7 +33,6 @@ difference = 現在の金額 - 理想金額
 ```
 
 **例：**
-
 - 総額: ¥1,000,000
 - コアの理想比: 3、サテライトの理想比: 2
 - 理想比率合計: 5
@@ -49,7 +46,6 @@ difference = 現在の金額 - 理想金額
 #### PC表示（デスクトップ）
 
 理想比を設定している場合、テーブルに以下のカラムを表示：
-
 1. 項目名
 2. 金額
 3. **差額（金額）** ← 新規追加カラム（¥単位）
@@ -60,13 +56,11 @@ difference = 現在の金額 - 理想金額
 理想比を設定している場合、以下の機能を提供：
 
 **表示切り替えボタン**:
-
 - 「差額表示」「比率表示」を切り替えられるボタンを表示
 - デフォルト：比率表示
 - ボタン配置：編集・削除ボタンの間
 
 **表示モード**:
-
 - **比率表示モード：** 通常通り比率（%）を表示
 - **差額表示モード：** 差額（金額）を表示
   - 正の値：`+¥50,000`
@@ -171,7 +165,7 @@ difference = 現在の金額 - 理想金額
 
 ```typescript
 const [displayModes, setDisplayModes] = useState<
-  Record<string, "percentage" | "difference">
+    Record<string, 'percentage' | 'difference'>
 >({});
 ```
 
@@ -180,8 +174,8 @@ const [displayModes, setDisplayModes] = useState<
 ```typescript
 // 理想比率合計を計算
 const totalRatio = aggregation.attributes.reduce(
-  (sum, a) => sum + (a.targetRatio || 0),
-  0,
+    (sum, a) => sum + (a.targetRatio || 0),
+    0
 );
 
 // 理想金額を計算

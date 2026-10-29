@@ -37,7 +37,7 @@ switch (command) {
 
 ```typescript
 export const login = async (): Promise<void> => {
-  // ログイン処理
+    // ログイン処理
 };
 ```
 

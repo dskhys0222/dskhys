@@ -15,7 +15,6 @@
 ## 公開URL
 
 既存の Nginx は `/` を API へ proxy しているため、Budget は衝突しないよう **`budget.${DOMAIN_NAME}` のサブドメイン**で配信する。
-
 - 公開 URL：`https://budget.${DOMAIN_NAME}/`
 - サーバー配置先：`${DEPLOY_PATH}/static/budget/`
 
@@ -43,7 +42,6 @@
 ## 必要な GitHub Secrets
 
 既存デプロイと同様に以下を使用する。
-
 - `SSH_PRIVATE_KEY`
 - `SSH_HOST`
 - `SSH_USER`
@@ -54,13 +52,11 @@
 ## Nginx 設定
 
 `deployment/nginx/nginx.conf` に以下を追加する想定。
-
 - `budget.${DOMAIN_NAME}` を配信する `server`（HTTP/HTTPS）
   - HTTPS で `root` を Budget の静的ファイルに向ける（例：`/usr/share/nginx/html/budget`）
   - SPA 対応：`try_files $uri $uri/ /index.html;`
 
 また、Nginx コンテナが静的ファイルを参照できるように、`deployment/compose.yaml` の `nginx` サービスに以下の volume を追加する。
-
 - `./static/budget:/usr/share/nginx/html/budget:ro`
 
 ## 動作確認（手動）

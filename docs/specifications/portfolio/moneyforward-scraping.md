@@ -98,18 +98,18 @@ openssl rand -base64 32
 
 ```typescript
 interface PortfolioData {
-  stocks: MFStock[];
-  scrapedAt: string; // ISO 8601
+    stocks: MFStock[];
+    scrapedAt: string; // ISO 8601
 }
 
 interface MFStock {
-  name: string; // 銘柄名
-  units: number; // 保有数
-  averageCost: number; // 平均取得単価
-  currentPrice: number; // 基準価額
-  value: number; // 評価額
-  profitLoss: number; // 評価損益
-  account: string; // 保有金融機関
+    name: string; // 銘柄名
+    units: number; // 保有数
+    averageCost: number; // 平均取得単価
+    currentPrice: number; // 基準価額
+    value: number; // 評価額
+    profitLoss: number; // 評価損益
+    account: string; // 保有金融機関
 }
 ```
 
@@ -117,9 +117,9 @@ interface MFStock {
 
 ```typescript
 interface EncryptedData {
-  iv: string; // Base64エンコードされたIV
-  data: string; // Base64エンコードされた暗号文
-  tag: string; // Base64エンコードされた認証タグ
+    iv: string; // Base64エンコードされたIV
+    data: string; // Base64エンコードされた暗号文
+    tag: string; // Base64エンコードされた認証タグ
 }
 ```
 
@@ -143,21 +143,21 @@ Base64デコード → AES-256-GCM復号 → UTF-8文字列 → JSON.parse → �
 
 ```json
 {
-  "name": "@dskhys/mf-scraper",
-  "version": "0.0.1",
-  "type": "module",
-  "scripts": {
-    "start": "tsx src/index.ts",
-    "login": "tsx src/login.ts"
-  },
-  "dependencies": {
-    "playwright": "^1.40.0"
-  },
-  "devDependencies": {
-    "typescript": "~5.9.3",
-    "tsx": "^4.21.0",
-    "@types/node": "^24.10.4"
-  }
+    "name": "@dskhys/mf-scraper",
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "start": "tsx src/index.ts",
+        "login": "tsx src/login.ts"
+    },
+    "dependencies": {
+        "playwright": "^1.40.0"
+    },
+    "devDependencies": {
+        "typescript": "~5.9.3",
+        "tsx": "^4.21.0",
+        "@types/node": "^24.10.4"
+    }
 }
 ```
 
@@ -167,10 +167,10 @@ Base64デコード → AES-256-GCM復号 → UTF-8文字列 → JSON.parse → �
 
 ```json
 {
-  "encryptionKey": "Base64エンコードされた32バイトのキー",
-  "apiUrl": "https://api.example.com",
-  "apiUsername": "APIサーバーのユーザー名",
-  "apiPassword": "APIサーバーのパスワード"
+    "encryptionKey": "Base64エンコードされた32バイトのキー",
+    "apiUrl": "https://api.example.com",
+    "apiUsername": "APIサーバーのユーザー名",
+    "apiPassword": "APIサーバーのパスワード"
 }
 ```
 
@@ -235,14 +235,14 @@ MoneyForward 2FA Code: 123456
 ```typescript
 // 例：セレクタは実際のページ構造に合わせて調整
 const selectors = {
-  stockRow: ".portfolio-table tbody tr",
-  name: ".name-column",
-  units: ".units-column",
-  averageCost: ".average-cost-column",
-  currentPrice: ".current-price-column",
-  value: ".value-column",
-  profitLoss: ".profit-loss-column",
-  account: ".account-column",
+    stockRow: '.portfolio-table tbody tr',
+    name: '.name-column',
+    units: '.units-column',
+    averageCost: '.average-cost-column',
+    currentPrice: '.current-price-column',
+    value: '.value-column',
+    profitLoss: '.profit-loss-column',
+    account: '.account-column',
 };
 ```
 
@@ -255,7 +255,6 @@ node dist/login.js
 ```
 
 **処理**:
-
 1. ブラウザを表示モードで起動
 2. マネーフォワードログインページへ
 3. ユーザーがマネーフォワード ID/パスワードを入力
@@ -284,10 +283,10 @@ node dist/login.js
 
 ```typescript
 interface CreateEncryptedPortfolioRequest {
-  iv: string; // Base64エンコードされたIV
-  data: string; // Base64エンコードされた暗号文
-  tag: string; // Base64エンコードされた認証タグ
-  scrapedAt: string; // ISO 8601形式の日時
+    iv: string; // Base64エンコードされたIV
+    data: string; // Base64エンコードされた暗号文
+    tag: string; // Base64エンコードされた認証タグ
+    scrapedAt: string; // ISO 8601形式の日時
 }
 ```
 
@@ -295,10 +294,10 @@ interface CreateEncryptedPortfolioRequest {
 
 ```typescript
 const CreateEncryptedPortfolioSchema = z.object({
-  iv: z.string().min(1),
-  data: z.string().min(1),
-  tag: z.string().min(1),
-  scrapedAt: z.string().datetime(),
+    iv: z.string().min(1),
+    data: z.string().min(1),
+    tag: z.string().min(1),
+    scrapedAt: z.string().datetime(),
 });
 ```
 
@@ -307,14 +306,14 @@ const CreateEncryptedPortfolioSchema = z.object({
 ```typescript
 // 成功時（201 Created）
 interface CreateEncryptedPortfolioResponse {
-  success: true;
-  message: string;
+    success: true;
+    message: string;
 }
 
 // エラー時（400 Bad Request / 401 Unauthorized / 500 Internal Server Error）
 interface ErrorResponse {
-  success: false;
-  error: string;
+    success: false;
+    error: string;
 }
 ```
 
@@ -329,17 +328,17 @@ interface ErrorResponse {
 ```typescript
 // 成功時（200 OK）
 interface GetEncryptedPortfolioResponse {
-  iv: string;
-  data: string;
-  tag: string;
-  scrapedAt: string;
-  updatedAt: string;
+    iv: string;
+    data: string;
+    tag: string;
+    scrapedAt: string;
+    updatedAt: string;
 }
 
 // データなし（404 Not Found）
 interface NotFoundResponse {
-  success: false;
-  error: "Portfolio data not found";
+    success: false;
+    error: 'Portfolio data not found';
 }
 ```
 
@@ -353,20 +352,20 @@ interface NotFoundResponse {
 
 ```typescript
 interface DecryptParams {
-  iv: string; // Base64
-  data: string; // Base64
-  tag: string; // Base64
-  key: string; // Base64
+    iv: string; // Base64
+    data: string; // Base64
+    tag: string; // Base64
+    key: string; // Base64
 }
 
 interface DecryptResult {
-  success: true;
-  data: PortfolioData;
+    success: true;
+    data: PortfolioData;
 }
 
 interface DecryptError {
-  success: false;
-  error: string;
+    success: false;
+    error: string;
 }
 
 type DecryptResponse = DecryptResult | DecryptError;
@@ -380,17 +379,17 @@ async function decrypt(params: DecryptParams): Promise<DecryptResponse>;
 
 ```typescript
 interface MFState {
-  // 状態
-  encryptionKey: string | null;
-  portfolioData: PortfolioData | null;
-  isLoading: boolean;
-  error: string | null;
-  lastUpdated: string | null;
+    // 状態
+    encryptionKey: string | null;
+    portfolioData: PortfolioData | null;
+    isLoading: boolean;
+    error: string | null;
+    lastUpdated: string | null;
 
-  // アクション
-  setEncryptionKey: (key: string) => void;
-  fetchAndDecrypt: () => Promise<void>;
-  clearData: () => void;
+    // アクション
+    setEncryptionKey: (key: string) => void;
+    fetchAndDecrypt: () => Promise<void>;
+    clearData: () => void;
 }
 ```
 
@@ -483,11 +482,11 @@ systemctl --user start mf-scraper.timer
 
 ```typescript
 interface LogEntry {
-  timestamp: string;
-  level: "INFO" | "WARN" | "ERROR";
-  code?: string;
-  message: string;
-  details?: unknown;
+    timestamp: string;
+    level: 'INFO' | 'WARN' | 'ERROR';
+    code?: string;
+    message: string;
+    details?: unknown;
 }
 ```
 

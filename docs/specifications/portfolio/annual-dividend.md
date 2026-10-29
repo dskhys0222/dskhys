@@ -8,13 +8,13 @@
 
 ```typescript
 export interface Stock {
-  // ... 既存フィールド
+    // ... 既存フィールド
 
-  // 配当金関連
-  includeDividend?: boolean; // 配当金集計対象フラグ（デフォルト: false）
-  dividendAmount?: number; // 年間配当金額（円）
-  dividendYield?: number; // 配当利回り（%）
-  lastDividendDate?: string; // 直近配当金の支払い日（ISO 8601）
+    // 配当金関連
+    includeDividend?: boolean; // 配当金集計対象フラグ（デフォルト: false）
+    dividendAmount?: number; // 年間配当金額（円）
+    dividendYield?: number; // 配当利回り（%）
+    lastDividendDate?: string; // 直近配当金の支払い日（ISO 8601）
 }
 ```
 
@@ -23,16 +23,16 @@ export interface Stock {
 ```typescript
 // 配当金情報
 export interface DividendInfo {
-  annualAmount: number; // 年間配当金額（円）
-  yieldPercent: number; // 配当利回り（%）
-  stockCount: number; // 配当対象銘柄数
-  stockDetails: {
-    stockId: string;
-    name: string;
-    ticker: string;
-    amount: number;
-    yield: number;
-  }[];
+    annualAmount: number; // 年間配当金額（円）
+    yieldPercent: number; // 配当利回り（%）
+    stockCount: number; // 配当対象銘柄数
+    stockDetails: {
+        stockId: string;
+        name: string;
+        ticker: string;
+        amount: number;
+        yield: number;
+    }[];
 }
 ```
 
@@ -100,16 +100,16 @@ export interface DividendInfo {
 
 ```json
 {
-  "ticker": "1234",
-  "name": "Sample Corp",
-  "dividends": [
-    {
-      "date": "2024-01-01",
-      "amount": 100,
-      "currency": "JPY"
-    }
-  ],
-  "annualAmount": 400
+    "ticker": "1234",
+    "name": "Sample Corp",
+    "dividends": [
+        {
+            "date": "2024-01-01",
+            "amount": 100,
+            "currency": "JPY"
+        }
+    ],
+    "annualAmount": 400
 }
 ```
 

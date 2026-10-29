@@ -1,11 +1,11 @@
 ---
+
 description: "Write Vitest tests for the selected or specified code. Detects whether the target is an API route (Supertest), React component (Testing Library), or pure function (Vitest)."
 argument-hint: "File or function to test (optional — defaults to active editor selection)"
 agent: "agent"
 ---
 
 Write comprehensive Vitest tests for the provided code.
-
 1. Identify the type of code being tested:
    - **Express route** → use Supertest patterns
    - **React component** → use Testing Library patterns

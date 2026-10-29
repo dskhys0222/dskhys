@@ -40,7 +40,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** デプロイサーバーのホスト名または IP アドレス
 
 **設定例:**
-
 - `example.com`
 - `192.168.1.100`
 - `deploy.myapp.com`
@@ -50,7 +49,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** SSH 接続に使用するユーザー名
 
 **設定例:**
-
 - `ubuntu`
 - `deploy`
 - `myuser`
@@ -60,7 +58,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** SSH ポート番号（オプション、デフォルトは 22）
 
 **設定例:**
-
 - `22`（デフォルト）
 - `2222`
 - `22000`
@@ -70,7 +67,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** アプリケーションがデプロイされるサーバー上の絶対パス
 
 **設定例:**
-
 - `/opt/dskhys`
 - `/home/deploy/packages/dskhys`
 - `/var/www/dskhys`
@@ -82,7 +78,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** SSL 証明書を取得するドメイン名
 
 **設定例:**
-
 - `example.com`
 - `api.example.com`
 
@@ -93,7 +88,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** Let's Encrypt からの通知を受け取るメールアドレス（証明書の有効期限警告など）
 
 **設定例:**
-
 - `admin@example.com`
 - `devops@example.com`
 
@@ -104,14 +98,12 @@ cat ~/.ssh/github_deploy.pub
 **説明:** CORS で許可するメインドメイン（サブドメインからのリクエストを許可）
 
 **設定例:**
-
 - `example.com` → `portfolio.example.com`, `budget.example.com` などを許可
 - `myapp.local` → `api.myapp.local` などを許可
 
 **デフォルト:** `localhost`
 
 **動作:**
-
 - 環境変数で指定したドメイン配下のすべてのサブドメインからのリクエストを許可
 - `http://localhost:5173` (開発環境) を常に許可
 - 同一オリジン、モバイルアプリなど (オリジンなし) も許可
@@ -121,7 +113,6 @@ cat ~/.ssh/github_deploy.pub
 **説明:** 明示的に許可する追加オリジンのカンマ区切りリスト
 
 **設定例:**
-
 - `https://external-service.com,https://trusted-partner.com`
 - `http://staging.example.com,https://production.example.com`
 
@@ -130,7 +121,6 @@ cat ~/.ssh/github_deploy.pub
 ## 検証
 
 すべてのシークレットを設定した後、以下の方法で検証できます:
-
 1. リポジトリの **Actions** タブにアクセス
 2. **Deploy to Server** ワークフローを選択
 3. **Run workflow** をクリックして手動デプロイを実行

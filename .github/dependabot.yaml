@@ -1,55 +1,55 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directories:
-      - "/"
-      - "/packages/server/api"
-      - "/packages/client/budget"
-      - "/packages/client/mf-scraper"
-      - "/packages/client/portfolio"
-      - "/packages/client/web"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 10
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      all-dependencies:
-        patterns:
-          - "*"
+    - package-ecosystem: "npm"
+      directories:
+          - "/"
+          - "/packages/server/api"
+          - "/packages/client/budget"
+          - "/packages/client/mf-scraper"
+          - "/packages/client/portfolio"
+          - "/packages/client/web"
+      schedule:
+          interval: "daily"
+          time: "09:00"
+          timezone: "Asia/Tokyo"
+      open-pull-requests-limit: 10
+      assignees:
+          - "dskhys0222"
+      cooldown:
+          default-days: 7
+      groups:
+          all-dependencies:
+              patterns:
+                  - "*"
 
-  - package-ecosystem: "docker"
-    directory: "/deployment"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      docker:
-        patterns:
-          - "*"
+    - package-ecosystem: "docker"
+      directory: "/deployment"
+      schedule:
+          interval: "daily"
+          time: "09:00"
+          timezone: "Asia/Tokyo"
+      open-pull-requests-limit: 5
+      assignees:
+          - "dskhys0222"
+      cooldown:
+          default-days: 7
+      groups:
+          docker:
+              patterns:
+                  - "*"
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-    assignees:
-      - "dskhys0222"
-    cooldown:
-      default-days: 7
-    groups:
-      github-actions:
-        patterns:
-          - "*"
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "09:00"
+          timezone: "Asia/Tokyo"
+      open-pull-requests-limit: 5
+      assignees:
+          - "dskhys0222"
+      cooldown:
+          default-days: 7
+      groups:
+          github-actions:
+              patterns:
+                  - "*"

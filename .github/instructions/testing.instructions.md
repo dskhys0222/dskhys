@@ -1,4 +1,5 @@
 ---
+
 description: "Use when writing, reviewing, or improving tests. Covers Vitest unit/integration test patterns, Supertest API tests for Express routes, and Testing Library patterns for React components."
 applyTo: "**/*.{test,spec}.ts"
 ---
@@ -19,6 +20,7 @@ applyTo: "**/*.{test,spec}.ts"
 - Test the full request/response cycle: status code, body shape, and headers
 - Seed test data in `beforeEach` and clean up in `afterEach` using an in-memory or temp DB
 - Example:
+
   ```ts
   it('should return 201 when creating a valid resource', async () => {
       const res = await request(app)
@@ -37,6 +39,7 @@ applyTo: "**/*.{test,spec}.ts"
 - Avoid querying by `data-testid` unless no accessible alternative exists
 - Wrap async interactions in `waitFor` or use `findBy*` queries
 - Example:
+
   ```ts
   it('should display error when form is submitted empty', async () => {
       render(<MyForm />);

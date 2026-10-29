@@ -20,7 +20,6 @@
 ### テーブルセクション共通構成
 
 各セクションは以下の要素で構成：
-
 1. **セクションヘッダー**
    - タイトル（例：「収入」）
    - フィルターボタン（表示/非表示を切り替え）
@@ -41,12 +40,12 @@
 
 ```typescript
 interface BudgetItemData {
-  id: string;
-  category: string;
-  name: string;
-  pricePerMonth: number;
-  pricePerYear: number;
-  remark?: string;
+    id: string;
+    category: string;
+    name: string;
+    pricePerMonth: number;
+    pricePerYear: number;
+    remark?: string;
 }
 ```
 
@@ -54,7 +53,7 @@ interface BudgetItemData {
 
 ```typescript
 interface SubscriptionItemData extends BudgetItemData {
-  renewalMonth?: string; // 更新月
+    renewalMonth?: string; // 更新月
 }
 ```
 
@@ -68,12 +67,12 @@ Zustandを使用した一元管理：
 interface IncomeItem extends BudgetItemData {}
 
 interface IncomeStore {
-  items: IncomeItem[];
-  addItem: (item: Omit<IncomeItem, "id">) => void;
-  updateItem: (id: string, item: Partial<IncomeItem>) => void;
-  removeItem: (id: string) => void;
-  getTotalMonthly: () => number;
-  getTotalYearly: () => number;
+    items: IncomeItem[];
+    addItem: (item: Omit<IncomeItem, 'id'>) => void;
+    updateItem: (id: string, item: Partial<IncomeItem>) => void;
+    removeItem: (id: string) => void;
+    getTotalMonthly: () => number;
+    getTotalYearly: () => number;
 }
 ```
 
@@ -83,12 +82,12 @@ interface IncomeStore {
 interface ExpenseItem extends BudgetItemData {}
 
 interface ExpenseStore {
-  items: ExpenseItem[];
-  addItem: (item: Omit<ExpenseItem, "id">) => void;
-  updateItem: (id: string, item: Partial<ExpenseItem>) => void;
-  removeItem: (id: string) => void;
-  getTotalMonthly: () => number;
-  getTotalYearly: () => number;
+    items: ExpenseItem[];
+    addItem: (item: Omit<ExpenseItem, 'id'>) => void;
+    updateItem: (id: string, item: Partial<ExpenseItem>) => void;
+    removeItem: (id: string) => void;
+    getTotalMonthly: () => number;
+    getTotalYearly: () => number;
 }
 ```
 
@@ -98,13 +97,13 @@ interface ExpenseStore {
 interface ActiveSubscriptionItem extends SubscriptionItemData {}
 
 interface ActiveSubscriptionStore {
-  items: ActiveSubscriptionItem[];
-  addItem: (item: Omit<ActiveSubscriptionItem, "id">) => void;
-  updateItem: (id: string, item: Partial<ActiveSubscriptionItem>) => void;
-  removeItem: (id: string) => void;
-  getTotalMonthly: () => number;
-  getTotalYearly: () => number;
-  moveToCandidate: (id: string) => void; // 追加候補へ移動
+    items: ActiveSubscriptionItem[];
+    addItem: (item: Omit<ActiveSubscriptionItem, 'id'>) => void;
+    updateItem: (id: string, item: Partial<ActiveSubscriptionItem>) => void;
+    removeItem: (id: string) => void;
+    getTotalMonthly: () => number;
+    getTotalYearly: () => number;
+    moveToCandidate: (id: string) => void; // 追加候補へ移動
 }
 ```
 
@@ -114,13 +113,13 @@ interface ActiveSubscriptionStore {
 interface SubscriptionCandidateItem extends SubscriptionItemData {}
 
 interface SubscriptionCandidateStore {
-  items: SubscriptionCandidateItem[];
-  addItem: (item: Omit<SubscriptionCandidateItem, "id">) => void;
-  updateItem: (id: string, item: Partial<SubscriptionCandidateItem>) => void;
-  removeItem: (id: string) => void;
-  getTotalMonthly: () => number;
-  getTotalYearly: () => number;
-  moveToActive: (id: string) => void; // 契約中へ移動
+    items: SubscriptionCandidateItem[];
+    addItem: (item: Omit<SubscriptionCandidateItem, 'id'>) => void;
+    updateItem: (id: string, item: Partial<SubscriptionCandidateItem>) => void;
+    removeItem: (id: string) => void;
+    getTotalMonthly: () => number;
+    getTotalYearly: () => number;
+    moveToActive: (id: string) => void; // 契約中へ移動
 }
 ```
 

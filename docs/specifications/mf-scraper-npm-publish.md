@@ -10,14 +10,14 @@
 
 ```yaml
 on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - "packages/client/mf-scraper/package.json"
-      - "packages/client/mf-scraper/src/**"
-      - ".github/workflows/publish.yaml"
-  workflow_dispatch:
+    push:
+        branches:
+            - "main"
+        paths:
+            - "packages/client/mf-scraper/package.json"
+            - "packages/client/mf-scraper/src/**"
+            - ".github/workflows/publish.yaml"
+    workflow_dispatch:
 ```
 
 - **main ブランチへのプッシュ** で自動実行
@@ -49,9 +49,9 @@ on:
 - name: Setup Node.js
   uses: actions/setup-node@v6.4.0
   with:
-    node-version-file: "package.json"
-    cache: "pnpm"
-    registry-url: "https://registry.npmjs.org"
+      node-version-file: "package.json"
+      cache: "pnpm"
+      registry-url: "https://registry.npmjs.org"
 ```
 
 `registry-url` により npm レジストリ認証が自動設定される
@@ -77,10 +77,10 @@ TypeScript をコンパイルして `dist/` を生成
 ```yaml
 - name: Publish to npm
   env:
-    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   run: |
-    cd packages/client/mf-scraper
-    npm publish --access public
+      cd packages/client/mf-scraper
+      npm publish --access public
 ```
 
 - `NODE_AUTH_TOKEN` に `NPM_TOKEN` シークレットを指定
@@ -151,7 +151,6 @@ npm version major
 ```
 
 このコマンド実行時：
-
 - `package.json` のバージョンが自動更新
 - `package-lock.json` が自動更新
 - Git タグが自動作成（例：v0.0.2）
@@ -176,7 +175,6 @@ git push origin --tags
 ### ワークフロー実行を確認
 
 GitHub リポジトリの Actions タブで実行状況を確認：
-
 - Publish to npm ワークフローが実行
 - ビルドとパブリッシュのログが表示
 

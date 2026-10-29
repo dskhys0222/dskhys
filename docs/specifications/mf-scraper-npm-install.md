@@ -8,9 +8,9 @@
 
 ```json
 {
-  "bin": {
-    "mf-scraper": "./dist/index.js"
-  }
+    "bin": {
+        "mf-scraper": "./dist/index.js"
+    }
 }
 ```
 

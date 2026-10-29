@@ -17,11 +17,13 @@ packages/
 ## Tech Stack
 
 ### Common
+
 - Language: TypeScript
 - Linter/Formatter: Biome (4-space indent, single quotes)
 - Package manager: pnpm 10
 
 ### Server (`packages/server/api`)
+
 - Runtime: Node.js 24
 - Framework: Express 5
 - Database: SQLite3 (raw, no ORM)
@@ -31,6 +33,7 @@ packages/
 - Testing: Vitest + Supertest
 
 ### Client (`packages/client/*`)
+
 - Framework: React 19 (with compiler)
 - Build: Vite 7
 - Styling: Panda CSS
@@ -41,6 +44,7 @@ packages/
 - PWA: vite-plugin-pwa (offline support required)
 
 ### CLI (`packages/client/mf-scraper`)
+
 - Automation: Playwright (Chromium)
 - Distribution: npm global install
 

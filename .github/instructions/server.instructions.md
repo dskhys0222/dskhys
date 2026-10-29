@@ -1,4 +1,5 @@
 ---
+
 description: "Use when writing server-side code in packages/server/api. Covers Express 5 routing, SQLite3 raw queries, Zod 4 validation, JWT authentication, bcrypt, and neverthrow Result type error handling."
 applyTo: "packages/server/api/src/**/*.ts"
 ---

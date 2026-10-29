@@ -1,161 +1,160 @@
 name: Setup SSL Certificate
 
 on:
-  workflow_dispatch:
-    inputs:
-      use_staging:
-        description: 'Use Let''s Encrypt staging environment (to avoid rate limits)'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
+    workflow_dispatch:
+        inputs:
+            use_staging:
+                description: "Use Let's Encrypt staging environment (to avoid rate limits)"
+                required: false
+                default: "false"
+                type: choice
+                options:
+                    - "false"
+                    - "true"
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  setup-ssl:
-    name: Setup SSL Certificate
-    runs-on: ubuntu-latest
+    setup-ssl:
+        name: Setup SSL Certificate
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          sparse-checkout: |
-            deployment/compose.yaml
-            deployment/nginx/nginx.conf
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: |
+                      deployment/compose.yaml
+                      deployment/nginx/nginx.conf
 
-      - name: Setup SSL on server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
-          LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
-        run: |
-          # Setup SSH
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
-          trap 'rm -f ~/.ssh/deploy_key' EXIT
+            - name: Setup SSL on server
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+                  SSH_HOST: ${{ secrets.SSH_HOST }}
+                  SSH_USER: ${{ secrets.SSH_USER }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
+                  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+                  DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+                  LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
+              run: |
+                  # Setup SSH
+                  mkdir -p ~/.ssh
+                  echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+                  chmod 600 ~/.ssh/deploy_key
+                  ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
+                  trap 'rm -f ~/.ssh/deploy_key' EXIT
 
-          # Create deploy directory
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}/nginx"
+                  # Create deploy directory
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "mkdir -p ${DEPLOY_PATH}/nginx"
 
-          # Copy files to server
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" \
-            deployment/compose.yaml \
-            "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+                  # Copy files to server
+                  scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" \
+                    deployment/compose.yaml \
+                    "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
 
-          scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" \
-            deployment/nginx/nginx.conf \
-            "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/nginx/"
+                  scp -i ~/.ssh/deploy_key -P "${SSH_PORT:-22}" \
+                    deployment/nginx/nginx.conf \
+                    "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/nginx/"
 
-          # Replace domain placeholder and verify nginx config
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}/nginx
-            sed -i 's/__DOMAIN_NAME__/${DOMAIN_NAME}/g' nginx.conf
-          "
+                  # Replace domain placeholder and verify nginx config
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}/nginx
+                    sed -i 's/__DOMAIN_NAME__/${DOMAIN_NAME}/g' nginx.conf
+                  "
 
-          # Restart nginx to load updated config
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            docker compose up -d --no-deps --force-recreate nginx
-            sleep 3
-          "
+                  # Restart nginx to load updated config
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    docker compose up -d --no-deps --force-recreate nginx
+                    sleep 3
+                  "
 
-          # Update .env file (update existing keys or add new ones)
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            touch .env
-            
-            # Update DOMAIN_NAME
-            if grep -q '^DOMAIN_NAME=' .env; then
-              sed -i 's|^DOMAIN_NAME=.*|DOMAIN_NAME=${DOMAIN_NAME}|' .env
-            else
-              echo 'DOMAIN_NAME=${DOMAIN_NAME}' >> .env
-            fi
-            
-            # Update LETSENCRYPT_EMAIL
-            if grep -q '^LETSENCRYPT_EMAIL=' .env; then
-              sed -i 's|^LETSENCRYPT_EMAIL=.*|LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}|' .env
-            else
-              echo 'LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}' >> .env
-            fi
-          "
+                  # Update .env file (update existing keys or add new ones)
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    touch .env
+                    
+                    # Update DOMAIN_NAME
+                    if grep -q '^DOMAIN_NAME=' .env; then
+                      sed -i 's|^DOMAIN_NAME=.*|DOMAIN_NAME=${DOMAIN_NAME}|' .env
+                    else
+                      echo 'DOMAIN_NAME=${DOMAIN_NAME}' >> .env
+                    fi
+                    
+                    # Update LETSENCRYPT_EMAIL
+                    if grep -q '^LETSENCRYPT_EMAIL=' .env; then
+                      sed -i 's|^LETSENCRYPT_EMAIL=.*|LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}|' .env
+                    else
+                      echo 'LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}' >> .env
+                    fi
+                  "
 
-          # Create dummy certificate for initial nginx startup
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            
-            # Remove any existing certificates to avoid -0001 suffix issue
-            docker compose run --rm --entrypoint '' certbot sh -c '
-              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
-              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
-              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
-              mkdir -p /etc/letsencrypt/live/${DOMAIN_NAME}
-              openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
-                -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
-                -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
-                -subj \"/CN=localhost\"
-            '
-          "
+                  # Create dummy certificate for initial nginx startup
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    
+                    # Remove any existing certificates to avoid -0001 suffix issue
+                    docker compose run --rm --entrypoint '' certbot sh -c '
+                      rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+                      rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+                      rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
+                      mkdir -p /etc/letsencrypt/live/${DOMAIN_NAME}
+                      openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+                        -keyout /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem \
+                        -out /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem \
+                        -subj \"/CN=localhost\"
+                    '
+                  "
 
-          # Start nginx with dummy cert
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            docker compose pull nginx certbot
-            docker compose up -d --no-deps nginx
-            sleep 5
-          "
+                  # Start nginx with dummy cert
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    docker compose pull nginx certbot
+                    docker compose up -d --no-deps nginx
+                    sleep 5
+                  "
 
-          # Obtain certificate
-          USE_STAGING="${{ github.event.inputs.use_staging }}"
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            
-            echo '=== Removing existing certificates completely ==='
-            docker compose run --rm --entrypoint '' certbot sh -c '
-              rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
-              rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
-              rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
-            '
-            
-            STAGING_FLAG=''
-            if [ '"${USE_STAGING}"' = 'true' ]; then
-              STAGING_FLAG='--staging'
-            fi
-            
-            docker compose run --rm certbot certonly \\
-              --webroot \\
-              --webroot-path=/var/www/certbot \\
-              --email '"${LETSENCRYPT_EMAIL}"' \\
-              --agree-tos \\
-              --no-eff-email \\
-              --cert-name '"${DOMAIN_NAME}"' \\
-              \$STAGING_FLAG \\
-              -d '"${DOMAIN_NAME}"' \\
-              -d '"budget.${DOMAIN_NAME}"' \\
-              -d '"portfolio.${DOMAIN_NAME}"'
-          "
+                  # Obtain certificate
+                  USE_STAGING="${{ github.event.inputs.use_staging }}"
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    
+                    echo '=== Removing existing certificates completely ==='
+                    docker compose run --rm --entrypoint '' certbot sh -c '
+                      rm -rf /etc/letsencrypt/live/${DOMAIN_NAME}*
+                      rm -rf /etc/letsencrypt/archive/${DOMAIN_NAME}*
+                      rm -rf /etc/letsencrypt/renewal/${DOMAIN_NAME}*.conf
+                    '
+                    
+                    STAGING_FLAG=''
+                    if [ '"${USE_STAGING}"' = 'true' ]; then
+                      STAGING_FLAG='--staging'
+                    fi
+                    
+                    docker compose run --rm certbot certonly \\
+                      --webroot \\
+                      --webroot-path=/var/www/certbot \\
+                      --email '"${LETSENCRYPT_EMAIL}"' \\
+                      --agree-tos \\
+                      --no-eff-email \\
+                      --cert-name '"${DOMAIN_NAME}"' \\
+                      \$STAGING_FLAG \\
+                      -d '"${DOMAIN_NAME}"' \\
+                      -d '"budget.${DOMAIN_NAME}"' \\
+                      -d '"portfolio.${DOMAIN_NAME}"'
+                  "
 
-          # Reload nginx with real certificate
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            cd ${DEPLOY_PATH}
-            docker compose exec nginx nginx -t
-            docker compose exec nginx nginx -s reload
-          "
+                  # Reload nginx with real certificate
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    cd ${DEPLOY_PATH}
+                    docker compose exec nginx nginx -t
+                    docker compose exec nginx nginx -s reload
+                  "
 
-          # Setup auto-renewal
-          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
-            (crontab -l 2>/dev/null | grep -v 'certbot renew'; echo \"0 */12 * * * cd ${DEPLOY_PATH} && docker compose run --rm certbot renew --quiet && docker compose exec nginx nginx -s reload\") | crontab -
-          "
+                  # Setup auto-renewal
+                  ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "
+                    (crontab -l 2>/dev/null | grep -v 'certbot renew'; echo \"0 */12 * * * cd ${DEPLOY_PATH} && docker compose run --rm certbot renew --quiet && docker compose exec nginx nginx -s reload\") | crontab -
+                  "
 
-          echo "SSL setup completed successfully!"
-
+                  echo "SSL setup completed successfully!"

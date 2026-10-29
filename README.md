@@ -6,17 +6,20 @@
 ## 環境構築
 
 1. Node.jsをインストールする
-    ```ps1
-    winget install -e --source winget --id OpenJS.NodeJS.LTS
-    node -v
-    ```
+
+   ```ps1
+   winget install -e --source winget --id OpenJS.NodeJS.LTS
+   node -v
+   ```
 2. pnpmを有効化する
+
    ```ps1
    corepack enable
    corepack install
    pnpm -v
    ```
 3. パッケージのインストール
+
    ```ps1
    pnpm install
    ```

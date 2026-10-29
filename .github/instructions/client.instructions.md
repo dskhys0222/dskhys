@@ -1,4 +1,5 @@
 ---
+
 description: "Use when writing React components, hooks, pages, or client-side logic in packages/client. Covers Panda CSS styling, Zustand state management, TanStack Router, React Hook Form, and PWA offline considerations."
 applyTo: "packages/client/**/*.{ts,tsx}"
 ---
