@@ -13,7 +13,6 @@ Nginx のリバースプロキシおよび SSL 終端設定の仕様を定義し
 ## HTTP サーバー設定
 
 以下の 3 つの場所を処理します：
-
 1. **ACME チャレンジ応答**: `/.well-known/acme-challenge/` → certbot に応答
 2. **API リクエスト**: `/api*` → OPTIONS は 204、その他は HTTPS へ 301 リダイレクト
 3. **その他**: 全て HTTPS へ 301 リダイレクト

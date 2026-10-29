@@ -21,7 +21,6 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ```
 
 **Nginx デプロイの特徴:**
-
 - API、Budget、Portfolio のデプロイが**すべて完了**してから実行
 - すべてのアプリが準備完了した状態で Nginx を再起動
 - Nginx の設定競合を防止
@@ -67,12 +66,10 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ### 1. API デプロイ（deploy_api）
 
 **トリガー条件:**
-
 - `packages/server/api/**` に変更がある
 - または `workflow_dispatch` で手動実行
 
 **処理内容:**
-
 1. Docker イメージをビルド
 2. Docker Hub にプッシュ
 3. サーバーに `compose.yaml` を転送
@@ -95,11 +92,9 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ### 2. Budget デプロイ（deploy_budget）
 
 **トリガー条件:**
-
 - `packages/client/budget/**` に変更がある
 
 **処理内容:**
-
 1. Budget をビルド
 2. `dist/` を `static/budget/` にアップロード
 3. Nginx の再起動は `deploy_nginx` で実行
@@ -107,11 +102,9 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ### 3. Portfolio デプロイ（deploy_portfolio）
 
 **トリガー条件:**
-
 - `packages/client/portfolio/**` に変更がある
 
 **処理内容:**
-
 1. Portfolio をビルド
 2. `dist/` を `static/portfolio/` にアップロード
 3. Nginx の再起動は `deploy_nginx` で実行
@@ -119,12 +112,10 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
 ### 4. Nginx デプロイ（deploy_nginx）
 
 **実行タイミング:**
-
 - API、Budget、Portfolio のデプロイ**すべてが完了後**に実行
 - 変更がない場合でも、compose.yaml と nginx.conf は常に更新
 
 **処理内容:**
-
 1. compose.yaml を転送
 2. nginx.conf を転送
 3. ドメイン名プレースホルダを置換
@@ -134,7 +125,6 @@ GitHub Actions CI/CD パイプラインでアプリケーションを自動デ�
    - `nginx -s reload` でホットリロード
 
 **利点:**
-
 - 複数アプリの静的ファイル更新と Nginx 設定を原子的に処理
 - Nginx の再起動競合を排除
 
@@ -164,10 +154,10 @@ GitHub Actions が自動で `secrets.xxx` の値をこのファイルに反映�
 
 ```yaml
 services:
-  api:
-    environment:
-      - ALLOWED_DOMAIN=${ALLOWED_DOMAIN:-localhost}
-      - CORS_WHITELIST=${CORS_WHITELIST:-}
+    api:
+        environment:
+            - ALLOWED_DOMAIN=${ALLOWED_DOMAIN:-localhost}
+            - CORS_WHITELIST=${CORS_WHITELIST:-}
 ```
 
 ## トラブルシューティング

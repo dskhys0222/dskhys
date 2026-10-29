@@ -12,10 +12,10 @@ portfolio アプリにマネーフォワードから取得した評価額デー�
 
 ```typescript
 interface MFSyncConfig {
-  apiUrl: string; // APIサーバーのURL
-  encryptionKey: string; // 暗号化キー（64文字の16進数）
-  accessToken?: string; // JWTアクセストークン
-  refreshToken?: string; // リフレッシュトークン
+    apiUrl: string; // APIサーバーのURL
+    encryptionKey: string; // 暗号化キー（64文字の16進数）
+    accessToken?: string; // JWTアクセストークン
+    refreshToken?: string; // リフレッシュトークン
 }
 ```
 
@@ -46,16 +46,16 @@ interface MFSyncConfig {
 ```typescript
 // APIクライアント
 interface MFApiClient {
-  login(email: string, password: string): Promise<void>;
-  getEncryptedPortfolio(): Promise<EncryptedPortfolioData>;
-  refreshAccessToken(): Promise<void>;
+    login(email: string, password: string): Promise<void>;
+    getEncryptedPortfolio(): Promise<EncryptedPortfolioData>;
+    refreshAccessToken(): Promise<void>;
 }
 
 interface EncryptedPortfolioData {
-  iv: string; // Base64エンコードされたIV
-  encryptedData: string; // Base64エンコードされた暗号文
-  authTag: string; // Base64エンコードされた認証タグ
-  scrapedAt: string; // スクレイピング日時（ISO8601）
+    iv: string; // Base64エンコードされたIV
+    encryptedData: string; // Base64エンコードされた暗号文
+    authTag: string; // Base64エンコードされた認証タグ
+    scrapedAt: string; // スクレイピング日時（ISO8601）
 }
 ```
 
@@ -67,19 +67,19 @@ interface EncryptedPortfolioData {
 ```typescript
 // 復号化後のデータ
 interface MFPortfolioData {
-  stocks: MFStock[];
-  scrapedAt: string;
+    stocks: MFStock[];
+    scrapedAt: string;
 }
 
 interface MFStock {
-  id: string; // MFサーバー側のストック ID
-  name: string; // 銘柄名
-  units: number; // 保有数量
-  averageCost: number; // 平均取得単価
-  currentPrice: number; // 現在価格（基準価額）
-  value: number; // 評価額
-  profitLoss: number; // 損益
-  account: string; // 口座名（金融機関名）
+    id: string; // MFサーバー側のストック ID
+    name: string; // 銘柄名
+    units: number; // 保有数量
+    averageCost: number; // 平均取得単価
+    currentPrice: number; // 現在価格（基準価額）
+    value: number; // 評価額
+    profitLoss: number; // 損益
+    account: string; // 口座名（金融機関名）
 }
 ```
 
@@ -91,9 +91,9 @@ Stock オブジェクトに `source` フィールドを追加：
 
 ```typescript
 interface Stock {
-  id: string; // UUID
-  source: "manual" | "mf"; // manual: 手動入力, mf: マネーフォワード同期
-  // ... その他のフィールド
+    id: string; // UUID
+    source: 'manual' | 'mf'; // manual: 手動入力, mf: マネーフォワード同期
+    // ... その他のフィールド
 }
 ```
 
@@ -119,7 +119,6 @@ interface Stock {
 #### 3.3 マッピング規則
 
 MFStock の`id`を使用して、再同期時の重複登録を防止：
-
 - 初回同期：mfStock.id をそのまま使用して Stock 作成
 - 再同期：同じ mfStock.id を持つ Stock を更新
 
@@ -160,25 +159,29 @@ MFStock の`id`を使用して、再同期時の重複登録を防止：
 
 ```typescript
 interface MFDataStore {
-  // 状態
-  mfData: MFPortfolioData | null;
-  syncConfig: MFSyncConfig;
-  accessToken: string | null;
-  refreshToken: string | null;
-  encryptionKey: string;
-  isLoading: boolean;
-  isConfigured: boolean;
+    // 状態
+    mfData: MFPortfolioData | null;
+    syncConfig: MFSyncConfig;
+    accessToken: string | null;
+    refreshToken: string | null;
+    encryptionKey: string;
+    isLoading: boolean;
+    isConfigured: boolean;
 
-  // アクション
-  setEncryptionKey: (key: string) => void;
-  saveSyncConfig: (config: Partial<MFSyncConfig>) => void;
-  loadEncryptionKey: () => void;
-  loadSyncConfig: () => void;
-  loadTokens: () => void;
-  login: (apiUrl: string, email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  fetchAndDecrypt: () => Promise<MFPortfolioData | null>;
-  applySync: () => void; // ストアの銘柄にMFデータを反映
+    // アクション
+    setEncryptionKey: (key: string) => void;
+    saveSyncConfig: (config: Partial<MFSyncConfig>) => void;
+    loadEncryptionKey: () => void;
+    loadSyncConfig: () => void;
+    loadTokens: () => void;
+    login: (
+        apiUrl: string,
+        email: string,
+        password: string
+    ) => Promise<boolean>;
+    logout: () => void;
+    fetchAndDecrypt: () => Promise<MFPortfolioData | null>;
+    applySync: () => void; // ストアの銘柄にMFデータを反映
 }
 ```
 
@@ -186,13 +189,13 @@ interface MFDataStore {
 
 ```typescript
 interface StocksStore {
-  stocks: Stock[];
+    stocks: Stock[];
 
-  addStock: (stock: Omit<Stock, "id" | "createdAt" | "updatedAt">) => void;
-  updateStock: (id: string, stock: Partial<Stock>) => void;
-  deleteStock: (id: string) => void;
-  saveStocks: () => void;
-  loadStocks: () => void;
+    addStock: (stock: Omit<Stock, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    updateStock: (id: string, stock: Partial<Stock>) => void;
+    deleteStock: (id: string) => void;
+    saveStocks: () => void;
+    loadStocks: () => void;
 }
 ```
 

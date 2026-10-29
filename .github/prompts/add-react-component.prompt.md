@@ -1,4 +1,5 @@
 ---
+
 description: "Add a new React component to a client package (budget, portfolio, rss-reader, web). Generates the component file with Panda CSS styling and a Vitest unit test."
 argument-hint: "Component description (e.g., 'BudgetCard component in packages/client/budget showing amount and category')"
 agent: "agent"
@@ -7,7 +8,6 @@ agent: "agent"
 Add a new React component to the specified client package based on the description provided.
 
 Generate all of the following:
-
 1. **Component file** in `src/components/<ComponentName>.tsx`:
    - TypeScript props interface
    - Panda CSS styling via `css()` from `styled-system/css`

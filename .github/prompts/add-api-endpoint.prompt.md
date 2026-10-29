@@ -1,4 +1,5 @@
 ---
+
 description: "Add a new REST API endpoint to packages/server/api. Generates the Express route handler, Zod schema, repository function, and Supertest tests."
 argument-hint: "Endpoint description (e.g., 'POST /api/budgets - create a new budget entry')"
 agent: "agent"
@@ -7,7 +8,6 @@ agent: "agent"
 Add a new REST API endpoint to `packages/server/api` based on the description provided.
 
 Generate all of the following files/additions:
-
 1. **Zod schema** in `src/schemas/` — define request body and response shape
 2. **Repository function** in `src/repository/` — parameterized SQLite3 query returning `Result<T, E>` via neverthrow
 3. **Express route handler** in `src/routes/` — validate with `safeParse`, call repository, return JSON

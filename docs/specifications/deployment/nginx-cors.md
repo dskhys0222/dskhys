@@ -9,9 +9,7 @@
 ### 原因
 
 Nginx がリバースプロキシとして機能する際、以下の問題が発生することがあります：
-
 1. **CORS プリフライトリクエスト（OPTIONS）が処理されていない**
-
    - ブラウザは GET/POST 前に OPTIONS リクエストを送信
    - OPTIONS に対して正しいレスポンスがないとブロックされる
 
@@ -84,7 +82,6 @@ location / {
 ### ブラウザの DevTools で確認
 
 1. **Network タブで確認**
-
    - API リクエストの **Response Headers** で `Access-Control-*` が存在するか確認
    - OPTIONS プリフライトが 204 を返しているか確認
 

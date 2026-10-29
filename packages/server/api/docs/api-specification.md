@@ -21,9 +21,9 @@ POST /api/auth/register
 
 ```json
 {
-  "name": "テストユーザー",
-  "email": "user@example.com",
-  "password": "password123"
+    "name": "テストユーザー",
+    "email": "user@example.com",
+    "password": "password123"
 }
 ```
 
@@ -31,13 +31,13 @@ POST /api/auth/register
 
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": 1,
-    "name": "テストユーザー",
-    "email": "user@example.com"
-  }
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "name": "テストユーザー",
+        "email": "user@example.com"
+    }
 }
 ```
 
@@ -69,8 +69,8 @@ POST /api/auth/login
 
 ```json
 {
-  "email": "user@example.com",
-  "password": "password123"
+    "email": "user@example.com",
+    "password": "password123"
 }
 ```
 
@@ -78,13 +78,13 @@ POST /api/auth/login
 
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": 1,
-    "name": "テストユーザー",
-    "email": "user@example.com"
-  }
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "name": "テストユーザー",
+        "email": "user@example.com"
+    }
 }
 ```
 
@@ -116,7 +116,7 @@ Authorization: Bearer {accessToken}
 
 ```json
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
@@ -124,7 +124,7 @@ Authorization: Bearer {accessToken}
 
 ```json
 {
-  "message": "Logged out successfully"
+    "message": "Logged out successfully"
 }
 ```
 
@@ -138,7 +138,7 @@ POST /api/auth/refresh
 
 ```json
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
@@ -146,8 +146,8 @@ POST /api/auth/refresh
 
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
@@ -179,10 +179,10 @@ Authorization: Bearer {accessToken}
 
 ```json
 {
-  "id": 1,
-  "name": "テストユーザー",
-  "email": "user@example.com",
-  "created_at": "2025-10-23T12:00:00.000Z"
+    "id": 1,
+    "name": "テストユーザー",
+    "email": "user@example.com",
+    "created_at": "2025-10-23T12:00:00.000Z"
 }
 ```
 
@@ -198,8 +198,8 @@ GET /health
 
 ```json
 {
-  "status": "OK",
-  "timestamp": "2025-06-19T13:00:00.000Z"
+    "status": "OK",
+    "timestamp": "2025-06-19T13:00:00.000Z"
 }
 ```
 
@@ -213,9 +213,9 @@ GET /api/
 
 ```json
 {
-  "message": "API is running",
-  "version": "0.0.1",
-  "timestamp": "2025-06-19T13:00:00.000Z"
+    "message": "API is running",
+    "version": "0.0.1",
+    "timestamp": "2025-06-19T13:00:00.000Z"
 }
 ```
 
@@ -228,16 +228,15 @@ GET /api/users/:id
 ```
 
 **パラメータ:**
-
 - `id` (number): ユーザーID
 
 **レスポンス例:**
 
 ```json
 {
-  "id": 1,
-  "name": "User 1",
-  "email": "user1@example.com"
+    "id": 1,
+    "name": "User 1",
+    "email": "user1@example.com"
 }
 ```
 
@@ -269,8 +268,8 @@ POST /api/users
 
 ```json
 {
-  "name": "新しいユーザー",
-  "email": "newuser@example.com"
+    "name": "新しいユーザー",
+    "email": "newuser@example.com"
 }
 ```
 
@@ -278,10 +277,10 @@ POST /api/users
 
 ```json
 {
-  "id": 123,
-  "name": "新しいユーザー",
-  "email": "newuser@example.com",
-  "created_at": "2025-06-19T13:00:00.000Z"
+    "id": 123,
+    "name": "新しいユーザー",
+    "email": "newuser@example.com",
+    "created_at": "2025-06-19T13:00:00.000Z"
 }
 ```
 
@@ -305,23 +304,23 @@ POST /api/users
 
 ## 📊 HTTPステータスコード
 
-| コード | 意味 | 説明 |
-|--------|------|------|
-| 200 | OK | 正常にリクエストが処理された |
-| 201 | Created | 新しいリソースが作成された |
-| 400 | Bad Request | リクエストに問題がある（バリデーションエラーなど） |
-| 401 | Unauthorized | 認証が必要 |
-| 404 | Not Found | リソースが見つからない |
-| 500 | Internal Server Error | サーバー内部エラー |
+| コード | 意味                  | 説明                                               |
+| ------ | --------------------- | -------------------------------------------------- |
+| 200    | OK                    | 正常にリクエストが処理された                       |
+| 201    | Created               | 新しいリソースが作成された                         |
+| 400    | Bad Request           | リクエストに問題がある（バリデーションエラーなど） |
+| 401    | Unauthorized          | 認証が必要                                         |
+| 404    | Not Found             | リソースが見つからない                             |
+| 500    | Internal Server Error | サーバー内部エラー                                 |
 
 ## 🔧 バリデーションルール
 
 ### ユーザー
 
-| フィールド | 型 | 必須 | 制約 |
-|------------|----|----|------|
-| name | string | ✅ | 1文字以上、100文字以下 |
-| email | string | ✅ | 有効なメールアドレス形式 |
+| フィールド | 型     | 必須 | 制約                     |
+| ---------- | ------ | ---- | ------------------------ |
+| name       | string | ✅   | 1文字以上、100文字以下   |
+| email      | string | ✅   | 有効なメールアドレス形式 |
 
 ## 🚨 エラーレスポンス形式
 
@@ -329,10 +328,10 @@ POST /api/users
 
 ```json
 {
-  "error": {
-    "message": "エラーメッセージ",
-    "stack": "スタックトレース（開発環境のみ）"
-  }
+    "error": {
+        "message": "エラーメッセージ",
+        "stack": "スタックトレース（開発環境のみ）"
+    }
 }
 ```
 
@@ -361,33 +360,33 @@ curl -X POST http://localhost:3000/api/users \
 ```javascript
 // ユーザー取得
 const getUser = async (id) => {
-  const response = await fetch(`http://localhost:3000/api/users/${id}`)
-  
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error.message)
-  }
-  
-  return response.json()
-}
+    const response = await fetch(`http://localhost:3000/api/users/${id}`);
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error.message);
+    }
+
+    return response.json();
+};
 
 // ユーザー作成
 const createUser = async (userData) => {
-  const response = await fetch('http://localhost:3000/api/users', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userData)
-  })
-  
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error.message)
-  }
-  
-  return response.json()
-}
+    const response = await fetch('http://localhost:3000/api/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error.message);
+    }
+
+    return response.json();
+};
 ```
 
 ## 🔮 今後の実装予定

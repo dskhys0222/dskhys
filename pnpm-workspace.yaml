@@ -1,14 +1,14 @@
 packages:
-  - packages/server/api
-  - packages/client/web
-  - packages/client/budget
-  - packages/client/portfolio
-  - packages/client/mf-scraper
+    - packages/server/api
+    - packages/client/web
+    - packages/client/budget
+    - packages/client/portfolio
+    - packages/client/mf-scraper
 
 allowBuilds:
-  '@parcel/watcher': false
-  bcrypt: true
-  esbuild: true
-  sqlite3: true
+    "@parcel/watcher": false
+    bcrypt: true
+    esbuild: true
+    sqlite3: true
 
 minimumReleaseAge: 10080

@@ -14,29 +14,28 @@ APIサーバーのエラーハンドリングシステムについて説明し�
 
 ```typescript
 export const errorHandler = (
-  err: ApiError,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
+    err: ApiError,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
 ): void => {
-  const statusCode = err.statusCode || 500
-  const message = err.message || 'Internal Server Error'
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
 
-  console.error('Error:', err)
+    console.error('Error:', err);
 
-  res.status(statusCode).json({
-    error: {
-      message,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-    }
-  })
-}
+    res.status(statusCode).json({
+        error: {
+            message,
+            ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+        },
+    });
+};
 ```
 
 ### カスタムエラークラス
 
 `src/utils/errors.ts`で定義されている専用エラークラス：
-
 - **ValidationError** (400) - バリデーションエラー
 - **NotFoundError** (404) - リソースが見つからない
 - **UnauthorizedError** (401) - 認証エラー
@@ -47,12 +46,12 @@ export const errorHandler = (
 
 ```typescript
 export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
 ) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next)
-  }
-}
+    return (req: Request, res: Response, next: NextFunction) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+};
 ```
 
 ## 🎯 使用方法
@@ -60,25 +59,32 @@ export const asyncHandler = (
 ### 基本的な使用例
 
 ```typescript
-import { ValidationError, NotFoundError, asyncHandler } from '../utils/errors.js'
+import {
+    ValidationError,
+    NotFoundError,
+    asyncHandler,
+} from '../utils/errors.js';
 
 // ルート定義
-router.get('/:id', asyncHandler(async (req, res) => {
-  const { id } = req.params
-  
-  // バリデーションエラー
-  if (!id || Number.isNaN(Number(id))) {
-    throw new ValidationError('Invalid user ID')
-  }
-  
-  // NotFoundエラー
-  const user = await findUser(id)
-  if (!user) {
-    throw new NotFoundError('User')
-  }
-  
-  res.json(user)
-}))
+router.get(
+    '/:id',
+    asyncHandler(async (req, res) => {
+        const { id } = req.params;
+
+        // バリデーションエラー
+        if (!id || Number.isNaN(Number(id))) {
+            throw new ValidationError('Invalid user ID');
+        }
+
+        // NotFoundエラー
+        const user = await findUser(id);
+        if (!user) {
+            throw new NotFoundError('User');
+        }
+
+        res.json(user);
+    })
+);
 ```
 
 ### エラーレスポンス形式
@@ -87,21 +93,21 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 ```json
 {
-  "error": {
-    "message": "エラーメッセージ",
-    "stack": "スタックトレース（開発環境のみ）"
-  }
+    "error": {
+        "message": "エラーメッセージ",
+        "stack": "スタックトレース（開発環境のみ）"
+    }
 }
 ```
 
 ## 📊 エラーの種類とステータスコード
 
-| エラー種類 | ステータスコード | 説明 |
-|------------|------------------|------|
-| ValidationError | 400 | 入力値の検証エラー |
-| UnauthorizedError | 401 | 認証が必要 |
-| NotFoundError | 404 | リソースが見つからない |
-| Generic Error | 500 | サーバー内部エラー |
+| エラー種類        | ステータスコード | 説明                   |
+| ----------------- | ---------------- | ---------------------- |
+| ValidationError   | 400              | 入力値の検証エラー     |
+| UnauthorizedError | 401              | 認証が必要             |
+| NotFoundError     | 404              | リソースが見つからない |
+| Generic Error     | 500              | サーバー内部エラー     |
 
 ## 🔄 エラー処理の流れ
 
@@ -147,10 +153,10 @@ npm run test:run
 
 ```typescript
 // ❌ 悪い例
-throw new Error('User not found')
+throw new Error('User not found');
 
 // ✅ 良い例
-throw new NotFoundError('User')
+throw new NotFoundError('User');
 ```
 
 ### 2. asyncHandlerの使用
@@ -158,15 +164,18 @@ throw new NotFoundError('User')
 ```typescript
 // ❌ 悪い例（エラーがキャッチされない）
 router.get('/users', async (req, res) => {
-  const users = await getUsers()
-  res.json(users)
-})
+    const users = await getUsers();
+    res.json(users);
+});
 
 // ✅ 良い例
-router.get('/users', asyncHandler(async (req, res) => {
-  const users = await getUsers()
-  res.json(users)
-}))
+router.get(
+    '/users',
+    asyncHandler(async (req, res) => {
+        const users = await getUsers();
+        res.json(users);
+    })
+);
 ```
 
 ### 3. バリデーションの実装
@@ -174,21 +183,24 @@ router.get('/users', asyncHandler(async (req, res) => {
 ```typescript
 // Zodスキーマを使用したバリデーション
 const CreateUserSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email()
-})
+    name: z.string().min(1),
+    email: z.string().email(),
+});
 
-router.post('/users', asyncHandler(async (req, res) => {
-  try {
-    const userData = CreateUserSchema.parse(req.body)
-    // ユーザー作成処理...
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw new ValidationError(error.errors[0].message)
-    }
-    throw error
-  }
-}))
+router.post(
+    '/users',
+    asyncHandler(async (req, res) => {
+        try {
+            const userData = CreateUserSchema.parse(req.body);
+            // ユーザー作成処理...
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                throw new ValidationError(error.errors[0].message);
+            }
+            throw error;
+        }
+    })
+);
 ```
 
 ## 🚀 今後の拡張

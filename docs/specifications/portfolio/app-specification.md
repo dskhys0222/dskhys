@@ -7,7 +7,6 @@
 ### 必須依存関係
 
 **本番依存関係（dependencies）:**
-
 - `react`
 - `react-dom`
 - `@tanstack/react-router`
@@ -20,7 +19,6 @@
 - `@hookform/resolvers`（React Hook FormとZodの統合）
 
 **開発依存関係（devDependencies）:**
-
 - `typescript`
 - `vite`
 - `@vitejs/plugin-react`
@@ -85,19 +83,19 @@ type Attribute = '現金' | 'インデックス' | '増配' | 'ゴールド' | '
 type Account = '預金' | '特定' | 'NISA' | 'DC' | '暗号資産';
 
 interface Stock {
-  id: string; // UUID
-  name: string; // 銘柄名（必須）
-  ticker: string; // ティッカーシンボル（必須）
-  value: number; // 評価額（必須）
-  units?: number; // 口数（任意）
-  averageCost?: number; // 平均取得単価（任意）
-  assetClass: AssetClass; // クラス（必須）
-  region: Region; // 地域（必須）
-  attribute: Attribute; // 属性（必須）
-  account: Account; // 口座（必須）
-  note?: string; // 備考（任意）
-  createdAt: string; // 作成日時（ISO 8601）
-  updatedAt: string; // 更新日時（ISO 8601）
+    id: string; // UUID
+    name: string; // 銘柄名（必須）
+    ticker: string; // ティッカーシンボル（必須）
+    value: number; // 評価額（必須）
+    units?: number; // 口数（任意）
+    averageCost?: number; // 平均取得単価（任意）
+    assetClass: AssetClass; // クラス（必須）
+    region: Region; // 地域（必須）
+    attribute: Attribute; // 属性（必須）
+    account: Account; // 口座（必須）
+    note?: string; // 備考（任意）
+    createdAt: string; // 作成日時（ISO 8601）
+    updatedAt: string; // 更新日時（ISO 8601）
 }
 ```
 
@@ -105,7 +103,7 @@ interface Stock {
 
 ```typescript
 interface AppSettings {
-  version: string; // データフォーマットバージョン
+    version: string; // データフォーマットバージョン
 }
 ```
 
@@ -117,12 +115,12 @@ interface AppSettings {
 
 ```typescript
 interface StocksStore {
-  stocks: Stock[];
-  addStock: (stock: Omit<Stock, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateStock: (id: string, updates: Partial<Stock>) => void;
-  deleteStock: (id: string) => void;
-  loadStocks: () => void;
-  saveStocks: () => void;
+    stocks: Stock[];
+    addStock: (stock: Omit<Stock, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    updateStock: (id: string, updates: Partial<Stock>) => void;
+    deleteStock: (id: string) => void;
+    loadStocks: () => void;
+    saveStocks: () => void;
 }
 ```
 
@@ -130,9 +128,9 @@ interface StocksStore {
 
 ```typescript
 interface SettingsStore {
-  settings: AppSettings;
-  loadSettings: () => void;
-  saveSettings: () => void;
+    settings: AppSettings;
+    loadSettings: () => void;
+    saveSettings: () => void;
 }
 ```
 
@@ -164,7 +162,6 @@ interface SettingsStore {
 #### 1. ホーム画面（/）
 
 **コンポーネント:**
-
 - `DashboardSummary`: サマリー情報カード
   - 総評価額
 - `DonutChart`: ドーナツグラフコンポーネント
@@ -177,14 +174,12 @@ interface SettingsStore {
 #### 2. 銘柄一覧画面（/stocks）
 
 **コンポーネント:**
-
 - `StocksTable`: 銘柄一覧テーブル
   - ソート機能（ティッカー、評価額など）
   - フィルタ機能（クラス、地域、属性、口座など）
 - `AddStockButton`: 銘柄追加ボタン
 
 **表示項目:**
-
 - ティッカー
 - 銘柄名
 - 評価額
@@ -201,7 +196,6 @@ interface SettingsStore {
 #### 3. 銘柄追加/編集画面（/stocks/new, /stocks/:id/edit）
 
 **コンポーネント:**
-
 - `StockForm`: 銘柄入力フォーム
   - React Hook Form + Zod バリデーション
   - 全フィールド入力
@@ -209,23 +203,22 @@ interface SettingsStore {
 
 **入力フィールド:**
 
-| フィールド | 型 | 必須 | バリデーション |
-|-----------|-----|------|---------------|
-| 銘柄 | text | ○ | 1-100文字 |
-| ティッカー | text | ○ | 1-20文字 |
-| 評価額 | number | ○ | 0以上 |
-| 口数 | number | - | 0以上 |
-| 平均取得単価 | number | - | 0以上 |
-| クラス | select | ○ | 現金/株式/コモディティ |
-| 地域 | select | ○ | 日本/米国/全世界 |
-| 属性 | select | ○ | 現金/インデックス/増配/ゴールド/暗号通貨 |
-| 口座 | select | ○ | 預金/特定/NISA/DC/暗号資産 |
-| 備考 | textarea | - | 500文字以内 |
+| フィールド   | 型       | 必須 | バリデーション                           |
+| ------------ | -------- | ---- | ---------------------------------------- |
+| 銘柄         | text     | ○    | 1-100文字                                |
+| ティッカー   | text     | ○    | 1-20文字                                 |
+| 評価額       | number   | ○    | 0以上                                    |
+| 口数         | number   | -    | 0以上                                    |
+| 平均取得単価 | number   | -    | 0以上                                    |
+| クラス       | select   | ○    | 現金/株式/コモディティ                   |
+| 地域         | select   | ○    | 日本/米国/全世界                         |
+| 属性         | select   | ○    | 現金/インデックス/増配/ゴールド/暗号通貨 |
+| 口座         | select   | ○    | 預金/特定/NISA/DC/暗号資産               |
+| 備考         | textarea | -    | 500文字以内                              |
 
 #### 4. 設定画面（/settings）
 
 **コンポーネント:**
-
 - `DataManagement`: データ管理
   - エクスポートボタン
   - インポートボタン
@@ -236,7 +229,6 @@ interface SettingsStore {
 ### ドーナツグラフ（DonutChart）
 
 **共通設定:**
-
 - `<ResponsiveContainer>`: 親要素に応じてリサイズ
 - `<PieChart>`: 円グラフコンテナ
 - `<Pie>`: データ系列
@@ -251,7 +243,6 @@ interface SettingsStore {
 - `<Tooltip>`: ツールチップ（評価額と比率を表示）
 
 **表示グラフ:**
-
 1. クラス別アロケーション: 現金/株式/コモディティの配分
 2. 地域別アロケーション: 日本/米国/全世界の配分
 3. 属性別アロケーション: 現金/インデックス/増配/ゴールド/暗号通貨の配分
@@ -261,25 +252,25 @@ interface SettingsStore {
 
 ```typescript
 const COLORS = {
-  // クラス
-  '現金': '#F57C00',
-  '株式': '#2E7D32',
-  'コモディティ': '#FFD700',
-  // 地域
-  '日本': '#C62828',
-  '米国': '#1976D2',
-  '全世界': '#7B1FA2',
-  // 属性
-  'インデックス': '#2E7D32',
-  '増配': '#1976D2',
-  'ゴールド': '#FFD700',
-  '暗号通貨': '#F57C00',
-  // 口座
-  '預金': '#F57C00',
-  '特定': '#1976D2',
-  'NISA': '#2E7D32',
-  'DC': '#7B1FA2',
-  '暗号資産': '#C62828',
+    // クラス
+    現金: '#F57C00',
+    株式: '#2E7D32',
+    コモディティ: '#FFD700',
+    // 地域
+    日本: '#C62828',
+    米国: '#1976D2',
+    全世界: '#7B1FA2',
+    // 属性
+    インデックス: '#2E7D32',
+    増配: '#1976D2',
+    ゴールド: '#FFD700',
+    暗号通貨: '#F57C00',
+    // 口座
+    預金: '#F57C00',
+    特定: '#1976D2',
+    NISA: '#2E7D32',
+    DC: '#7B1FA2',
+    暗号資産: '#C62828',
 };
 ```
 
@@ -289,29 +280,31 @@ const COLORS = {
 
 ```typescript
 // 評価額の合計
-function calculateTotalValue(stocks: Stock[]): number
+function calculateTotalValue(stocks: Stock[]): number;
 
 // カテゴリ別評価額集計（ドーナツグラフ用）
-function aggregateByField<T extends 'assetClass' | 'region' | 'attribute' | 'account'>(
-  stocks: Stock[],
-  field: T
-): Array<{ name: string; value: number; percentage: number }>
+function aggregateByField<
+    T extends 'assetClass' | 'region' | 'attribute' | 'account',
+>(
+    stocks: Stock[],
+    field: T
+): Array<{ name: string; value: number; percentage: number }>;
 ```
 
 ### データ変換関数
 
 ```typescript
 // LocalStorageからの読み込み
-function loadFromLocalStorage<T>(key: string, defaultValue: T): T
+function loadFromLocalStorage<T>(key: string, defaultValue: T): T;
 
 // LocalStorageへの保存
-function saveToLocalStorage<T>(key: string, value: T): void
+function saveToLocalStorage<T>(key: string, value: T): void;
 
 // JSONエクスポート
-function exportToJSON(data: unknown): string
+function exportToJSON(data: unknown): string;
 
 // JSONインポート
-function importFromJSON<T>(json: string): T
+function importFromJSON<T>(json: string): T;
 ```
 
 ## エラーハンドリング

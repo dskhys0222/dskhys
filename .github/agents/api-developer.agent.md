@@ -1,4 +1,5 @@
 ---
+
 description: "Use when working on packages/server/api: adding endpoints, writing repository functions, modifying DB schema, updating auth logic, or writing Supertest tests. Expert in Express 5, SQLite3, Zod 4, JWT, bcrypt, and neverthrow."
 name: "API Developer"
 tools: [read, edit, search, execute, todo]

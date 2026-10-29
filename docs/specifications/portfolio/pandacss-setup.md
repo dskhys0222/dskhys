@@ -60,10 +60,10 @@
 import { css } from '../styled-system/css';
 
 const styles = {
-  container: css({
-    padding: '1rem',
-    backgroundColor: 'gray.50',
-  }),
+    container: css({
+        padding: '1rem',
+        backgroundColor: 'gray.50',
+    }),
 };
 ```
 
@@ -88,7 +88,7 @@ import { flex, grid } from '../styled-system/patterns';
 
 ```typescript
 const styles = css({
-  fontSize: { base: 'sm', md: 'md', lg: 'lg' },
-  padding: { base: '2', md: '4', lg: '6' },
+    fontSize: { base: 'sm', md: 'md', lg: 'lg' },
+    padding: { base: '2', md: '4', lg: '6' },
 });
 ```

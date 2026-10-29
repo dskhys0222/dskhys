@@ -3,7 +3,6 @@
 ## 概要
 
 Budgetアプリに、以下の4つのサブスク管理テーブルを追加する。
-
 1. **収入予算**（収入表）
 2. **支出予算**（支出表）
 3. **契約中のサブスク**（契約中サブスク表）
@@ -68,12 +67,12 @@ Budgetアプリに、以下の4つのサブスク管理テーブルを追加す�
 
 ```typescript
 interface BudgetItem {
-  id: string;
-  category: string;
-  name: string;
-  pricePerMonth: number;
-  pricePerYear: number;
-  remark?: string;
+    id: string;
+    category: string;
+    name: string;
+    pricePerMonth: number;
+    pricePerYear: number;
+    remark?: string;
 }
 ```
 
@@ -81,7 +80,7 @@ interface BudgetItem {
 
 ```typescript
 interface SubscriptionItem extends BudgetItem {
-  renewalMonth?: string;
+    renewalMonth?: string;
 }
 ```
 
