@@ -6,7 +6,7 @@
         "useIgnoreFile": true
     },
     "files": {
-        "includes": ["**", "!**/*.gen.*"],
+        "includes": ["**", "!**/*.gen.*", "!**/pnpm-lock.yaml"],
         "ignoreUnknown": false
     },
     "linter": {
