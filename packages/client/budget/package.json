@@ -17,12 +17,12 @@
         "@tanstack/router-plugin": "^1.168.48",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
-        "react-hook-form": "^7.90.0",
+        "react-hook-form": "^7.91.0",
         "zod": "^4.6.7",
         "zustand": "^5.0.16"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.7",
+        "@babel/core": "^8.0.9",
         "@pandacss/dev": "^2.4.0",
         "@pandacss/preset-base": "2.4.0",
         "@pandacss/preset-panda": "2.4.0",
