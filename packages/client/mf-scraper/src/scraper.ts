@@ -75,7 +75,9 @@ export const createContextWithSession = async (
  * ログイン状態を確認
  */
 export const checkLoginStatus = async (page: Page): Promise<boolean> => {
-    await page.goto(MF_PORTFOLIO_URL, { waitUntil: 'networkidle' });
+    // networkidle は広告や計測タグの通信で到達しないことがあるため使わない
+    // ログインページへのリダイレクトはHTTPレベルで行われるので DOM 構築完了で十分
+    await page.goto(MF_PORTFOLIO_URL, { waitUntil: 'domcontentloaded' });
 
     // ログインページにリダイレクトされていないか確認
     const url = page.url();
@@ -86,7 +88,10 @@ export const checkLoginStatus = async (page: Page): Promise<boolean> => {
  * ポートフォリオデータをスクレイピング
  */
 export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
-    await page.goto(MF_PORTFOLIO_URL, { waitUntil: 'networkidle' });
+    // checkLoginStatus で既に遷移済みなら再読み込みしない
+    if (!page.url().startsWith(MF_PORTFOLIO_URL)) {
+        await page.goto(MF_PORTFOLIO_URL, { waitUntil: 'domcontentloaded' });
+    }
 
     // ログインチェック
     const url = page.url();
@@ -97,8 +102,11 @@ export const scrapePortfolio = async (page: Page): Promise<PortfolioData> => {
         );
     }
 
-    // ポートフォリオテーブルを待機
-    await page.waitForSelector('table', { timeout: 3000 });
+    // 取得対象セクションのテーブルを待機
+    await page.waitForSelector(
+        '#portfolio_det_depo table, #portfolio_det_eq table, #portfolio_det_mf table',
+        { timeout: 15000 }
+    );
 
     // 数値のパース用ヘルパー
     const parseNumber = (text: string): number => {
