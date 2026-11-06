@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^6.0.2",
-        "@tanstack/react-devtools": "^0.10.13",
+        "@tanstack/react-devtools": "^0.10.14",
         "@tanstack/react-router": "^1.170.46",
         "@tanstack/react-router-devtools": "^1.167.2",
         "@tanstack/router-plugin": "^1.168.48",
@@ -22,12 +22,12 @@
         "zustand": "^5.0.16"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.9",
+        "@babel/core": "^8.0.10",
         "@pandacss/dev": "^2.4.0",
         "@pandacss/preset-base": "2.4.0",
         "@pandacss/preset-panda": "2.4.0",
-        "@rolldown/plugin-babel": "^0.2.4",
-        "@tanstack/devtools-vite": "^0.8.5",
+        "@rolldown/plugin-babel": "^0.3.0",
+        "@tanstack/devtools-vite": "^0.8.6",
         "@testing-library/dom": "^10.4.2",
         "@testing-library/react": "^16.3.3",
         "@types/node": "^26.6.6",

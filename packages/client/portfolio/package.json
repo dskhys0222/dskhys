@@ -23,12 +23,12 @@
         "zustand": "^5.0.16"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.9",
+        "@babel/core": "^8.0.10",
         "@pandacss/dev": "^2.4.0",
         "@pandacss/preset-base": "2.4.0",
         "@pandacss/preset-panda": "2.4.0",
-        "@rolldown/plugin-babel": "^0.2.4",
-        "@tanstack/devtools-vite": "^0.8.5",
+        "@rolldown/plugin-babel": "^0.3.0",
+        "@tanstack/devtools-vite": "^0.8.6",
         "@testing-library/dom": "^10.4.2",
         "@testing-library/react": "^16.3.3",
         "@types/node": "^26.6.6",
