@@ -151,6 +151,7 @@ npm version major
 ```
 
 このコマンド実行時：
+
 - `package.json` のバージョンが自動更新
 - `package-lock.json` が自動更新
 - Git タグが自動作成（例：v0.0.2）
@@ -175,6 +176,7 @@ git push origin --tags
 ### ワークフロー実行を確認
 
 GitHub リポジトリの Actions タブで実行状況を確認：
+
 - Publish to npm ワークフローが実行
 - ビルドとパブリッシュのログが表示
 

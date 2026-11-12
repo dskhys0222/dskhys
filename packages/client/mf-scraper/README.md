@@ -48,6 +48,7 @@ pnpm link --global
 ### 1. 設定ファイルを作成
 
 設定ファイルの場所：
+
 - **Linux/macOS**: `~/.config/mf-scraper/config.json`
 - **Windows**: `%USERPROFILE%\.config\mf-scraper\config.json`
 
@@ -75,6 +76,7 @@ mf-scraper login
 ```
 
 実行内容：
+
 1. ブラウザが開く
 2. メールアドレスとパスワードを入力
 3. 2FA コードを入力（有効な場合）
@@ -107,6 +109,7 @@ mf-scraper
 ```
 
 実行内容：
+
 1. 設定ファイルを読み込み
 2. API サーバーにログイン
 3. MoneyForward のログイン状態を確認
@@ -139,6 +142,7 @@ SyslogIdentifier=mf-scraper
 ```
 
 **注意:**
+
 - `YOUR_USERNAME` を自分のユーザー名に置き換え
 - npm グローバルインストール先を確認：`npm bin -g`
 
@@ -411,6 +415,7 @@ packages/client/mf-scraper/
 ```
 
 例:
+
 - `0.0.0+git.6d898ff`
 - `0.0.0+git.abc1234`
 
@@ -432,6 +437,7 @@ pnpm build
 ```
 
 実行内容:
+
 1. `scripts/generate-version.js` でコミットハッシュから version.ts を自動生成
 2. TypeScript を JavaScript にコンパイル（`dist/` に出力）
 
@@ -466,6 +472,7 @@ ISC
 ## サポート
 
 問題が発生した場合：
+
 1. [トラブルシューティング](#トラブルシューティング) を確認
 2. ログを確認：`journalctl --user -u mf-scraper.service`
 3. GitHub Issues で報告

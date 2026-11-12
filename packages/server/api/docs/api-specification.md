@@ -108,6 +108,7 @@ POST /api/auth/logout
 **認証**: 必要 (Bearer Token)
 
 **ヘッダー:**
+
 ```
 Authorization: Bearer {accessToken}
 ```
@@ -171,6 +172,7 @@ GET /api/auth/me
 **認証**: 必要 (Bearer Token)
 
 **ヘッダー:**
+
 ```
 Authorization: Bearer {accessToken}
 ```
@@ -228,6 +230,7 @@ GET /api/users/:id
 ```
 
 **パラメータ:**
+
 - `id` (number): ユーザーID
 
 **レスポンス例:**

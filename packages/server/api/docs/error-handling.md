@@ -36,6 +36,7 @@ export const errorHandler = (
 ### カスタムエラークラス
 
 `src/utils/errors.ts`で定義されている専用エラークラス：
+
 - **ValidationError** (400) - バリデーションエラー
 - **NotFoundError** (404) - リソースが見つからない
 - **UnauthorizedError** (401) - 認証エラー

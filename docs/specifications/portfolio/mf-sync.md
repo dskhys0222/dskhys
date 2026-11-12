@@ -119,6 +119,7 @@ interface Stock {
 #### 3.3 マッピング規則
 
 MFStock の`id`を使用して、再同期時の重複登録を防止：
+
 - 初回同期：mfStock.id をそのまま使用して Stock 作成
 - 再同期：同じ mfStock.id を持つ Stock を更新
 
