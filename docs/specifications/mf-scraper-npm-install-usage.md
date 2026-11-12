@@ -84,6 +84,7 @@ pnpm add -g @dskhys/mf-scraper
 ### 3.2 設定ファイルの準備
 
 設定ファイルの場所：
+
 - **Windows**: `%USERPROFILE%\.config\mf-scraper\config.json`
 - **macOS/Linux**: `~/.config/mf-scraper/config.json`
 
@@ -112,6 +113,7 @@ mf-scraper login
 ```
 
 **実行内容:**
+
 1. ブラウザが開く
 2. メールアドレスとパスワードを入力
 3. 2FA コードを入力
@@ -124,6 +126,7 @@ mf-scraper
 ```
 
 **初回実行時の挙動:**
+
 - Playwright が Chromium ブラウザをダウンロード（1-5 分）
 - ターミナルに進捗が表示されます
 - 以後はキャッシュから高速に実行

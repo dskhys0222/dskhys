@@ -38,6 +38,7 @@ npm login
 ```
 
 以下を入力：
+
 - Username: npm ユーザー名
 - Password: npm パスワード
 - Email: 登録したメールアドレス
@@ -66,6 +67,7 @@ npm whoami
 ### 2.2 Token スコープ確認
 
 生成された Token の権限：
+
 - ✅ read:packages
 - ✅ publish:packages
 
@@ -123,6 +125,7 @@ NPM_TOKEN  Updated just now
 ```
 
 確認項目：
+
 - ✅ name がスコープ付き（@dskhys/mf-scraper）
 - ✅ version が設定されている
 - ✅ main が dist/index.js を指している
@@ -188,6 +191,7 @@ npm version patch
 ```
 
 このコマンドで：
+
 - `package.json` のバージョンが更新される
 - `package-lock.json` が更新される
 - Git タグが作成される（例：v0.0.2）
@@ -312,6 +316,7 @@ git push origin main --tags
 ### パッケージが公開されない
 
 **ログを確認：**
+
 1. GitHub > Actions > Publish npm Packages
 2. 最新の実行をクリック
 3. Publish to npm ステップを確認
@@ -328,11 +333,13 @@ git push origin main --tags
 ### ワークフローが起動しない
 
 **手動実行で確認:**
+
 1. GitHub > Actions > Publish npm Packages
 2. Run workflow をクリック
 3. Run workflow をクリック
 
 手動実行で成功する場合：
+
 - paths フィルタが厳しい可能性
 - `.github/workflows/publish.yaml` の paths を確認
 

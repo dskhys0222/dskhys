@@ -13,6 +13,7 @@ Monitor task progress, make adjustments as needed, and ensure the final delivera
 ## Subagents
 
 You must call on only the following subagents to complete tasks:
+
 - `Planner`: Responsible for researching and planning development tasks, creating detailed plans, and coordinating with other agents to ensure smooth execution.
 - `Frontend Developer`: Responsible for implementing UI components, managing state, and ensuring responsive design.
 - `API Developer`: Handles backend logic, database interactions, and API endpoint creation.

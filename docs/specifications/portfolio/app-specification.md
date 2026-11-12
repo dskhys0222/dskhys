@@ -7,6 +7,7 @@
 ### 必須依存関係
 
 **本番依存関係（dependencies）:**
+
 - `react`
 - `react-dom`
 - `@tanstack/react-router`
@@ -19,6 +20,7 @@
 - `@hookform/resolvers`（React Hook FormとZodの統合）
 
 **開発依存関係（devDependencies）:**
+
 - `typescript`
 - `vite`
 - `@vitejs/plugin-react`
@@ -162,6 +164,7 @@ interface SettingsStore {
 #### 1. ホーム画面（/）
 
 **コンポーネント:**
+
 - `DashboardSummary`: サマリー情報カード
   - 総評価額
 - `DonutChart`: ドーナツグラフコンポーネント
@@ -174,12 +177,14 @@ interface SettingsStore {
 #### 2. 銘柄一覧画面（/stocks）
 
 **コンポーネント:**
+
 - `StocksTable`: 銘柄一覧テーブル
   - ソート機能（ティッカー、評価額など）
   - フィルタ機能（クラス、地域、属性、口座など）
 - `AddStockButton`: 銘柄追加ボタン
 
 **表示項目:**
+
 - ティッカー
 - 銘柄名
 - 評価額
@@ -196,6 +201,7 @@ interface SettingsStore {
 #### 3. 銘柄追加/編集画面（/stocks/new, /stocks/:id/edit）
 
 **コンポーネント:**
+
 - `StockForm`: 銘柄入力フォーム
   - React Hook Form + Zod バリデーション
   - 全フィールド入力
@@ -219,6 +225,7 @@ interface SettingsStore {
 #### 4. 設定画面（/settings）
 
 **コンポーネント:**
+
 - `DataManagement`: データ管理
   - エクスポートボタン
   - インポートボタン
@@ -229,6 +236,7 @@ interface SettingsStore {
 ### ドーナツグラフ（DonutChart）
 
 **共通設定:**
+
 - `<ResponsiveContainer>`: 親要素に応じてリサイズ
 - `<PieChart>`: 円グラフコンテナ
 - `<Pie>`: データ系列
@@ -243,6 +251,7 @@ interface SettingsStore {
 - `<Tooltip>`: ツールチップ（評価額と比率を表示）
 
 **表示グラフ:**
+
 1. クラス別アロケーション: 現金/株式/コモディティの配分
 2. 地域別アロケーション: 日本/米国/全世界の配分
 3. 属性別アロケーション: 現金/インデックス/増配/ゴールド/暗号通貨の配分

@@ -6,6 +6,7 @@ agent: "agent"
 ---
 
 Write comprehensive Vitest tests for the provided code.
+
 1. Identify the type of code being tested:
    - **Express route** → use Supertest patterns
    - **React component** → use Testing Library patterns

@@ -14,6 +14,7 @@
 ```
 
 例:
+
 - `0.0.0+git.6d898ff`
 - `0.0.0+git.a1b2c3d`
 
@@ -86,6 +87,7 @@ try {
 ```
 
 **主な機能:**
+
 - `git rev-parse --short HEAD` でコミットハッシュを取得
 - `src/version.ts` に VERSION、GIT_HASH、BUILD_DATE を書き込み
 - Git リポジトリでない場合（npm tar ball など）のフォールバック処理
@@ -127,6 +129,7 @@ pnpm build
 ```
 
 実行内容:
+
 1. **prebuild**: `scripts/generate-version.js` 実行
    - コミットハッシュ取得
    - `src/version.ts` 生成
@@ -174,6 +177,7 @@ npm info @dskhys/mf-scraper
 npm に publish されたパッケージは `0.0.0+git.{hash}` というバージョンで公開されます。
 
 例:
+
 - `@dskhys/mf-scraper@0.0.0+git.6d898ff`
 
 ### タグ・リリースノートでのバージョン管理

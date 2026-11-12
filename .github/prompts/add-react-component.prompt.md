@@ -8,6 +8,7 @@ agent: "agent"
 Add a new React component to the specified client package based on the description provided.
 
 Generate all of the following:
+
 1. **Component file** in `src/components/<ComponentName>.tsx`:
    - TypeScript props interface
    - Panda CSS styling via `css()` from `styled-system/css`
@@ -18,6 +19,7 @@ Generate all of the following:
    - Query by accessible role where possible
 
 Follow conventions in [client.instructions.md](../instructions/client.instructions.md):
+
 - Use `css()` from `styled-system/css` for all styling
 - 4-space indent, single quotes (Biome enforced)
 - If the component needs form input, integrate React Hook Form + Zod
