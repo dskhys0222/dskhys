@@ -11,19 +11,19 @@
         "test:watch": "vitest"
     },
     "dependencies": {
-        "@hookform/resolvers": "^7.0.5",
+        "@hookform/resolvers": "^7.0.6",
         "@tanstack/react-router": "^1.170.46",
         "@tanstack/react-router-devtools": "^1.167.3",
         "@tanstack/router-plugin": "^1.169.0",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
-        "react-hook-form": "^7.91.0",
+        "react-hook-form": "^7.92.0",
         "recharts": "^3.10.1",
         "zod": "^4.6.7",
         "zustand": "^5.1.0"
     },
     "devDependencies": {
-        "@babel/core": "^8.1.0",
+        "@babel/core": "^8.1.2",
         "@pandacss/dev": "^2.5.0",
         "@pandacss/preset-base": "2.5.0",
         "@pandacss/preset-panda": "2.5.0",
@@ -39,7 +39,7 @@
         "babel-plugin-react-compiler": "^1.0.0",
         "jsdom": "^31.0.0",
         "typescript": "^7.0.2",
-        "vite": "^8.3.7",
+        "vite": "^8.3.8",
         "vite-plugin-pwa": "^2.0.0",
         "vitest": "^5.1.0"
     }
