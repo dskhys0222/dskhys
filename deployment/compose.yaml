@@ -40,7 +40,7 @@ services:
             - dskhys-network
 
     certbot:
-        image: certbot/certbot:latest
+        image: certbot/certbot:v5.10.0
         container_name: dskhys-certbot
         volumes:
             - certbot-certs:/etc/letsencrypt
