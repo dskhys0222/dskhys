@@ -24,7 +24,7 @@ services:
             - dskhys-network
 
     nginx:
-        image: nginx:alpine
+        image: nginx:1.31.9-alpine
         container_name: dskhys-nginx
         restart: unless-stopped
         ports:
@@ -40,7 +40,7 @@ services:
             - dskhys-network
 
     certbot:
-        image: certbot/certbot:latest
+        image: certbot/certbot:v5.10.0
         container_name: dskhys-certbot
         volumes:
             - certbot-certs:/etc/letsencrypt

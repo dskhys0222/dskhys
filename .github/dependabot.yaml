@@ -38,6 +38,22 @@ updates:
               patterns:
                   - "*"
 
+    - package-ecosystem: "docker-compose"
+      directory: "/deployment"
+      schedule:
+          interval: "daily"
+          time: "09:00"
+          timezone: "Asia/Tokyo"
+      open-pull-requests-limit: 5
+      assignees:
+          - "dskhys0222"
+      cooldown:
+          default-days: 7
+      groups:
+          docker-compose:
+              patterns:
+                  - "*"
+
     - package-ecosystem: "github-actions"
       directory: "/"
       schedule:
